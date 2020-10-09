@@ -1,0 +1,275 @@
+@import './root.scss';
+@import './utils.scss';
+
+//content common 
+
+.imengyu-content-box {
+  position: relative;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  width: 50%;
+
+  &.full {
+    width: 65%;
+
+    .imengyu-right-catalog {
+      right: 15%;
+    }
+  }
+}
+.imengyu-content-title {
+  position: relative;
+  display: block;
+  padding: 60px $page-padding-lg 20px $page-padding-lg;
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+  color: #000;
+  font-family: 'Engineer';
+
+  &.left {
+    text-align: left;
+    padding: 0;
+    padding-bottom: 40px;
+  }
+  &.right {
+    text-align: right;
+    padding: 0;
+    padding-bottom: 40px;
+  }
+
+  span {
+    display: block;
+    font-size: 11px;
+    color: #707070;
+    letter-spacing: 5px;
+  }
+
+}
+.imengyu-content-sub-title {
+  position: relative;
+  display: block;
+  padding: 24px 16px;
+  font-size: 36px;
+  font-weight: bold;
+  text-align: center;
+  color: #000;
+  font-family: 'Engineer';
+
+  @include text-underline-center(20px, 10px);
+
+  span {
+    display: block;
+    font-size: 11px;
+    color: #707070;
+    letter-spacing: 5px;
+  }
+
+  &:hover::after {
+    width: 40px;
+    margin-left: -20px;
+  }
+
+}
+.imengyu-content-box-innern {
+  position: relative;
+  padding: $page-padding-lg $page-padding-lg*2;
+  font-size: 17px;
+  color: #000;
+  text-align: left;
+}
+.imengyu-content-box-left-right {
+ 
+  font-size: 17px;
+  color: #000;
+  text-align: left;
+
+  > .left {
+    display: inline-block;
+    padding: $page-padding-md $page-padding-lg;
+    vertical-align: middle;
+  }
+  > .right {
+    display: inline-block;
+    padding: $page-padding-md $page-padding-lg;
+    vertical-align: middle;
+  }
+
+}
+.imengyu-content-line {
+  margin: 10px $page-padding-lg;
+  height: 1px;
+  background-color: #ececec;
+}
+
+//small widgets
+
+.imengyu-content-innern-subtitle {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+  padding: 20px 0;
+}
+//tip
+
+.imengyu-float-tip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 2px solid #000;
+  padding: 10px;
+  z-index: 101;
+}
+
+//alert
+
+.imengyu-alert-box {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.6);
+  
+  z-index: 202;
+
+  .box {
+    background-color: #fff;
+    border: 2px solid #000;
+  }
+}
+
+@media only screen and (max-width: 1280px) {
+  .imengyu-content-box {
+    width: 66%;
+  
+    .imengyu-right-catalog {
+      display: none;
+    }
+    &.full {
+      width: 70%;
+    }
+  }
+}
+
+@media only screen and (max-width: 1020px) {
+
+  .imengyu-content-title {
+    padding: 00px $page-padding-md 5px $page-padding-md;
+    font-size: 50px;
+  
+    &.left {
+      padding-bottom: 30px;
+    }
+    &.right {
+      padding-bottom: 30px;
+    }
+  }
+  .imengyu-content-sub-title {
+    padding: 20px 15px;
+    font-size: 36px;
+  
+    span {
+      font-size: 11px;
+    }
+  
+    &:hover::after {
+      width: 40px;
+      margin-left: -20px;
+    }
+  
+  }
+  .imengyu-content-box-innern {
+    padding: $page-padding-md/2 $page-padding-md;
+    font-size: 17px;
+  }
+  .imengyu-content-box-left-right {
+   
+    font-size: 17px;
+  
+    > .left {
+      padding: $page-padding-md/2 $page-padding-md;
+    }
+    > .right {
+      padding: $page-padding-md/2 $page-padding-md;
+    }
+  
+  }
+  .imengyu-content-line {
+    margin: 10px $page-padding-md;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .imengyu-content-box {
+    width: 88%;
+  
+    &.full {
+      width: 90%;
+    }
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .imengyu-content-box {
+    width: 100%;
+  
+    &.full {
+      width: 100%;
+    }
+  }
+  .imengyu-content-title {
+    padding: 00px $page-padding-sm 5px $page-padding-sm;
+    font-size: 50px;
+  
+    &.left {
+      padding-bottom: 20px;
+    }
+    &.right {
+      padding-bottom: 20px;
+    }
+  
+    span {
+      font-size: 11px;
+    }
+  
+  }
+  .imengyu-content-sub-title {
+    padding: 16px 14px;
+    font-size: 30px;
+  
+    span {
+      font-size: 11px;
+    }
+  
+    &:hover::after {
+      width: 40px;
+      margin-left: -20px;
+    }
+  
+  }
+  .imengyu-content-box-innern {
+    padding: $page-padding-sm/2 $page-padding-sm;
+    font-size: 17px;
+  }
+  .imengyu-content-box-left-right {
+   
+    font-size: 17px;
+  
+    > .left {
+      padding: $page-padding-sm/2 $page-padding-sm;
+    }
+    > .right {
+      padding: $page-padding-sm/2 $page-padding-sm;
+    }
+  
+  }
+  .imengyu-content-line {
+    margin: 10px $page-padding-sm;
+  }
+
+}

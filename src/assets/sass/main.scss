@@ -1,0 +1,272 @@
+@import './fonts.scss';
+@import './header.scss';
+@import './scroll.scss';
+@import './content.scss';
+@import './root.scss';
+@import './about.scss';
+@import './works.scss';
+@import './game.scss';
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.imengyu,.imengyu-main {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  font-size: 13px;
+}
+.imengyu-main,.imengyu-dark {
+  background-color: #f3f3f3;
+}
+.imengyu-canvas {
+  background-color: #e7e7e7;
+}
+.imengyu-main-host {
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: $page-bottom;
+  top: $page-top;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+
+  overflow-y: scroll;
+  overflow-x: hidden;
+
+  @include pc-fix-scrollbar-white();
+}
+
+//go button
+
+.imengyu-go-button {
+  display: inline-block;
+  position: relative;
+  padding: 3px 6px;
+  color: #464646;
+  transition: all ease-in-out 0.2s;
+  margin-top: 20px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  color: #fff;
+  background-color: #000;
+  font-weight: bold;
+  font-family: 'Engineer';
+
+  i {
+    font-size: 14px;
+  }
+
+  &:hover {
+    background-color: #353535;
+  }
+    
+}
+.imengyu-icon-button {
+  display: inline-block;
+  position: relative;
+  padding: 3px 6px;
+  color: #000;
+  transition: all ease-in-out 0.2s;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Engineer';
+  font-size: 22px;
+  outline: none;
+
+  &:hover, &:focus {
+    color: #555;
+  }
+}
+
+//intro
+
+.imengyu-intro {
+
+  font-family: 'Engineer';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: $page-bottom;
+  top:20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  z-index: 0;
+  flex-direction: column;
+
+  h1 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 90px;
+  }
+}
+.imengyu-intro-box {
+  padding: $page-padding-lg;
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.55);
+
+  > i {
+    display: block;
+    color: #000;
+    font-size: 27px;
+  }
+  .tip {
+    margin-top: 14px;
+    font-style: normal;
+    display: block;
+    color: #979797;
+    font-size: 12px;
+  }
+}
+
+//404
+
+.imengyu-404 {
+  font-family: 'Engineer';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: $page-bottom;
+  top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  z-index: 0;
+  flex-direction: column;
+}
+.imengyu-404-box {
+  padding: $page-padding-lg;
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.55);
+
+  > span {
+    display: block;
+    color: #636363;
+    font-size: 16px;
+  }
+  img {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+a {
+  color: #111;
+  transition: all ease-in-out 0.2s;
+
+  &:hover, &:active {
+    color: #7e7e7e;
+  }
+}
+
+//copyright
+
+.imengyu-copyright {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 0 0 20px 0;
+
+  a {
+    text-decoration: none;
+    text-shadow: 0px 1px 10px #fff;
+  }
+}
+
+
+@media only screen and (max-width: 800px) {
+
+  .imengyu-intro {
+    bottom: $page-bottom-sm;
+    top: $page-top-sm;
+  
+    h1 {
+      font-size: 70px;
+    }
+  }
+  .imengyu-intro-box {
+    padding: $page-padding-sm;
+  
+    > i {
+      font-size: 20px;
+    }
+    .tip {
+      margin-top: 10px;
+      font-size: 11px;
+    }
+  }
+  .imengyu-404 {
+    bottom: $page-bottom-sm;
+    top: $page-top-sm;
+  }
+  .imengyu-404-box {
+    padding: $page-padding-sm;
+
+  }
+  .imengyu-main-host {
+    bottom: $page-bottom-md;
+    top: $page-top-md;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .imengyu-copyright {
+    padding: 0 0 10px 0;
+  }
+  .imengyu-go-button {
+    margin-top: 16px;
+  }
+  .imengyu-intro {
+    bottom: $page-bottom-md;
+    top: $page-top-md;
+  
+    h1 {
+      font-size: 50px;
+    }
+  }
+  .imengyu-intro-box {
+    padding: $page-padding-md;
+  
+    > i {
+      font-size: 16px;
+    }
+    .tip {
+      margin-top: 10px;
+      font-size: 11px;
+    }
+  }
+  .imengyu-404 {
+    bottom: $page-bottom-md;
+    top: $page-top-md;
+  }
+  .imengyu-404-box {
+    padding: $page-padding-md;
+  }
+  .imengyu-main-host {
+    bottom: $page-bottom-sm;
+    top: $page-top-sm;
+  }
+}
+
+
+.imengyu-canvas {
+  width: 100%;
+  height: 100%;
+}

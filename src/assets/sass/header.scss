@@ -1,0 +1,128 @@
+.imengyu-header {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  font-family: 'Engineer';
+  z-index: 100;
+  font-size: 16px;
+}
+.imengyu-header-left {
+  display: inline-block;
+  position: absolute;
+  margin: 0;
+  left: 60px;
+  top: 30px;
+  background-image: url('../images/logo-black.svg');
+  background-repeat: no-repeat;
+  background-size: 80px;
+  background-position: center;
+  width: 80px;
+  height: 40px;
+}
+.imengyu-header-menu {
+  display: inline-block;
+  position: absolute;
+  top: 10px;
+  right: 66px;
+  width: auto;
+  height: 40px;
+
+  ul {
+    display: inline-block;
+    list-style: none;
+    padding: 0;
+
+    li {
+      display: inline-block;
+      width: 60px;
+      height: 40px;
+      text-align: center;
+      line-height: 40px;
+      font-weight: bold;
+      padding: 0 20px;
+
+      a {
+        display: inline-block;
+        position: relative;
+        text-decoration: none;
+        color: #000;
+
+        &::after {
+          display: inline-block;
+          content: '';
+          background-color: #000;
+          width: 0;
+          height: 2px;
+          position: absolute;
+          bottom: 3px;
+          left: 50%;
+          margin-left: 0;
+          transition: all ease-in-out 0.3s;
+        }
+        &:hover {
+          color: #575757;
+        }
+        &.router-link-exact-active {
+          &:hover {
+            color: #000;
+          }
+          &::after {
+            width: 40px;
+            margin-left: -20px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 1000px) {
+  .imengyu-header-left {
+    top: 30px;
+  }
+  .imengyu-header-menu {
+    top: 10px;
+  }
+}
+@media only screen and (max-width: 500px) {
+  .imengyu-header-left {
+    left: 40px;
+    background-size: 60px;
+    width: 60px;
+    top: 18px;
+  }
+  .imengyu-header-menu {
+    top: 0px;
+    right: 26px;
+    height: 40px;
+  
+    ul {
+  
+      li {
+        width: 40px;
+        line-height: 40px;
+        padding: 0 20px;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 350px) {
+  .imengyu-header-left {
+    left: 30px;
+    background-size: 50px;
+    width: 50px;
+  }
+  .imengyu-header-menu {
+  
+    ul {
+  
+      li {
+        width: 30px;
+        padding: 0 15px;
+      }
+    }
+  }
+}
