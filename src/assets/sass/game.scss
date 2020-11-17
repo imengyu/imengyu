@@ -1,4 +1,5 @@
 @import './root.scss';
+@import './scroll.scss';
 
 .imengyu-game-contol {
 
@@ -133,6 +134,9 @@
     line-height: 12px;
     white-space: normal;
     padding-top: 4px;
+    overflow: scroll;
+
+    @include pc-fix-scrollbar-white();
   }
 
   .info {
