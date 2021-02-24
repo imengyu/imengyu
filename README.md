@@ -7,7 +7,7 @@ Hello 你好
 * 🌈 想与同样爱好的大佬们交朋友
 * 🔝 欢迎访问我的[煮页](https://imengyu.top)
 * ✅ 会用 C/C++/C#/Java/JavaScript/Vue/React
-* 🆙 经常整一些 前端/Android App/Electron/Unity/Unreal
+* 🆙 经常整一些 前端的东东/Android App/Electron 小应用/Unity或Unreal的小游戏
 * 📚 正在努力学习更多知识
 
 ---
