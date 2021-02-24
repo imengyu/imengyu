@@ -6,7 +6,7 @@ Hello 你好
 * 🎁 喜欢程序开发，喜欢做一些有趣的小玩意小应用
 * 🌈 想与同样爱好的大佬们交朋友
 * 🔝 欢迎访问我的[煮页](https://imengyu.top)
-* ✅ 会用 C/C++/Java/JavaScript/C#/Vue/React
+* ✅ 会用 C/C++/C#/Java/JavaScript/Vue/React
 * 🆙 经常整一些 前端/Android App/Electron/Unity/Unreal
 * 📚 正在努力学习更多知识
 
