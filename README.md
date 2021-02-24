@@ -28,5 +28,6 @@ Stats 一些状态
 Contract me 我
 ---
 
-* Home page: [imengyu.to](https://imengyu.top)
+* Home page: [https://imengyu.top](https://imengyu.top)
 * Mail: 1501076885@qq.com
+* WeChart: imyzc_dream_or_chase
