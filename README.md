@@ -31,4 +31,4 @@ Contract me 我
 
 * Home page: [https://imengyu.top](https://imengyu.top)
 * Mail: 1501076885@qq.com
-* WeChart: imyzc_dream_or_chase
+* WeChart: brave_imengyu
