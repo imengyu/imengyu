@@ -1,8 +1,8 @@
-import { CanvasGameProvider } from './CanvasGameProvider'
-import Utils from '../utils/Utils'
+import { CanvasGameProvider } from '../CanvasGameProvider'
+import Utils from '../../utils/Utils'
 
-const DATA_LIGHT_TICK = 10;
-const DATA_SLEET_TICK = 250;
+const DATA_LIGHT_TICK = 5;
+const DATA_SLEET_TICK = 150;
 export const SortMethodNames = [
   'bobble','insertion','selection','quick','shell','merge','heap','radix','bucket'
 ];
@@ -11,8 +11,6 @@ export type SortMethods = 'bobble'|'insertion'|'selection'|'quick'|'shell'|'merg
 
 const spectrum_width = 128;
 const spectrum_line = 512;
-
-export type DrawSpectrumCallback = () => void;
 
 export class CanvasSortGame extends CanvasGameProvider {
 
@@ -36,9 +34,6 @@ export class CanvasSortGame extends CanvasGameProvider {
       this.currentSortMethod = 'spectrum';
     }
     else this.goGenData();
-  }
-  public setDrawSpectrumCallback(drawSpectrumCallback : DrawSpectrumCallback) {
-    this.drawSpectrumCallback = drawSpectrumCallback;
   }
   public drawSpectrum(analyser : AnalyserNode, voiceHeight : Uint8Array) {
     analyser.getByteFrequencyData(voiceHeight);
@@ -91,8 +86,6 @@ export class CanvasSortGame extends CanvasGameProvider {
     this.sortStepRest();
   }
 
-  private drawSpectrumCallback : DrawSpectrumCallback = null;
-
   private dataArrgenDataBuffer : Array<number> = [];
   private dataPool : Array<number> = [];
 
@@ -107,8 +100,8 @@ export class CanvasSortGame extends CanvasGameProvider {
 
   private currentForceUseSortMethod = false;
 
-  public init(ctx : CanvasRenderingContext2D) {
-    super.init(ctx);
+  public init(canvas : HTMLCanvasElement, ctx : CanvasRenderingContext2D) {
+    super.init(canvas, ctx);
   }
   public destroy() {
     super.destroy();

@@ -132,33 +132,41 @@
   position: absolute;
   top: 50%;
   cursor: pointer;
-  width: 40px;
-  height: 40px;
-  font-size: 50px;
+  width: 60px;
+  height: 60px;
+  font-size: 40px;
   margin-top: -20px;
   z-index: 100;
   transition: all ease-in-out 0.2s;
+  background-color: rgba(255, 255, 255, 0.356);
 
   i {
-    background-color: rgba(255, 255, 255, 0.356);
+    display: inline-block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    
   }
 
   &.left {
     left: -70px;
+    i {
+      transform: translateX(-50%) translateY(-50%);
+    }
   }
   &.right {
     right: -70px;
 
     i {
       display: inline-block;
-      transform: rotate(180deg);
+      transform: translateX(-50%) translateY(-50%) rotate(180deg);
     }
   } 
 
   &:disabled,&[disabled] {
     cursor: default;
     transform: none!important;
-    color: #999;
+    opacity: 0.5;
   }
   &:hover {
     transform: scale(1.2);

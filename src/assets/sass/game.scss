@@ -4,17 +4,56 @@
 .imengyu-game-contol {
 
   position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-direction: column;
   bottom: 40px;
-  left: 30px;
-  padding: 4px 16px;
+  left: 0;
   z-index: 300;
 
   .open-button {
+    z-index: 0;
+    position: absolute;
+    bottom: 0;
+    width: 50px;
+    height: 50px;
     background-color: rgba(#fff, 0.7);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.03);
+
+    &[data-open="true"] {
+      i {
+        display: inline-block;
+        transition: transform ease-in-out 0.3s;
+        transform: rotate(180deg);
+      } 
+      transform: translateX(266px);
+    }
+  }
+
+  .box {
+    z-index: 2;
+    padding: 14px 10px 14px 16px;
+    width: 240px; 
+    background-color: rgba(#fff, 0.7);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.03);
+
+    .item {
+      position: relative;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin: 4px 0;
+
+
+      > div {
+        display: inline-block;
+        max-width: 66%;
+      }
+      &.full > div {
+        max-width: 100%;
+      }
+      > span {
+        display: inline-block;
+        width: 34%;
+      }
+    }
   }
 
   &.right {
@@ -42,17 +81,6 @@
     }
   }
 
-  > div {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    white-space: nowrap;
-
-    &.imengyu-icon-sort-text {
-      display: inline-block;
-    }
-  }
   input[type="range"] {
     display: inline-block;
     vertical-align: middle;
@@ -113,6 +141,13 @@
   justify-content: center;
   align-items: center;
 }
+.imengyu-icon-sort-info {
+  font-size: 12px;
+  font-family: 'Engineer';
+  line-height: 15px;
+  padding: 6px 10px;
+  color: #000;
+}
 .imengyu-icon-sort-text {
   position: relative;
   background-color: #fff;
@@ -137,18 +172,6 @@
     overflow: scroll;
 
     @include pc-fix-scrollbar-white();
-  }
-
-  .info {
-    display: inline-block;
-    position: absolute;
-    left: 0;
-    bottom: 100%;
-    z-index: 1;
-    font-size: 12px;
-    background-color: rgba(#fff, 0.5);
-    line-height: 15px;
-    padding: 6px 10px;
   }
   .inn {
     display: inline-block;
@@ -185,7 +208,6 @@
 @media only screen and (max-width: 1000px) {
   .imengyu-game-contol {
     bottom: $page-bottom-md;
-    left: 20px;
   }  
 }
 
@@ -195,20 +217,11 @@
     left: 0px;
     padding: 0;    
     z-index: 300;
-    
-    &.open {
-      width: 100%;
-      padding: 10px 16px;
-      padding-left: 0;
-      background-color: rgba(255, 255, 255, 0.9);
-      border: 2px solid #000;
-      border-left: none;
 
-      .imengyu-icon-sort-text .info {
-        background-color: rgba(255, 255, 255, 0.9);
-      }
+    .open-button {
+      width: 32px;
+      height: 32px;
     }
-
   }  
   .imengyu-music-control {
     padding: 3px 0;

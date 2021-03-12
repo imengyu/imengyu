@@ -1,6 +1,7 @@
 const path = require('path');
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = {
   entry: { 
@@ -8,13 +9,8 @@ module.exports = {
   },
   output: {
     filename: process.env.NODE_ENV === 'production' 
-      ? 'static/[name].js' 
-      : 'static/[name].js',
-    /*
-      filename: process.env.NODE_ENV === 'production' 
-      ? 'static/[chunkhash].js' 
+      ? 'static/[hash].js'
       : 'static/[name]-[hash].js',
-      */
     publicPath: process.env.NODE_ENV === 'production'
       ? config.build.assetsPublicPath
       : config.dev.assetsPublicPath,
@@ -53,6 +49,7 @@ module.exports = {
       {
         test: /\.css$/, use: [
           { loader: "style-loader" },
+          { loader: MiniCssExtractPlugin.loader },
           { loader: 'css-loader' },
         ]
       },
@@ -81,6 +78,7 @@ module.exports = {
       {
         test: /\.(scss|sass)$/, use: [
           { loader: "style-loader" },
+          { loader: MiniCssExtractPlugin.loader },
           { loader: 'css-loader' },
           { loader: 'sass-loader' },
         ]

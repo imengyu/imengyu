@@ -12,7 +12,12 @@
   "author": "梦欤",
   "license": "MIT",
   "dependencies": {
+    "@types/dat.gui": "^0.7.6",
+    "@types/three": "^0.126.0",
     "animate.css": "^3.7.2",
+    "dat.gui": "^0.7.7",
+    "three": "^0.126.1",
+    "three-orbitcontrols": "^2.110.3",
     "typed.js": "^2.0.11",
     "vue": "^2.6.11",
     "vue-property-decorator": "^8.4.0",

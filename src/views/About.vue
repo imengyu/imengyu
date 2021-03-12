@@ -7,15 +7,15 @@
       </div>
       <div class="imengyu-content-box-innern imengyu-about-host" id="about-me">
 
-        <div class="imengyu-content-title left">
+        <div class="imengyu-content-title text-black left">
           ABOUT ME
           <span>关于我</span>
         </div>
         <div class="imengyu-about-content-left">
-          我叫梦欤<i style="color:#888;font-size:13px" title="真名不知道">（不是真名）</i><br>
+          我是 imemgyu<br>
           学生，大三，在浙江杭州<br>
           普通的大学生，程序猿<br>
-
+          正在努力学习工作<br>
 
           <div class="imengyu-about-subtitle">正在学习 <i class="iconfont icon-jiantou_xiangyouliangci_o"></i> </div>
           <div class="imengyu-about-small">
@@ -25,7 +25,7 @@
           </div>
         </div>
 
-        <img class="imengyu-about-big-image" src="../assets/images/about-photo.png" />
+        <img class="imengyu-about-big-image" width="200" src="../assets/images/about-photo.jpg" />
       
       </div>
       
@@ -37,17 +37,16 @@
           <span>我擅长的</span>
         </div>
 
-        <div class="imengyu-icon-list">
-
-          <div class="link-item">
-            <i class="iconfont icon-yingyongAPP_o"></i>
-            <span class="title">Web develop</span>
-            <span class="subtitle">PHP 应用开发<br>Java Web 开发</span>
-          </div>
+        <div class="imengyu-icon-list">         
           <div class="link-item">
             <i class="iconfont icon-wuliudanao_o"></i>
             <span class="title">Front-end desgin</span>
             <span class="subtitle">前端网页设计实现<br>官网设计 UI设计</span>
+          </div>
+          <div class="link-item">
+            <i class="iconfont icon-wuliudanao_o"></i>
+            <span class="title">Front-end develop</span>
+            <span class="subtitle">前端开发<br>网站开发 APP开发</span>
           </div>
           <div class="link-item">
             <i class="iconfont icon-ditu_diqiu_o"></i>
@@ -74,22 +73,12 @@
         <div class="imengyu-content-sub-title">
           MORE ABOUT ME
           <span>
-            {{showMore?'这就是我的全部信息啦':'还想要了解一下我？'}}
-            <a class="iconfont icon-biaoqing_xiao_o text-decoration-none" style="font-size:18px" href="javascript:;" @click="onShowMore"></a>
+            更多关于我
+            <a class="iconfont icon-biaoqing_xiao_o text-decoration-none" style="font-size:18px"></a>
           </span>
         </div>      
-        
-        <div :class="'mt-3 text-center text-center imengyu-alpha-anim '+(showMore?'hide':'show')" 
-          @mouseleave="showMoreSmallTip=false" @mouseenter="showMoreSmallTip=true">
-          <div v-if="!showMoreSmallTip" class="black-box small display-inline-block">
-            哎呀 ◑﹏◐ 讨厌，我没有什么更多值得展示的东西啦！
-          </div>
-          <div v-else class="black-box small display-inline-block">
-            Try click "<small class="iconfont icon-biaoqing_xiao_o "></small>" above this text.
-          </div>
-        </div>
 
-        <div :class="'imengyu-about-list '+(showMore?'show':'hide')">
+        <div class="imengyu-about-list show">
           <div class="item">
             <u class="title-prop">名字</u><span title="这就是我的真名">俞则成</span>。男生，学生/程序员
           </div>
@@ -110,9 +99,10 @@
           </div>
 
           <div class="imengyu-content-innern-subtitle">我是什么样的？</div>
-          一个超级普通的男生，长相一般，还是直男，内向，不善闲聊。<br>
+          一个普通的男生，长相一般，内向，不善闲聊。<br>
+          <span title="想要一个男朋友 21/170/50">🌈</span>。<br>
           喜欢新事物，新技术，对编程有浓厚兴趣，喜欢钻研。<br>
-          想和有同样兴趣爱好的男生<span title="原谅我癞蛤蟆想吃天鹅肉，想要一个男朋友🌈">交朋友</span>...<br>
+          想和有同样兴趣爱好的男生交朋友。<br>
           努力学习提升自己中...<br>
 
           <div class="imengyu-content-innern-subtitle">研究学习方向</div>
@@ -121,9 +111,7 @@
           深度学习<br>
           
           <div class="imengyu-content-innern-subtitle">一直为了实现梦想而努力...</div>
-          
         </div>
-
       </div>
 
 
@@ -131,7 +119,7 @@
       <!--联系-->
       <div class="imengyu-content-box-innern">
         
-        <div class="imengyu-content-title right imengyu-about-contact-title">
+        <div class="imengyu-content-title text-black right imengyu-about-contact-title">
           CONTACT<br class="hide-sm"> ME
           <span>联系我</span>
         </div>
@@ -140,8 +128,8 @@
             <li>
               <i class="icon iconfont icon-youxiang"></i>
               <div class="sub">
-                MAIL
-                <span><a href="mailto:1501076885@qq.com">1501076885@qq.com</a></span>
+                Mail
+                <span><a href="mailto:yuzecheng@imengyu.top">yuzecheng@imengyu.top</a></span>
               </div>
             </li>
             <li>
@@ -165,9 +153,7 @@
               </div>
             </li>
           </ul>
-
-        </div>
-        
+        </div>      
 
         <div class="hide-sm" style="height:40px"></div>
         <div class="imengyu-content-sub-title">
@@ -192,8 +178,6 @@ import RightCatalog from '../components/RightCatalog.vue'
 })
 export default class About extends Vue {
 
-  showMore = false;
-  showMoreSmallTip = false;
   showCode = false;
 
   currentItem = '';
@@ -230,10 +214,6 @@ export default class About extends Vue {
         behavior: "smooth" 
       })
     }
-  }
-
-  onShowMore() {
-    this.showMore = !this.showMore;
   }
   onGoWorks() {
     this.$router.push({name:'Works'})

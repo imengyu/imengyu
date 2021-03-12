@@ -9,6 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const JavaScriptObfuscator = require('webpack-obfuscator');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
@@ -29,12 +30,15 @@ const webpackConfig = merge(baseWebpackConfig, {
       chunks: ['index'],
       template: path.resolve(__dirname, '../src/index.html'),
       filename: 'index.html',
-      inject: false,
+      inject: 'body',
       minify: {
         removeComments: true,
         collapseWhitespace: true,
         removeAttributeQuotes: true
       },
+    }),
+    new MiniCssExtractPlugin({
+      filename: "static/[hash].css"
     }),
     new CopyWebpackPlugin([
       {

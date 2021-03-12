@@ -1,0 +1,63 @@
+.imengyu-main.dark {
+
+  color: #fff;
+
+  .imengyu-copyright {
+    color: #fff;
+    a {
+      color: #fff;
+      text-shadow: none;
+    }
+  }
+  .imengyu-content-box {
+    background-color: rgba(255, 255, 255, 0.86);
+  }
+  .imengyu-content-title:not(.text-black) {
+    color: #fff;
+  } 
+  .imengyu-works-list .work-item.active {
+    border-color: #fff;
+  }
+  .imengyu-works-tab {
+  
+    ul {
+  
+      li {
+        border: 1px solid #fff;
+        color: #fff;
+  
+        &:hover, &:active {
+          background-color: #dfdfdf;
+          border-color: #dfdfdf;
+          color: #000;
+        }
+  
+        &.active {
+          background-color: #fff;
+          color: #000;
+        }
+      }
+    }
+  }
+
+  .imengyu-right-catalog ul li.active, .imengyu-right-catalog ul li:hover {
+    color: #fff;
+  }
+  .imengyu-right-catalog ul li {
+    color: #b1b1b1;
+  }
+}
+.imengyu-header.dark {
+  color: #fff;
+
+  .imengyu-header-left {
+    background-image: url('../images/logo-white.svg');
+  }
+  .imengyu-header-menu ul li a {
+    color: #fff;
+
+    &::after {
+      background-color: #fff;
+    }
+  }
+}

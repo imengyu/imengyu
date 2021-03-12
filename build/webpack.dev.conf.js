@@ -56,12 +56,15 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       chunks: ['index'],
       template: path.resolve(__dirname, '../src/index.html'),
       filename: 'index.html',
-      inject: false,
+      inject: 'body',
       minify: {
         removeComments: true,
         collapseWhitespace: true,
         removeAttributeQuotes: true
       },
+    }),
+    new MiniCssExtractPlugin({
+      filename: "static/[hash].css"
     }),
     new VueLoaderPlugin(),
     // copy custom static assets

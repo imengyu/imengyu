@@ -54,7 +54,24 @@ import WorkTab from '../components/WorkTab.vue'
 export default class Works extends Vue {
 
   workItemsAll = [
-    //Web项目
+    {
+      id: 0,
+      img: require('../assets/images/projects/16.png'),
+      title: 'VR720 安卓端720°全景浏览软件',
+      text: 'A 720 Panorama viewer for Android<br>一个安卓端的720°全景图片/全景视频浏览软件',
+      link: 'https://github.com/imengyu/VR720',
+      linkText: '查看更多',
+      category: [ '应用和小程序' ],
+    },
+    {
+      id: 9,
+      img: require('../assets/images/projects/10.png'),
+      title: 'Blueprint',
+      text: '类似于 Unreal Engine 的蓝图脚本的设计软件(使用 Javascript 实现)',
+      link: 'https://github.com/imengyu/node-blueprint',
+      linkText: '查看更多',
+      category: [ '应用和小程序' ],
+    },
     {
       id: 0,
       img: require('../assets/images/projects/5.png'),
@@ -73,16 +90,6 @@ export default class Works extends Vue {
       linkText: '查看更多',
       category: [ 'Web项目' ],
     },
-    {
-      id: 2,
-      img: require('../assets/images/projects/6.png'),
-      title: '我的个人主页',
-      text: '就是你现在所在的这个网站了。这是自己玩玩的，结合了多个技术栈，但是功能上有很多不足，现在也更新好多次了',
-      link: '',
-      linkText: '',
-      category: [ 'Web项目' ],
-    },
-    //应用和小程序   
     {
       id: 3,
       img: require('../assets/images/projects/8.png'),
@@ -120,15 +127,6 @@ export default class Works extends Vue {
       category: [ '应用和小程序' ],
     },
     {
-      id: 9,
-      img: require('../assets/images/projects/10.png'),
-      title: 'Blueprint',
-      text: '类似于 Unreal Engine 的蓝图脚本的设计软件(使用 Javascript 实现)',
-      link: 'https://github.com/imengyu/blueprint',
-      linkText: '查看更多',
-      category: [ '应用和小程序' ],
-    },
-    {
       id: 4,
       img: require('../assets/images/projects/4.png'),
       title: '类似百度云的快速文件分享小程序',
@@ -137,17 +135,15 @@ export default class Works extends Vue {
       linkText: '',
       category: [ '应用和小程序' ],
     },
-    //游戏
     {
       id: 6,
       img: require('../assets/images/projects/7.png'),
       title: 'Ballance Rebuild',
       text: '一个曾经的老游戏重制(没有心情做下去了，可能烂尾了)',
-      link: 'https://github.com/imengyu/FishBlog',
+      link: 'https://github.com/imengyu/Ballance',
       linkText: '查看更多',
       category: [ '游戏' ],
     },
-    //网页设计
     {
       id: 7,
       img: require('../assets/images/projects/2.png'),
@@ -175,7 +171,15 @@ export default class Works extends Vue {
       linkText: '',
       category: [ '网页设计' ],
     },
-
+    {
+      id: 2,
+      img: require('../assets/images/projects/6.png'),
+      title: '我的个人主页',
+      text: '就是你现在所在的这个网站了。这是自己玩玩的，结合了多个技术栈，但是功能上有很多不足，现在也更新好多次了',
+      link: '',
+      linkText: '',
+      category: [ '网页设计' ],
+    }, 
     {
       id: 8,
       img: require('../assets/images/projects/14.png'),

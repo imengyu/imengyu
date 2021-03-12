@@ -3,8 +3,10 @@ import App from './App.vue'
 import { createRouter } from './router'
 import Vue from 'vue';
 
+let bus : Vue = null;
+
 function doInitVue() {
-  new Vue({
+  bus = new Vue({
     el: '#imengyu-app',
     render: h => h(App),
     router: createRouter()
@@ -50,3 +52,5 @@ function doLoadJs(name, callback) {
 }
 
 doLoadAll();
+
+export { bus }

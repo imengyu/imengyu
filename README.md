@@ -12,6 +12,7 @@ Hello 你好
 
 ---
 
+Hello!
 * 🙂 I am an ordinary college student
 * 🎁 Like program development, do some interesting gadgets or applications
 * 🙂 I want to make more friends

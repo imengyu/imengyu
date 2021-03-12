@@ -7,8 +7,12 @@
   position: relative;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.03);
   width: 50%;
 
+  &.background-transparent {
+    box-shadow: none;
+  }
   &.full {
     width: 65%;
 
@@ -133,13 +137,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.6);
-  
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: 202;
 
   .box {
-    background-color: #fff;
-    border: 2px solid #000;
+    padding-top: 15px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.03);
   }
 }
 

@@ -1,8 +1,3 @@
-import NotFound from '../views/NotFound.vue';
-import Index from '../views/Index.vue';
-import About from '../views/About.vue';
-import Works from '../views/Works.vue';
-
 import VueRouter from 'vue-router';
 import Vue from 'vue';
 
@@ -15,24 +10,24 @@ export function createRouter() {
       {
         path: '/',
         name: 'Index',
-        component: Index,
+        component: () => import('../views/Index.vue'),
         children: [
           {
             path: 'About',
             name: 'About',
-            component: About
+            component: () => import('../views/About.vue'),
           },
           {
             path: 'Works',
             name: 'Works',
-            component: Works
+            component: () => import('../views/Works.vue'),
           },
         ]
       },
       {
         path: '*',
         name: 'NotFound',
-        component: NotFound
+        component: () => import('../views/NotFound.vue')
       }
     ]
   });

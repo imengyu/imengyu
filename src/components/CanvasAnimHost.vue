@@ -15,7 +15,8 @@ export default class CanvasAnimHost extends Vue {
   canvas : HTMLCanvasElement;
   ctx : CanvasRenderingContext2D;
 
-  @Prop({default:null}) gameProvider : CanvasGameProvider;
+  @Prop({default:null}) gameProvider : CanvasGameProvider; 
+  @Prop({default:true}) create2DCtx : boolean;
   @Prop({default:'#000'}) background : string;
 
   mounted() {
@@ -46,14 +47,14 @@ export default class CanvasAnimHost extends Vue {
 
     this.currentFps = 1000 / detiaTime;
     this.renderLastTime = currentTime;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    if(this.ctx) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.gameProvider.render(1 / this.currentFps);
     this.renderTickHandle = requestAnimationFrame(this.renderTick);
   }
   initCanvas() {
-    this.ctx = this.canvas.getContext('2d');
+    if(this.create2DCtx) this.ctx = this.canvas.getContext('2d');
     this.onWindowResize();
-    this.gameProvider.init(this.ctx);
+    this.gameProvider.init(this.canvas, this.ctx);
   }
 
   destroyCanvas() {

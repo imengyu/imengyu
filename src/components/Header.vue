@@ -1,9 +1,12 @@
 <template>
-  <div class="imengyu-header">
+  <div :class="'imengyu-header'+(dark?' dark':'')">
     <div class="imengyu-header-left"></div>
     <div class="imengyu-header-menu">
       <ul>
-        <li v-for="(item, i) in homeMenu" :key="i"><router-link :to="item.to">{{item.name}}</router-link></li>
+        <li v-for="(item, i) in homeMenu" :key="i">
+          <a v-if="item.to.indexOf('http')==0" :href="item.to">{{item.name}}</a>
+          <router-link v-else :to="item.to">{{item.name}}</router-link>
+        </li>
       </ul>
     </div>
   </div>
@@ -17,10 +20,16 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 })
 export default class Header extends Vue {
 
+  @Prop({default:false}) dark : boolean;
+
   homeMenu = [
     {
       name: 'Home',
       to: '/'
+    },
+    {
+      name: 'Blog',
+      to: 'https://blog.imengyu.top/'
     },
     {
       name: 'Works',

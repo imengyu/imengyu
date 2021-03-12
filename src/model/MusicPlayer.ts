@@ -72,8 +72,10 @@ export class MusicPlayer extends EventEmitter {
           case 3: err = '无法解码该文件';break;
           case 4: err = '不支持的音频格式';break;
         }
-        this.emit('error', err);
+        this.emit('error', err);     
+        this.updateStatus('stopped');
       }else {
+        this.updateStatus('opened');
         this.playPause();
       }
     }, 600);
@@ -100,20 +102,26 @@ export class MusicPlayer extends EventEmitter {
   }
   pause() {
     if(!this.audio.paused && !this.audioFading) {
-      this.doFadeOut(() => this.audio.pause());
+      this.doFadeOut(() => {
+        this.audio.pause();
+        this.updateStatus('paused');
+      });
     }
   }
   play() {
     if(this.audio.paused && !this.audioFading) {
       this.audio.play();
-      this.doFadeIn(() => {})
-    }
+      this.doFadeIn(() => {
+        this.updateStatus('playing');
+      })
+    } else if(this.status!='playing')
+      this.updateStatus('playing');
   }
 
   private doFadeOut(callback : () => void) {
     if(this.status == 'playing'){
 
-      let fadeMs = 1000;
+      let fadeMs = 500;
       let timeStep = fadeMs / 40.0;
       let endVolume = this.audio.volume;
       let volumeStep = (endVolume - 0.01) / timeStep;
@@ -137,7 +145,7 @@ export class MusicPlayer extends EventEmitter {
   private doFadeIn(callback : () => void) {
     if(this.audio.currentTime > 0){
   
-      let fadeMs = 1000;
+      let fadeMs = 500;
       let timeStep = fadeMs / 40.0;
       let endVolume = this.audio.volume;
       let volumeStep = (endVolume - 0.01) / timeStep;
@@ -189,7 +197,6 @@ export class MusicPlayer extends EventEmitter {
     this.audioDurtionString = getTimeStringSec(this.audio.duration.toString());
     if(!this.audioOpened) {
       this.audioOpened = true;
-      this.updateStatus('opened');
     }
   }
   onPlayerEnded() {
