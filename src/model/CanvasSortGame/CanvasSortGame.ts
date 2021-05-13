@@ -3,11 +3,12 @@ import Utils from '../../utils/Utils'
 
 const DATA_LIGHT_TICK = 5;
 const DATA_SLEET_TICK = 150;
+
 export const SortMethodNames = [
-  'bobble','insertion','selection','quick','shell','merge','heap','radix','bucket'
+  'bobble','insertion','selection','quick','shell','merge','heap','radix'
 ];
 
-export type SortMethods = 'bobble'|'insertion'|'selection'|'quick'|'shell'|'merge'|'heap'|'radix'|'bucket'|'spectrum'|'';
+export type SortMethods = 'bobble'|'insertion'|'selection'|'quick'|'shell'|'merge'|'heap'|'radix'|'spectrum'|'';
 
 const spectrum_width = 128;
 const spectrum_line = 512;
@@ -252,7 +253,6 @@ export class CanvasSortGame extends CanvasGameProvider {
       case 'quick': this.dataCount = 512; this.currentSortWorkTickCount = 10; break;
       case 'heap': this.dataCount = 256; this.currentSortWorkTickCount = 5; break;
       case 'radix': this.dataCount = 512; this.currentSortWorkTickCount = 10;break;
-      case 'bucket': this.dataCount = 512; this.currentSortWorkTickCount = 5;break;
     }
   }
 
@@ -270,7 +270,6 @@ export class CanvasSortGame extends CanvasGameProvider {
       case 'quick': this.quickSortSortStart(); break;
       case 'heap': this.heapSortSortStart(); break;
       case 'radix': this.radixSortStart(); break;
-      case 'bucket': this.bucketSortStart(); break;
       default:
         this.sorting = false;
         this.goSleep();
@@ -573,13 +572,16 @@ export class CanvasSortGame extends CanvasGameProvider {
     var pivot = left,                      //设定基准值（pivot）
         index = pivot + 1;
     for (var i = index; i <= right; i++) {
+      
       this.sortStepAccess(index);
       this.sortStepAccess(pivot);
+      
       if (arr[i] < arr[pivot]) {
         this.sortStepSwap(arr, i, index);
         index++;
       }        
     }
+    
     this.sortStepSwap(arr, pivot, index - 1);
     return index-1;
   }
@@ -680,55 +682,5 @@ export class CanvasSortGame extends CanvasGameProvider {
   private radixSortGetDigit(x,d){
     var a = [ 1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000];
     return (Math.floor(x / a[d]) % 10);
-  }
-
-  private bucketSortStart() {
-    this.sortStepRest();
-    this.currentSortJumped = true;
-    this.radixSortCounter.splice(0, this.radixSortCounter.length);
-    this.bucketSort(this.sortStepGetTempData(), 9);
-  }
-  private bucketSort(arr : Array<number>, bucketSize : number) {
-
-    var i;
-    var minValue = arr[0];
-    var maxValue = arr[0];
-    for (i = 1; i < arr.length; i++) {
-      this.sortStepAccess(i);
-      if (arr[i] < minValue) {
-        minValue = arr[i];                //输入数据的最小值
-        this.sortStepAccess(i);
-      } else if (arr[i] > maxValue) {
-        maxValue = arr[i];                //输入数据的最大值
-        this.sortStepAccess(i);
-      }
-    }
-
-    //桶的初始化
-    var DEFAULT_BUCKET_SIZE = 5;            //设置桶的默认数量为5
-    bucketSize = bucketSize || DEFAULT_BUCKET_SIZE;
-    var bucketCount = Math.floor((maxValue - minValue) / bucketSize) + 1;   
-    var buckets = new Array(bucketCount);
-    for (i = 0; i < buckets.length; i++) {
-      buckets[i] = [];
-    }
-
-    //利用映射函数将数据分配到各个桶中
-    for (i = 0; i < arr.length; i++) {
-      buckets[Math.floor((arr[i] - minValue) / bucketSize)].push(arr[i]);
-      this.sortStepSet(i, -1);
-    }
-
-    let index = 0;
-    for (i = 0; i < buckets.length; i++) {
-      this.quickSort(buckets[i]);                      //对每个桶进行排序，这里使用了快速排序
-      for (var j = 0; j < buckets[i].length; j++) {
-        arr[index++] = buckets[i][j];    
-        
-        this.sortStepSet(index - 1, buckets[i][j])
-      }
-    }
-
-    return arr;
   }
 }

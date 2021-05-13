@@ -1,45 +1,33 @@
 <template>
-  <div :class="'imengyu-main '+((setEnableAnim && currentGameAnim=='space')?'dark':'')">  
+  <div :class="'imengyu-main '+((setEnableAnim && currentGameAnim != 'sort')?'dark':'')">  
 
     <!--Canvas-->
     <CanvasAnimHost v-show="gameProvider==sortGameProvider" ref="sortGameCanvasAnimHost" :gameProvider="sortGameProvider"></CanvasAnimHost>
     <CanvasAnimHost v-show="setEnableAnim && gameProvider==spaceGameProvider" ref="spaceGameCanvasAnimHost" :gameProvider="spaceGameProvider" :create2DCtx="false"></CanvasAnimHost>
+    <CanvasAnimHost v-show="setEnableAnim && gameProvider==blackholeGameProvider" ref="blackholeGameCanvasAnimHost" :gameProvider="blackholeGameProvider" :create2DCtx="false"></CanvasAnimHost>
+    <CanvasAnimHost v-show="setEnableAnim && gameProvider==clockGameProvider" ref="clockGameCanvasAnimHost" :gameProvider="clockGameProvider"></CanvasAnimHost>
     
     <!--Intro-->
     
     <div class="imengyu-intro animated fadeInRight" v-show="showIntro && (currentGameAnim=='sort' || !setEnableAnim)">
-      <div class="imengyu-intro-box animated" >
-        <div v-show="showIntroIndex===1">
-          <h1>Hi  <small class="ml-3">i am imengyu</small></h1>
-          <i class="text animated fadeInLeft">I'm a programmer / student</i>
-          <i class="text animated fadeInRight">front-end developer / designer</i>
-          <i class="text animated fadeInLeft">In Hangzhou</i>
-          <i class="text tip animated fadeInRight">          
-            Welecome to my website,<br/>
-            this is my homepage.<br/>
-            Bad design may not satisfy you,<br/>
-            but I hope you like it.
-          </i>
-          <div class="imengyu-go-button animated fadeInLeft" @click="onGo">
-            More about me
-            <i class="iconfont icon-jiantou_xiangyouliangci_o"></i>
-          </div>
+      <div class="imengyu-intro-box animated position-relative overflow-hidden" >
+        <div class="background">
+          <img class="hello" src="@/assets/images/hello.png" />
+          <img class="rainbow" src="@/assets/images/rainbow.png" />
         </div>
-        <div v-show="showIntroIndex===2" >
-          <h1><span style="font-size: 50px">你好，我是</span> <small class="ml-3">imengyu</small></h1>
-          <i class="text animated fadeInLeft">我是一个程序员/学生</i>
-          <i class="text animated fadeInRight">擅长前端开发/UI设计</i>
-          <i class="text animated fadeInLeft">在浙江杭州</i>
-          <i class="text tip animated fadeInRight">          
-            非常感谢您百忙之中来到这里,<br>
-            这是我的个人网站小作品,<br>
-            才学疏浅可能不能让您满意,<br>
-            但还是希望您能喜欢,
-          </i>
-          <div class="imengyu-go-button animated fadeInLeft" @click="onGo">
-            更多关于我
-            <i class="iconfont icon-jiantou_xiangyouliangci_o"></i>
-          </div>
+        <h1><span>你好，我是</span> <br/><small class="name">快乐的梦鱼</small></h1>
+        <i class="text animated fadeInLeft">我是一个程序员/学生</i>
+        <i class="text animated fadeInRight">擅长前端开发/UI设计</i>
+        <i class="text animated fadeInLeft">在浙江杭州</i>
+        <i class="text tip animated fadeInRight">          
+          非常感谢您百忙之中来到这里,<br>
+          这是我的个人网站小作品,<br>
+          才学疏浅可能不能让您满意,<br>
+          但还是希望您能喜欢,
+        </i>
+        <div class="imengyu-go-button animated fadeInLeft" @click="onGo">
+          更多关于我
+          <i class="iconfont icon-jiantou_xiangyouliangci_o"></i>
         </div>
       </div>
     </div>
@@ -52,7 +40,7 @@
     <!--版权提示-->
     <AlertDialog v-model="showCopyright" title="Copyright" subTitle="网页版权信息">
 
-      <i class="iconfont icon-banquan"></i> 2021 imengyu 版权所有
+      <i class="iconfont icon-banquan"></i> 2021 快乐的梦鱼 版权所有
       <br>本网站所有设计均为作者原创。
       <br>仅本人使用，不在任何商业用途中使用。
       <br>如须转载，请事先联系我。谢谢你!
@@ -90,11 +78,39 @@
           </select>
         </div>
       </div>
+      <div class="item">
+        <span>FPS</span>
+        <div v-if="canvasAnimHost" class="imengyu-go-button mt-0">
+          {{ canvasAnimHost.currentFpsShowVal }}
+        </div>
+      </div>
       <div v-if="currentGameAnim=='space'" class="item">
         <span>拖动视图</span>
         <div>
           <div class="imengyu-go-button mt-0" @click="setEnableDrag=!setEnableDrag;onEnableDragChanged()">
             {{ setEnableDrag ? '开' : '关' }}
+          </div>
+        </div>
+      </div>
+      <div v-if="currentGameAnim=='blackhole'" class="item">
+        <span>模式</span>
+        <div>
+          <div class="imengyu-go-button mt-0">
+            更换
+            <select ref="selectBlackholeGame" class="imengyu-sort-mode-select" :value="currentBlackholeGameAnim" @change="onChangeBlackholeGameAnim">
+              <option v-for="(i, ind) in blackholeGameAmins" :key="ind" :value="i">{{i}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div v-if="currentGameAnim=='clock'" class="item">
+        <span>模式</span>
+        <div>
+          <div class="imengyu-go-button mt-0">
+            更换
+            <select ref="selectClockGame" class="imengyu-sort-mode-select" @change="onChangeClockGameAnim">
+              <option v-for="(i, ind) in clockGameAmins" :key="ind" :value="i">{{i}}</option>
+            </select>
           </div>
         </div>
       </div>
@@ -136,6 +152,8 @@ import MusicGameControll from '../components/MusicGameControll.vue'
 import Utils from '../utils/Utils'
 import { CanvasSortGame, SortMethodNames, SortMethods } from '../model/CanvasSortGame/CanvasSortGame'
 import { ThreeSpaceGame } from '../model/ThreeSpaceGame/ThreeSpaceGame'
+import { BlackHoleGame, BlackHoleWorkMode, getBlackHoleModes } from '../model/BlackHoleGame/BlackHoleGame'
+import { ClockGame, getStartsModes, StartsMode } from '../model/ClockGame/ClockGame'
 import { CanvasGameProvider } from '../model/CanvasGameProvider'
 import { bus } from '..'
 
@@ -150,7 +168,6 @@ import { bus } from '..'
 export default class Index extends Vue {
 
   showIntro = true;
-  showIntroIndex = 0;
   showCopyright = false;
   showSetting = false;
   showAnimTools = true;
@@ -158,23 +175,44 @@ export default class Index extends Vue {
   gameProvider : CanvasGameProvider = null;
   sortGameProvider = new CanvasSortGame();
   spaceGameProvider = new ThreeSpaceGame();
+  blackholeGameProvider = new BlackHoleGame();
+  clockGameProvider = new ClockGame();
 
-  gameAmins = [ 'sort', 'space' ];
-  gameProviders = [ this.sortGameProvider, this.spaceGameProvider ];
+  gameAmins = [ 'sort', 'space', 'blackhole', 'clock' ];
+  gameProviders = [ this.sortGameProvider, this.spaceGameProvider, this.blackholeGameProvider, this.clockGameProvider ];
 
+  canvasAnimHost : CanvasAnimHost = null;
   currentGameAnim = this.gameAmins[0];
   sortMethodNames = SortMethodNames;
+ 
   onChangeGameAnim() {
     this.currentGameAnim = (<HTMLSelectElement>this.$refs.selectGame).value;
     switch(this.currentGameAnim) {
       case 'sort': this.gameProvider = this.sortGameProvider; break;
       case 'space': this.gameProvider = this.spaceGameProvider; break;
+      case 'blackhole': this.gameProvider = this.blackholeGameProvider; break;
+      case 'clock': this.gameProvider = this.clockGameProvider; break;
     }
-    bus.$emit('updateDarkMode', this.currentGameAnim === 'space');
+    bus.$emit('updateDarkMode', this.currentGameAnim != 'sort');
     this.onSetEnableAnimChanged();
   }
   onChangeSortMethod() {
     this.sortGameProvider.changeSortMethod(<SortMethods>(<HTMLSelectElement>this.$refs.selectSortMethod).value);
+  }
+
+  blackholeGameAmins = getBlackHoleModes();
+  currentBlackholeGameAnim = this.blackholeGameAmins[0];
+
+  onChangeBlackholeGameAnim() {
+    if(this.currentGameAnim === 'blackhole')
+      this.blackholeGameProvider.setBlackHoleWorkMode((this.$refs.selectBlackholeGame as HTMLSelectElement).value as BlackHoleWorkMode)
+  }
+
+  clockGameAmins = getStartsModes();
+
+  onChangeClockGameAnim() {
+    if(this.currentGameAnim === 'clock')
+      this.clockGameProvider.setStarsMode((this.$refs.selectClockGame as HTMLSelectElement).value as StartsMode)
   }
 
   setEnableAnim = true;
@@ -186,23 +224,27 @@ export default class Index extends Vue {
     if(this.currentCanvasAnimHost)
       this.currentCanvasAnimHost.stop();
 
-    let canvasAnimHost : CanvasAnimHost = null;
-    if(this.currentGameAnim === 'sort') canvasAnimHost = this.sortGameCanvasAnimHost;
-    else if(this.currentGameAnim === 'space') canvasAnimHost = this.spaceGameCanvasAnimHost;
-    
-    if(this.setEnableAnim && this.currentGameAnim === 'space') 
+    if(this.currentGameAnim === 'sort') this.canvasAnimHost = this.sortGameCanvasAnimHost;
+    else if(this.currentGameAnim === 'space') this.canvasAnimHost = this.spaceGameCanvasAnimHost;
+    else if(this.currentGameAnim === 'blackhole') this.canvasAnimHost = this.blackholeGameCanvasAnimHost;
+    else if(this.currentGameAnim === 'clock') this.canvasAnimHost = this.clockGameCanvasAnimHost;
+
+    if(this.setEnableAnim && (this.currentGameAnim === 'space' || this.currentGameAnim === 'blackhole' || this.currentGameAnim === 'clock')) 
       bus.$emit('updateDarkMode', true);
-    if(!this.setEnableAnim && this.currentGameAnim === 'space') 
+    if(!this.setEnableAnim || this.currentGameAnim === 'sort') 
       bus.$emit('updateDarkMode', false);
 
-    if(canvasAnimHost)
-      if(this.setEnableAnim) canvasAnimHost.start();
-      else canvasAnimHost.stop();
-    this.currentCanvasAnimHost = canvasAnimHost;
+    if(this.canvasAnimHost) {
+      if(this.setEnableAnim) this.canvasAnimHost.start();
+      else this.canvasAnimHost.stop();
+    }
+    this.currentCanvasAnimHost = this.canvasAnimHost;
   }
   onAnimSwitchSpectrum(on : boolean) {
     if(this.currentGameAnim === 'sort') this.sortGameProvider.switchSpectrum(on);
     else if(this.currentGameAnim === 'space') this.spaceGameProvider.switchSpectrum(on);
+    else if(this.currentGameAnim === 'blackhole') this.blackholeGameProvider.switchSpectrum(on);
+    else if(this.currentGameAnim === 'clock') this.clockGameProvider.switchSpectrum(on);
   }
   onEnableDragChanged() {
     this.spaceGameProvider.setDragEnable(this.setEnableDrag);
@@ -221,6 +263,8 @@ export default class Index extends Vue {
   currentCanvasAnimHost : CanvasAnimHost = null;
   sortGameCanvasAnimHost : CanvasAnimHost = null;
   spaceGameCanvasAnimHost : CanvasAnimHost = null;
+  blackholeGameCanvasAnimHost : CanvasAnimHost = null;
+  clockGameCanvasAnimHost : CanvasAnimHost = null;
 
   introInterval = null;
 
@@ -241,16 +285,12 @@ export default class Index extends Vue {
     setTimeout(() => {
       this.sortGameCanvasAnimHost = <CanvasAnimHost>this.$refs.sortGameCanvasAnimHost;
       this.spaceGameCanvasAnimHost = <CanvasAnimHost>this.$refs.spaceGameCanvasAnimHost;
+      this.blackholeGameCanvasAnimHost = <CanvasAnimHost>this.$refs.blackholeGameCanvasAnimHost;
+      this.clockGameCanvasAnimHost = <CanvasAnimHost>this.$refs.clockGameCanvasAnimHost;
       this.gameProvider = this.sortGameProvider;
       if(this.setEnableAnim)
         this.onSetEnableAnimChanged();
     }, 350);
-
-    this.showIntroIndex = 2;
-    this.introInterval = setInterval(() => {
-      this.showIntroIndex++;
-      if(this.showIntroIndex > 2) this.showIntroIndex = 1;
-    }, 15000);
 
     window.onbeforeunload = () => { this.saveSettings(); };
   }

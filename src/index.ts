@@ -1,4 +1,5 @@
 import './assets/sass/main.scss'
+import './utils/Extends'
 import App from './App.vue'
 import { createRouter } from './router'
 import Vue from 'vue';

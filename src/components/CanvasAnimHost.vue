@@ -39,7 +39,10 @@ export default class CanvasAnimHost extends Vue {
   renderTickHandle = null;
   renderLastTime = new Date();
   currentFps = 0;
+  currentFpsShowVal = '00.00';
   playing = false;
+
+  tick = 0;
 
   renderTick() {
     var currentTime = new Date();
@@ -47,7 +50,16 @@ export default class CanvasAnimHost extends Vue {
 
     this.currentFps = 1000 / detiaTime;
     this.renderLastTime = currentTime;
+
     if(this.ctx) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.tick ++;
+
+    if(this.tick >= 60) {
+      this.tick = 0;
+      this.currentFpsShowVal = this.currentFps.toFixed(2);
+    }
+
     this.gameProvider.render(1 / this.currentFps);
     this.renderTickHandle = requestAnimationFrame(this.renderTick);
   }

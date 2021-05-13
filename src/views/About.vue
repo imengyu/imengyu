@@ -12,7 +12,7 @@
           <span>关于我</span>
         </div>
         <div class="imengyu-about-content-left">
-          我是 imemgyu<br>
+          我是 快乐的梦鱼<br>
           学生，大三，在浙江杭州<br>
           普通的大学生，程序猿<br>
           正在努力学习工作<br>
@@ -25,7 +25,18 @@
           </div>
         </div>
 
-        <img class="imengyu-about-big-image" width="200" src="../assets/images/about-photo.jpg" />
+        <div class="imengyu-about-big-image">
+          <img v-for="(img, i) in aboutImages" 
+          :key="img.key" 
+          :class="i==0?'active':''" 
+          :src="img.src" 
+          :style="{ 
+            left:(i*30)+'px', 
+            transform: 'scale('+(1-0.1*i)+')',
+            zIndex: 3-i
+          }"
+          @click="moveAboutImgToFirst(img)" />
+        </div>
       
       </div>
       
@@ -41,10 +52,10 @@
           <div class="link-item">
             <i class="iconfont icon-wuliudanao_o"></i>
             <span class="title">Front-end desgin</span>
-            <span class="subtitle">前端网页设计实现<br>官网设计 UI设计</span>
+            <span class="subtitle">UI设计 APP界面设计<br>网页设计 官网设计 </span>
           </div>
           <div class="link-item">
-            <i class="iconfont icon-wuliudanao_o"></i>
+            <i class="iconfont icon-cengji_o"></i>
             <span class="title">Front-end develop</span>
             <span class="subtitle">前端开发<br>网站开发 APP开发</span>
           </div>
@@ -100,7 +111,7 @@
 
           <div class="imengyu-content-innern-subtitle">我是什么样的？</div>
           一个普通的男生，长相一般，内向，不善闲聊。<br>
-          <span title="想要一个男朋友 21/170/50">🌈</span>。<br>
+          <span title="在等一个男孩子，互相契合的灵魂，我能做你的男朋友。我不是颜控，不喜欢10。 21/170/50">🌈</span>。<br>
           喜欢新事物，新技术，对编程有浓厚兴趣，喜欢钻研。<br>
           想和有同样兴趣爱好的男生交朋友。<br>
           努力学习提升自己中...<br>
@@ -113,7 +124,6 @@
           <div class="imengyu-content-innern-subtitle">一直为了实现梦想而努力...</div>
         </div>
       </div>
-
 
       <div class="imengyu-content-line" id="contact-me"></div>
       <!--联系-->
@@ -179,6 +189,28 @@ import RightCatalog from '../components/RightCatalog.vue'
 export default class About extends Vue {
 
   showCode = false;
+
+  activeAboutImage = 0;
+  aboutImages = [
+    {
+      src: require("../assets/images/about-photo-1.jpg"),
+      key: '1'
+    }, 
+    {
+      src: 
+    require("../assets/images/about-photo-2.jpg"),
+      key: '2'
+    }, 
+    {
+      src: require("../assets/images/about-photo-3.jpg"),
+      key: '3'
+    }
+  ]
+
+  moveAboutImgToFirst(img) {
+    this.aboutImages.splice(this.aboutImages.indexOf(img), 1);
+    this.aboutImages.unshift(img)
+  }
 
   currentItem = '';
   catalogItems = [

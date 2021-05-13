@@ -111,11 +111,41 @@ html, body {
   flex-direction: column;
 
   h1 {
-    margin: 0;
+    margin: 10px 0 15px 0;
     font-weight: bold;
-    font-size: 90px;
+    font-size: 30px;
+
+    .name {
+      font-size: 40px;
+    }
+  }
+
+  .background {
+    position: absolute;
+    width: 350px;
+    height: 600px;
+    top: -50px;
+    right: -42px;
+    background-color: rgba(53, 53, 53, 0.03);
+    transform: rotate(15deg);
+
+    .hello {
+      position: absolute;
+      width: 200px;
+      right: 75px;
+      top: 350px;
+      transform: rotate(-40deg);
+    }
+    .rainbow {
+      position: absolute;
+      width: 200px;
+      transform: rotate(-30deg);
+      right: 90px;
+      top: 130px;
+    }
   }
 }
+
 .imengyu-intro-box {
   padding: $page-padding-lg;
   text-align: left;
@@ -202,7 +232,7 @@ a {
     top: $page-top-sm;
   
     h1 {
-      font-size: 70px;
+      font-size: 43px;
     }
   }
   .imengyu-intro-box {
@@ -243,7 +273,7 @@ a {
     top: $page-top-md;
   
     h1 {
-      font-size: 50px;
+      font-size: 30px;
     }
   }
   .imengyu-intro-box {

@@ -4,7 +4,7 @@ import * as dat from 'dat.gui';
 import OrbitControls from 'three-orbitcontrols'
 import RendererStats from './utils/threex.rendererstats'
 import Stats from './utils/Stats'
-import { BaseObject } from "./geometry/BaseObject"
+import { BaseObject } from "./model/BaseObject"
 import { random, randomBoolean } from "./utils/RandomUtil";
 import { linearTween } from "./utils/TwenUtils";
 
@@ -15,8 +15,9 @@ const spectrumWidth = 128;
 export class ThreeSpaceGame extends CanvasGameProvider {
 
   //静态配置
-  private objectCount = 1000;
+  private objectCount = 2000;
   private objectLineWidth = 20;
+
   /**
    * 调试gui
    */
@@ -35,9 +36,7 @@ export class ThreeSpaceGame extends CanvasGameProvider {
   private controls : OrbitControls = null;
   private rendererStats : RendererStats;
   private stats : Stats;
-  private raycaster : THREE.Raycaster = null;
   private mouse = new THREE.Vector2();
-  private mouseDown = false;
   private INTERSECTED : BaseObject;
   private radius = 100;
   private theta = 0;camMoveSpeed = 0.05;camZoomSpeed = 0.5;camZoomSpeedMusic = 2;camIsZooIn = false;
@@ -47,8 +46,8 @@ export class ThreeSpaceGame extends CanvasGameProvider {
   private explodeSpeed = 0.3;
   private explodeSpeedBig = 0.2;
   private explodeIsBig = false;
-  private objectMinSize = 0.3; 
-  private objectMaxSize = 2;
+
+  private mouseDown = false;
 
   private collectFinishedCallback : () => void = null;
   private intoMusicFinishedCallback : () => void = null;
@@ -149,16 +148,10 @@ export class ThreeSpaceGame extends CanvasGameProvider {
         index = i * this.objectLineWidth + j;
         if(index < objectRealCount) {
           cube = this.objectPools[index];
-          if(j > h) {
-            cube.scale.x = this.objectMinSize;
-            cube.scale.y = this.objectMinSize;
-            cube.scale.z = this.objectMinSize;
-          }else {
-            w = (this.objectMaxSize - this.objectMinSize) * ((h - j) / h + 1);
-            cube.scale.x = w;
-            cube.scale.y = w;
-            cube.scale.z = w;
-          }
+          if(j > h) 
+            cube.colorValue = 0.1;
+          else 
+            cube.colorValue = ((h - j) / h + 1);
         }
       }
     }
@@ -198,8 +191,6 @@ export class ThreeSpaceGame extends CanvasGameProvider {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x000000);
   
-    this.raycaster = new THREE.Raycaster();
-  
     this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 5000);
     this.camera.position.z = this.camZeroPos.z;
   
@@ -217,40 +208,57 @@ export class ThreeSpaceGame extends CanvasGameProvider {
   }
   private initObjects() {
   
-    var colorBase = [ 0, 0.5922, 1 ];
+    let currentSetObjIndex = 0;
+    let currentSetObjIndex2 = 0;
+
+    let genParticle = (maxCount : number, tex : THREE.Texture, size: number) => {
+
+      var colorBase = [ 0, 0.5922, 1 ];
+      let geometry = new THREE.BufferGeometry();
+      let positions = new Array<number>();
+      let colors = new Array<number>();
+      let color = new THREE.Color();
+
+      for (var i = 0; i < maxCount; i ++, currentSetObjIndex2++) {
+        color = new THREE.Color(Math.random() * 0.2 + colorBase[0], Math.random() * 0.6 + colorBase[1], colorBase[2] - Math.random() * 0.2);
   
-    for (var i = 0; i < this.objectCount; i ++) {
-      var colorOffest = new THREE.Color(Math.random() * 0.2 + colorBase[0], Math.random() * 0.6 + colorBase[1], colorBase[2] - Math.random() * 0.2);
-      var geometry : THREE.BufferGeometry = null;
-      
-      if(i % this.objectLineWidth == 0) geometry = new THREE.BoxGeometry(6, 6, 6);
-      else geometry = new THREE.TetrahedronGeometry((((i + this.objectLineWidth) % this.objectLineWidth) / this.objectLineWidth) * 18 + 2);
-      
-      var object = new BaseObject(
-        geometry, 
-        new THREE.MeshBasicMaterial({
-          color: colorOffest,
-          wireframe: true,
-          wireframeLinewidth: 1
-        })
-      );
-      object.randSpeed = random(9, 12) / 10;
-      object.position.x = Math.random() * 1200 - 600;
-      object.position.y = Math.random() * 1200 - 600;
-      object.position.z = Math.random() * 1200 - 600;
-      object.rotation.x = Math.random() * 2 * Math.PI;
-      object.rotation.y = Math.random() * 2 * Math.PI;
-      object.rotation.z = Math.random() * 2 * Math.PI;
-      object.musicPosition.x = Math.floor((i + this.objectLineWidth) % this.objectLineWidth) * 60 - (this.objectLineWidth * 60 / 2);
-      object.musicPosition.z = Math.floor(i / this.objectLineWidth) * 100 - (this.objectCount / this.objectLineWidth * 100 / 2);
-      object.updateMatrix();
-      object.scale.set(1, 1, 1);
+        let x = Math.random() * 1200 - 600, y = Math.random() * 1200 - 600, z = Math.random() * 1200 - 600;
+        let object = new BaseObject();
   
-      this.objectPools.push(object);
-      this.scene.add(object);
-    }
+        object.index = i;
+        object.baseColor = color;
+        object.randSpeed = random(9, 12) / 10;
+        object.musicPosition.x = Math.floor((currentSetObjIndex2 + this.objectLineWidth) % this.objectLineWidth) * 25 - (this.objectLineWidth * 25 / 2);
+        object.musicPosition.z = Math.floor(currentSetObjIndex2 / this.objectLineWidth) * 25 - (this.objectCount / this.objectLineWidth * 25 / 2);
   
-    this.raycaster = new THREE.Raycaster();
+        positions.push(x, y, z);
+        colors.push(color.r, color.g, color.b);
+    
+        this.objectPools.push(object);
+      }
+
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+      let points = new THREE.Points(geometry, new THREE.PointsMaterial({
+        size: size,
+        sizeAttenuation: true,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        //alphaTest: 0.5,
+        //map: tex,
+        blending: THREE.AdditiveBlending
+      }));
+
+      for (var i = currentSetObjIndex, c = currentSetObjIndex + maxCount; i < c; i ++) 
+        this.objectPools[i].points = points;
+      currentSetObjIndex += maxCount;
+
+      return points;
+    };
+
+    this.scene.add(genParticle(this.objectCount, null, 5));
   }
   private initGui() {
 
@@ -266,6 +274,7 @@ export class ThreeSpaceGame extends CanvasGameProvider {
     this.datGui.add(this.gui, "collectSpeed", 0, 5);
     this.datGui.add(this.gui, "explodeSpeed", 0, 10);
     this.datGui.add(this.gui, 'lightOn', this.gui.lightOn);
+    this.datGui.add(this.globalData, 'action', [ 'view','collect','explode','into-music','music' ]);
   
     //Stats 
   
@@ -342,7 +351,6 @@ export class ThreeSpaceGame extends CanvasGameProvider {
   private destroyScense() {
     this.scene.clear();
     this.scene = null;
-    this.raycaster = null;
     this.camera = null;
     this.renderer = null;
 
@@ -407,51 +415,23 @@ export class ThreeSpaceGame extends CanvasGameProvider {
       var rows = Math.ceil(this.objectPools.length / lines);
       for(let start = 0; start < this.objectPools.length; start++) {
         cube = this.objectPools[start];
-        if(start % rows == 0){
-          cube.scale.x = this.objectMaxSize;
-          cube.scale.y = this.objectMaxSize;
-          cube.scale.z = this.objectMaxSize;
-        }else {
-          cube.scale.x = this.objectMinSize;
-          cube.scale.y = this.objectMinSize;
-          cube.scale.z = this.objectMinSize;
-        }
+        cube.colorValue = (start % rows == 0) ? 1 : 0.1
       }
     }
   }
   private resetObjectsMusicScale() {
-    for(let start = 0; start < this.objectPools.length; start++) {
-      this.objectPools[start].scale.x = 1;
-      this.objectPools[start].scale.y = 1;
-      this.objectPools[start].scale.z = 1;
-    }
-  }
-  private roateObjects() {
-    let start = Math.floor(Math.random() * (this.objectCount / 2));
-    let end = Math.floor(Math.random() * (this.objectCount / 2) + (this.objectCount / 2));
-    let cube : THREE.Mesh = null;
-    for(; start < end && start < this.objectPools.length; start++) {
-      cube = this.objectPools[start];
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-    }
+    for(let start = 0; start < this.objectPools.length; start++)
+      this.objectPools[start].colorValue = 1;
   }
   private collectObjects() {
     let zeroPos = new THREE.Vector3(0, 0, 0);
     let cube : BaseObject = null;
-    let newPos : THREE.Vector3 = null;
     let collectCount = 0;
     for(var start = 0; start < this.objectPools.length; start++) {
       cube = this.objectPools[start];
       if(!cube.collected) {
-        newPos = cube.position.lerp(zeroPos, this.collectSpeed * this.delta * cube.randSpeed);
-        cube.position.x = newPos.x;
-        cube.position.y = newPos.y;
-        cube.position.z = newPos.z;
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
+        cube.position = cube.position.lerp(zeroPos, this.collectSpeed * this.delta * cube.randSpeed);
         collectCount ++;
-
         if(cube.position.distanceTo(zeroPos) < 2) {
           cube.collected = true;
           cube.explodeTargetMaked = false;
@@ -468,8 +448,7 @@ export class ThreeSpaceGame extends CanvasGameProvider {
   }
   private explodeObjects() {
     let cube : BaseObject = null;
-    let newPos : THREE.Vector3 = null;
-    let maxExplode = this.explodeIsBig ? 10000 : 3000;
+    let maxExplode = this.explodeIsBig ? 4000 : 2000;
     let explodeSpeedThis = this.explodeIsBig ? this.explodeSpeedBig : this.explodeSpeed;
     for(var start = 0; start < this.objectPools.length; start++) {
       cube = this.objectPools[start];
@@ -481,10 +460,7 @@ export class ThreeSpaceGame extends CanvasGameProvider {
           cube.explodeTarget.z = random(-maxExplode, maxExplode);
           cube.explodeTargetMaked = true;
         }
-        newPos = cube.position.lerp(cube.explodeTarget, explodeSpeedThis * this.delta * cube.randSpeed);
-        cube.position.x = newPos.x;
-        cube.position.y = newPos.y;
-        cube.position.z = newPos.z;
+        cube.position = cube.position.lerp(cube.explodeTarget, explodeSpeedThis * this.delta * cube.randSpeed);
 
         if(cube.position.distanceTo(cube.explodeTarget) < 2){
           cube.explodeTargetArrived = false;
@@ -494,16 +470,12 @@ export class ThreeSpaceGame extends CanvasGameProvider {
   }
   private moveToMusicObjects() {
     let cube : BaseObject = null;
-    let newPos : THREE.Vector3 = null;
     let collectCount = 0;
     for(var start = 0; start < this.objectPools.length; start++) {
       cube = this.objectPools[start];
       cube.collected = false;
       if(!cube.musicPositionArrived) {
-        newPos = cube.position.lerp(cube.musicPosition, 1.2 * this.delta);
-        cube.position.x = newPos.x;
-        cube.position.y = newPos.y;
-        cube.position.z = newPos.z;
+        cube.position = cube.position.lerp(cube.musicPosition, 1.2 * this.delta);
         collectCount++;
 
         if(cube.position.distanceTo(cube.musicPosition) < 1)
@@ -556,23 +528,6 @@ export class ThreeSpaceGame extends CanvasGameProvider {
     this.camera.updateMatrixWorld();
     
   }
-  private findIntersections() {
-    // find intersections
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    let intersects = this.raycaster.intersectObjects(this.scene.children);
-    let INTERSECTED = this.INTERSECTED;
-    if (intersects.length > 0) {
-      if (INTERSECTED != intersects[0].object) {
-        if (INTERSECTED) (<THREE.MeshBasicMaterial>INTERSECTED.material).color.setHex(INTERSECTED.currentHex);
-        INTERSECTED = <BaseObject>intersects[0].object;
-        INTERSECTED.currentHex = (<THREE.MeshBasicMaterial>INTERSECTED.material).color.getHex();
-        (<THREE.MeshBasicMaterial>INTERSECTED.material).color.setHex(0xFF3E96);
-      }
-    } else {
-      if (INTERSECTED) (<THREE.MeshBasicMaterial>INTERSECTED.material).color.setHex(INTERSECTED.currentHex);
-      this.INTERSECTED = null;
-  }
-  }
   private updateGuiProps() {
     this.camZoomSpeed = this.gui.camZoomSpeed;
     this.camMoveSpeed = this.gui.camMoveSpeed;
@@ -593,7 +548,7 @@ export class ThreeSpaceGame extends CanvasGameProvider {
     this.delta = this.clock.getDelta();
 
     let action = this.globalData.action;
-    if(action === 'view') this.roateObjects();
+    if(action === 'view') {}
     else if(action === 'collect') this.collectObjects();
     else if(action === 'explode') this.explodeObjects();
     else if(action === 'into-music') this.moveToMusicObjects();
@@ -601,7 +556,6 @@ export class ThreeSpaceGame extends CanvasGameProvider {
 
     if(this.globalData.canDrag) this.controls.update();
     else this.roateCamera();
-    //this.findIntersections();
     
     this.renderer.render(this.scene, this.camera);
 
