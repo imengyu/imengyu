@@ -385,6 +385,12 @@ export class ClockGame extends CanvasGameProvider {
     return this.mode == 'text';
   }
 
+
+  public resize(w : number, h: number) {
+    this.width = w;
+    this.height = h;
+    this.resize_rest_particles();
+  }
   public init(canvas : HTMLCanvasElement, ctx : CanvasRenderingContext2D) {
     super.init(canvas, ctx)
 
@@ -394,8 +400,8 @@ export class ClockGame extends CanvasGameProvider {
     this.onWindowMouseUp = this.onWindowMouseUp.bind(this);
     this.timerTimeUpdate = this.timerTimeUpdate.bind(this);
 
-    this.width = document.body.clientWidth;
-    this.height = document.body.clientHeight;
+    this.width = canvas.width;
+    this.height = canvas.height;
     this.particles = [];
 
     this.initEvents();
@@ -728,7 +734,8 @@ export class ClockGame extends CanvasGameProvider {
   private resize_rest_particles() {
     this.resize_dely_timer = null;
     this.lastP = [ 10, 10, 0, 10, 10, 0, 10, 10 ];
-    this.particles.forEach(p => p.resetPos());
+    if(this.particles)
+      this.particles.forEach(p => p.resetPos());
   }
 
   // Evevnt

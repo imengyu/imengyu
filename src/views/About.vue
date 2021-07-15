@@ -13,8 +13,8 @@
         </div>
         <div class="imengyu-about-content-left">
           我是 快乐的梦鱼<br>
-          学生，大三，在浙江杭州<br>
-          普通的大学生，程序猿<br>
+          一个普普通通的男孩子<br>
+          是一个普通的刚刚入行的程序猿<br>
           正在努力学习工作<br>
 
           <div class="imengyu-about-subtitle">正在学习 <i class="iconfont icon-jiantou_xiangyouliangci_o"></i> </div>
@@ -26,16 +26,7 @@
         </div>
 
         <div class="imengyu-about-big-image">
-          <img v-for="(img, i) in aboutImages" 
-          :key="img.key" 
-          :class="i==0?'active':''" 
-          :src="img.src" 
-          :style="{ 
-            left:(i*30)+'px', 
-            transform: 'scale('+(1-0.1*i)+')',
-            zIndex: 3-i
-          }"
-          @click="moveAboutImgToFirst(img)" />
+          <img src="../assets/images/about-photo-1.jpg" />
         </div>
       
       </div>
@@ -78,50 +69,55 @@
         </div>
       </div>
 
+      <!--Hello world-->
+      <div class="imengyu-content-box-innern" id="hello-world">
+
+        <div class="imengyu-content-sub-title">
+          HELLO WORLD
+          <span>
+            你好
+          </span>
+        </div>      
+
+        
+
+      </div>
+
       <!--更多-->
-      <div class="imengyu-content-box-innern" id="more-about-me">
+      <div class="imengyu-content-box-innern overflow-visible" id="more-about-me">
 
         <div class="imengyu-content-sub-title">
           MORE ABOUT ME
           <span>
             更多关于我
-            <a class="iconfont icon-biaoqing_xiao_o text-decoration-none" style="font-size:18px"></a>
           </span>
         </div>      
 
-        <div class="imengyu-about-list show">
-          <div class="item">
-            <u class="title-prop">名字</u><span title="这就是我的真名">俞则成</span>。男生，学生/程序员
-          </div>
-
-          <div class="item">
-            <u class="title-prop">家乡</u>浙江 
-            <u class="ml-3 title-prop">星座</u><img src="../assets/images/libra.svg" title="天秤座" />
-          </div>
-
-          <div class="item">
-            <u class="title-prop">爱好</u>编程、唱歌，绘画
-            <u class="ml-3 title-prop">性格</u>安静，有点内向，做事认真
-          </div>
-
-          <div class="item">
-            <u class="title-prop">学历</u><span title="温州科技职业学院">专科</span>
-            <u class="ml-3 title-prop">专业</u>软件技术
-          </div>
+        <div class="imengyu-about-list show overflow-visible">
 
           <div class="imengyu-content-innern-subtitle">我是什么样的？</div>
           一个普通的男生，长相一般，内向，不善闲聊。<br>
-          <span title="在等一个男孩子，互相契合的灵魂，我能做你的男朋友。我不是颜控，不喜欢10。 21/170/50">🌈</span>。<br>
           喜欢新事物，新技术，对编程有浓厚兴趣，喜欢钻研。<br>
           想和有同样兴趣爱好的男生交朋友。<br>
           努力学习提升自己中...<br>
 
-          <div class="imengyu-content-innern-subtitle">研究学习方向</div>
-          全栈开发<br>
-          数据科学<br>
-          深度学习<br>
+          <div @click="showHiddenAbout=!showHiddenAbout" title="彩虹" style="display:inline-block; cursor: pointer;">🌈</div>
+          <br><br>
+
+          <div :class="'imengyu-hidden-area float '+(showHiddenAbout?'show':'')">
+            <code class="mb-3 display-inline-block">21/170/50/0</code><br>
+            我好想要一个男朋友啊<br>
+            不颜控，只求合得来真心的，不是非常喜欢10<br>
+            一直期待能遇见你，我能陪着你一起<br>
+            一起经历人生的种种冒险，把最好的都给你...<br>
+            （我比较内向，刚开始可能不大会聊天，<br>
+            成为你的男孩之后就会无话不说啦，另外是不是<br>
+            两个内向的人在一起会有更多共同话语呢？）
+          </div>
+          <div :class="'imengyu-hidden-area-placeholder '+(showHiddenAbout?'show':'')">
+          </div>
+
           
-          <div class="imengyu-content-innern-subtitle">一直为了实现梦想而努力...</div>
         </div>
       </div>
 
@@ -189,29 +185,7 @@ import RightCatalog from '../components/RightCatalog.vue'
 export default class About extends Vue {
 
   showCode = false;
-
-  activeAboutImage = 0;
-  aboutImages = [
-    {
-      src: require("../assets/images/about-photo-1.jpg"),
-      key: '1'
-    }, 
-    {
-      src: 
-    require("../assets/images/about-photo-2.jpg"),
-      key: '2'
-    }, 
-    {
-      src: require("../assets/images/about-photo-3.jpg"),
-      key: '3'
-    }
-  ]
-
-  moveAboutImgToFirst(img) {
-    this.aboutImages.splice(this.aboutImages.indexOf(img), 1);
-    this.aboutImages.unshift(img)
-  }
-
+  showHiddenAbout = false;
   currentItem = '';
   catalogItems = [
     {
@@ -221,6 +195,10 @@ export default class About extends Vue {
     {
       text: 'MY SKILLS',
       id: 'my-skills'
+    },
+    {
+      text: 'HELLO WORLD',
+      id: 'hello-world'
     },
     {
       text: 'MORE ABOUT ME',

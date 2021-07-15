@@ -34,29 +34,33 @@ export class MusicPlayer extends EventEmitter {
   initPlayer() {
 
     this.audio = document.createElement('audio');
+    this.audio.autoplay = false;
+    this.audio.onended = this.onPlayerEnded.bind(this);
+    this.audio.onpause = this.onPlayerPause.bind(this);
+    this.audio.onplay = this.onPlayerPlay.bind(this);
+    this.audio.oncanplay = this.onPlayerCanPlay.bind(this);
 
     document.body.appendChild(this.audio);
-    
+  }
+  initContext() {
     this.oCtx = new AudioContext();
     this.audioSrc = this.oCtx.createMediaElementSource(this.audio);
-
     this.analyser = this.oCtx.createAnalyser();
 
     this.audioSrc.connect(this.analyser);
     this.analyser.connect(this.oCtx.destination);
 
     this.voiceHeight = new Uint8Array(this.analyser.frequencyBinCount);
-
-    this.audio.onended = this.onPlayerEnded.bind(this);
-    this.audio.onpause = this.onPlayerPause.bind(this);
-    this.audio.onplay = this.onPlayerPlay.bind(this);
-    this.audio.oncanplay = this.onPlayerCanPlay.bind(this);
   }
   destroyPlayer() {
     this.audio.onended = null;
     this.audio.onpause = null;
     this.audio.onplay = null;
     this.audio.oncanplay = null;
+    this.oCtx = null; 
+    this.audioSrc = null; 
+    this.analyser = null;
+    this.voiceHeight = null; 
 
     document.body.removeChild(this.audio);
   }
@@ -75,6 +79,8 @@ export class MusicPlayer extends EventEmitter {
         this.emit('error', err);     
         this.updateStatus('stopped');
       }else {
+        if(this.oCtx == null) 
+          this.initContext();
         this.updateStatus('opened');
         this.playPause();
       }

@@ -93,15 +93,64 @@
   width: 200px;
 
   img {
-    position: absolute;
     width: 200px;
-    transition: all ease-in-out 0.3s;
-    opacity: 0.7;
+  }
+}
+.imengyu-boy-background {
+  position: absolute;
+  width: 240px;
+  right: 10px;
+  bottom: 10px;
+}
+.imengyu-hidden-area { 
+  
+  opacity: 0;
+  transition: all ease-in-out 0.3s;
 
-    &:active, &:hover, &.active {
-      transform: scale(1);
-      opacity: 1;
+  background-color: rgba(233, 233, 233, 0.767);
+  background-image: url(../images/boy.png);
+  background-position: right;
+  background-size: 200px;
+  background-repeat: no-repeat;
+  text-align: center;
+  font-size: 13px;
+
+  pointer-events: none;
+  
+  padding-left: $page-padding-lg*2;
+  padding-right: $page-padding-lg*2;
+
+  code {
+    font-size: 12px;
+    background-color: #303030;
+    color: #fff;
+    border-radius: 5px;
+    padding: 2px 5px;
+  }
+
+  &.float {
+    position: absolute;
+    left: -$page-padding-lg*2;
+    right: -$page-padding-lg*2;
+    height: 0;
+
+    &.show {
+      height: auto;
     }
+  }
+
+  &.show {
+    padding-top: 40px;
+    padding-bottom: 60px;
+    opacity: 1;
+    pointer-events: visible;
+  }
+}
+.imengyu-hidden-area-placeholder {
+  height: 0;
+  transition: all ease-in-out 0.3s;
+  &.show {
+    height: 180px;
   }
 }
 
@@ -160,17 +209,6 @@
   .item {
     padding: 3px 0;
   }
-
-  transition: all ease-in-out 0.3s;
-
-  &.show {
-    height: 400px;
-    opacity: 1;
-  }
-  &.hide {
-    height: 0;
-    opacity: 0;
-  }
 }
 
 
@@ -183,6 +221,17 @@
     .link-item {
       padding: 0 3px;
       width: 33.33%;
+    }
+  }
+  .imengyu-hidden-area {
+    padding-left: $page-padding-md;
+    padding-right: $page-padding-md;   
+    padding-top: 20px;
+    padding-bottom: 40px;
+
+    &.float {
+      left: -$page-padding-md;
+      right: -$page-padding-md;
     }
   }
 }
@@ -201,6 +250,14 @@
     margin-top: 25px;
     right: 0;
   }
+  .imengyu-hidden-area-placeholder.show {
+    height: 230px;
+  }
+}
+@media only screen and (max-width: 768px) {
+  .imengyu-hidden-area-placeholder.show {
+    height: 210px;
+  }
 }
 
 @media only screen and (max-width: 500px) {
@@ -214,10 +271,6 @@
       width: 47%;
     }
   }
-  .imengyu-about-list.show {
-    height: 466px;
-  }
-
   //about contact
   .imengyu-about-contact-title {
     display: block;
@@ -228,6 +281,25 @@
 
     &.right {
       text-align: center;
+    }
+  }
+
+  .imengyu-hidden-area-placeholder.show {
+    height: 230px;
+  }
+  .imengyu-hidden-area {
+    padding-left: $page-padding-sm;
+    padding-right: $page-padding-md;    
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    background-position: 120% center;
+    background-size: 160px;
+    text-align: left;
+
+    &.float {
+      left: -$page-padding-sm;
+      right: -$page-padding-sm;
     }
   }
 }

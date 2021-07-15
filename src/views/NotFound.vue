@@ -33,7 +33,7 @@ export default class NotFound extends Vue {
     this.$router.push({ path: '/' });
   }
   mounted() {
-    document.title = '404 Not found - 梦欤的个人网站小作品';
+    document.title = '404 Not found - 快乐的梦鱼 个人网站小作品';
     setTimeout(() => this.hideLoadingMask())
   }
   hideLoadingMask() {

@@ -16,7 +16,7 @@
           <img class="rainbow" src="@/assets/images/rainbow.png" />
         </div>
         <h1><span>你好，我是</span> <br/><small class="name">快乐的梦鱼</small></h1>
-        <i class="text animated fadeInLeft">我是一个程序员/学生</i>
+        <i class="text animated fadeInLeft">我是一个程序员</i>
         <i class="text animated fadeInRight">擅长前端开发/UI设计</i>
         <i class="text animated fadeInLeft">在浙江杭州</i>
         <i class="text tip animated fadeInRight">          
@@ -280,7 +280,7 @@ export default class Index extends Vue {
     this.onRoute();
     this.hideLoadingMask();
 
-    document.title = '梦欤的个人网站小作品';
+    document.title = '快乐的梦鱼 个人网站小作品';
 
     setTimeout(() => {
       this.sortGameCanvasAnimHost = <CanvasAnimHost>this.$refs.sortGameCanvasAnimHost;

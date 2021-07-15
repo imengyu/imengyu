@@ -4,6 +4,8 @@ import App from './App.vue'
 import { createRouter } from './router'
 import Vue from 'vue';
 
+const version = '20210516';
+
 let bus : Vue = null;
 
 function doInitVue() {
@@ -35,7 +37,10 @@ function doLoadAll() {
       doInitVue();
     }
   }
+
   loadJs();
+
+  console.log(`%cVersion%c${version}`, 'color:#fff;background:#000;padding:3px 6px', 'color:#fff;background:#56a;padding:3px 6px');
 }
 function doLoadCss(name) {
   var s = s=document.createElement("link");

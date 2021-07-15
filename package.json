@@ -9,7 +9,7 @@
     "build": "node build/build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "梦欤",
+  "author": "快乐的梦鱼",
   "license": "MIT",
   "dependencies": {
     "@types/dat.gui": "^0.7.6",

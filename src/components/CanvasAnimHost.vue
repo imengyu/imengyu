@@ -32,8 +32,9 @@ export default class CanvasAnimHost extends Vue {
   }
 
   onWindowResize() {
-    this.canvas.width = window.outerWidth;
-    this.canvas.height = window.outerHeight;
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.gameProvider.resize(this.canvas.width,  this.canvas.height);
   }
 
   renderTickHandle = null;

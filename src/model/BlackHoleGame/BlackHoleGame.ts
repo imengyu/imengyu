@@ -474,18 +474,17 @@ export class BlackHoleGame extends CanvasGameProvider {
       loopInnern(i, (voiceHeight[step * (i - center)] / 250) * rows)
     
   }
+  public resize(w : number, h: number) {
+    this.width = w;
+    this.height = h;
+    if(this.gl)
+      this.gl.viewport(0, 0, this.width, this.height);
+  }
   public init(canvas : HTMLCanvasElement, ctx : CanvasRenderingContext2D) {
     super.init(canvas, ctx);
 
     this.width = this.canvas.width;
     this.height = this.canvas.height;
-
-    window.addEventListener('resize', () => {
-      this.width = this.canvas.width = document.body.clientWidth;
-      this.height = this.canvas.height = document.body.clientHeight;
-      if(this.gl)
-        this.gl.viewport(0, 0, this.width, this.height);
-    });
 
     const gl = this.gl = this.canvas.getContext('webgl');
     gl.viewport(0, 0, this.width, this.height);

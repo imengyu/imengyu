@@ -29,4 +29,7 @@ export class CanvasGameProvider {
   public stop() {
     
   }
+  public resize(w : number, h: number) {
+    
+  }
 }

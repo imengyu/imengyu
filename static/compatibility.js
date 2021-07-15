@@ -3,7 +3,7 @@ var loaded = false;
 window.onload = function() {
 
   var browser = checkBrowserType();
-  console.log('browser : ' + browser.type + '/' + browser.version);
+  console.log('Your browser : ' + browser.type + '/' + browser.version);
   if(checkIsOldBrowser(browser)) 
     showErrorTip();
 
@@ -11,11 +11,12 @@ window.onload = function() {
 }
 
 function checkIsOldBrowser(browser) {
+  var version = splitVersion(browser.version);
   return browser.type == 'IE'
-   || (browser.type == 'Chrome' && splitVersion(browser.version) < 55)
-   || (browser.type == 'Opera' && splitVersion(browser.version) < 12)
-   || (browser.type == 'Safari' && splitVersion(browser.version) < 5)
-   || (browser.type == 'Firefox' && splitVersion(browser.version) < 15)
+   || (browser.type == 'Chrome' && version < 55)
+   || (browser.type == 'Opera' && version < 12)
+   || (browser.type == 'Safari' && version < 5)
+   || (browser.type == 'Firefox' && version < 15)
 }
 function showErrorTip() {
   var body = document.body;
