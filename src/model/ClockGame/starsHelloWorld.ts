@@ -1,6 +1,6 @@
 
 
-var helloWorld = [
+const helloWorld = [
 
   /* H 13 */
   [ 2,1 ],                        [ 6,1 ],

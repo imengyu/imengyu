@@ -1,4 +1,4 @@
-/// <reference types="sizzle" />
-/// <reference path="window.d.ts" />
-/// <reference path="extends.d.ts" />
+import 'window.d.ts';
+import 'extends.d.ts';
 
+declare module 'three-orbitcontrols';

@@ -1,5 +1,5 @@
 
-var colors = [
+const colors = [
   'rgb(244, 67, 54)',
   'rgb(233, 30, 99)',
   'rgb(156, 39, 176)',
@@ -26,6 +26,6 @@ export function getColorByIndex(i : number) {
   else return colors[(i % colors.length)];
 }
 export function getRandomColor() {
-  var r = Math.floor(Math.random() * colors.length);
+  const r = Math.floor(Math.random() * colors.length);
   return colors[r];
 }

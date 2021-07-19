@@ -1,31 +1,29 @@
 <template>
   <div class="imengyu">
     <Header :dark="darkMode"></Header>
-    <router-view></router-view>
+    <router-view />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 import Header from './components/Header.vue'
-import { bus } from './index'
+import { emitter } from './main'
 
-@Component({
+export default defineComponent({
   components: {
-    Header
-  }
-})
-export default class App extends Vue {
-
-  darkMode = false;
-
+    Header,
+  },
+  data() {
+    return {
+      darkMode: false,
+    } 
+  },
   mounted() {
-    setTimeout(() => {
-      bus.$on('updateDarkMode', (c) => {
-        this.darkMode = c;
-      })
-    }, 1000);
-    
-  }
-}
+    emitter.on('updateDarkMode', (e) => {
+      this.darkMode = e as boolean;
+    })
+  },
+
+})
 </script>

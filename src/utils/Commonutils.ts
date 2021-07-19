@@ -1,5 +1,7 @@
 import StringUtils from "./StringUtils";
 
+
+
 /**
  * 检查是否定义
  * @param obj 
@@ -31,36 +33,15 @@ function getBoolean(v : string) {
 }
 
 /**
- * 通过字符串键值访问对象属性
- * @param o 基础对象
- * @param s key
- * @returns 
- */
-function getObjectKey(o : object, s : string) {
-  s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
-  s = s.replace(/^\./, '');           // strip a leading dot
-  var a = s.split('.');
-  for (var i = 0, n = a.length; i < n; ++i) {
-      var k = a[i];
-      if (k in o) {
-          o = o[k];
-      } else {
-          return;
-      }
-  }
-  return o;
-}
-
-/**
  * 生成随机字符串
  * @param len 随机字符串长度
  * @returns 随机字符串
  */
 function randomString(len ?: number) {
   len = len || 32;
-  var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
-  var maxPos = $chars.length;
-  var pwd = '';
+  const $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+  const maxPos = $chars.length;
+  let pwd = '';
   for (let i = 0; i < len; i++) {
     pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
   }
@@ -74,9 +55,9 @@ function randomString(len ?: number) {
  */
 function randomNumberString(len ?: number) {
   len = len || 32;
-  var $chars = '0123456789';
-  var maxPos = $chars.length;
-  var pwd = '';
+  const $chars = '0123456789';
+  const maxPos = $chars.length;
+  let pwd = '';
   for (let i = 0; i < len; i++) {
     pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
   }
@@ -104,7 +85,7 @@ function genNonDuplicateID(randomLength : number){
  * @param randomLength 字符长度
  */
 function genNonDuplicateIDHEX(randomLength : number){
-  let idStr = genNonDuplicateID(randomLength);
+  const idStr = genNonDuplicateID(randomLength);
   return StringUtils.strToHexCharCode(idStr, false).substr(idStr.length - randomLength, randomLength);
 }
 
@@ -113,7 +94,6 @@ export default {
   isNullOrEmpty,
   isDefinedAndNotNull,
   getBoolean,
-  getObjectKey,
   randomString,
   randomNumberString,
   genRandom,

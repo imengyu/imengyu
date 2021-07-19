@@ -1,16 +1,20 @@
 <template>
   <div class="imengyu-copyright">
-    <a href="javascript:;" @click="$emit('input', true)"><i class="iconfont icon-banquan"></i> 2021 快乐的梦鱼 版权所有</a> | <a href="http://beian.miit.gov.cn/" target="blank">浙ICP备18051956号-2</a>
+    <a href="javascript:;" @click="$emit('on-show-copyright')"><i class="iconfont icon-banquan"></i> 2021 快乐的梦鱼 版权所有</a> | <a href="http://beian.miit.gov.cn/" target="blank">{{BeianNumber}}</a>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import Const from '@/const/Const'
+import { defineComponent } from 'vue'
 
-@Component({
-  name: 'Footer'
+export default defineComponent({
+  name: 'Footer',
+  emits: [ 'on-show-copyright' ],
+  data() {
+    return {
+      BeianNumber: Const.BeianNumber
+    }
+  }
 })
-export default class Footer extends Vue {
-  @Prop({default:false})value : boolean;
-}
 </script>

@@ -9,7 +9,7 @@ interface Array<T> {
    * 删除数组中的元素
    * @param item 元素 或 元素索引
    */
-  remove(item: T | Number): boolean;
+  remove(item: T | number): boolean;
   /**
    * 查找数组中是否存在某一元素
    * @param item 元素
@@ -40,7 +40,7 @@ interface Date {
    * 格式化日期
    * @param formatStr 格式化字符串 支持 YYYY-MM-DD HH:ii:ss
    */
-  format(formatStr?: String);
+  format(formatStr?: string);
 
   toGMTString() : string;
 }
@@ -50,5 +50,5 @@ interface String {
    * 查找字符串中是包含另一个字符串
    * @param item 字符串
    */
-  contains(str: String) : boolean;
+  contains(str: string) : boolean;
 }

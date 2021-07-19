@@ -1,8 +1,10 @@
+import Utils from "@/utils/Utils";
 import { CanvasGameProvider } from "../CanvasGameProvider";
-import { random } from "../ThreeSpaceGame/utils/RandomUtil";
 import { getColorByIndex, getRandomColor } from "./colorPool";
 import { getNumberTextPointMap, NUMBER_MAP_HEIGHT, NUMBER_MAP_WIDTH, NUMBER_POINT_INDEX } from "./numberPmoduls";
 import { getHelloWorldTextMap } from "./starsHelloWorld";
+
+const random = Utils.randomNum;
 
 const max_particles = 200;
 const max_particles_size = 36;
@@ -21,8 +23,6 @@ const auto_switch_mode_sec_min = 16;
 const auto_switch_mode_sec_max = 26;
 const auto_switch_mode_sec_min_text = 36;
 const auto_switch_mode_sec_max_text = 50;
-const auto_switch_mode_sec_min_timer = 70;
-const auto_switch_mode_sec_max_timer = 100;
 const text_sm_sp = 700;
 const text_display_height = 100;
 const text_display_height_sm = 65;
@@ -80,7 +80,7 @@ export class Particle {
   infoItemText = '';
   infoConItemTick = 0;
 
-  private game : ClockGame = null;
+  private game : ClockGame;
 
   constructor(progress : number, isTextPart : boolean, game : ClockGame) {
     this.textPart = isTextPart;
@@ -102,69 +102,71 @@ export class Particle {
 
 
   render() {
-
-    if(this.alpha==0) return;
+    if(this.alpha == 0) return;
 
     const ctx = this.game.ctx;
+    if(ctx) {
+      //绘制圆
+      ctx.globalAlpha = this.alpha;
+      ctx.lineWidth = this.radius;
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      
+      if(this.game.show_box) {
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#f00';
+        ctx.strokeRect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+      }
 
-    //绘制圆
-    ctx.globalAlpha = this.alpha;
-    ctx.lineWidth = this.radius;
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2, true);
-    ctx.closePath();
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    
-    if(this.game.show_box) {
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#f00';
-      ctx.strokeRect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+      if(this.isMouseEnter && this.isAskItem) this.renderTextInCenter('?');
+      else if(this.isMouseEnter && this.game.mode == 'normal' && this.isInfoItem)this.renderTextInCenter(this.infoItemText, true);
+      else if(this.isInfoConItem) this.renderTextInCenter(this.infoItemText, true, true, 'big');
+
+      if(this.game.show_pos) this.renderTextPos();
     }
-
-    if(this.isMouseEnter && this.isAskItem) this.renderTextInCenter('?');
-    else if(this.isMouseEnter && this.game.mode == 'normal' && this.isInfoItem)this.renderTextInCenter(this.infoItemText, true);
-    else if(this.isInfoConItem) this.renderTextInCenter(this.infoItemText, true, true, 'big');
-
-    if(this.game.show_pos) this.renderTextPos();
   }
   renderTextPos() {
     //Render pos text
     if(this.game.mode == 'text') this.renderTextInCenter(this.positionXPText+','+this.positionYPText);
     
     const ctx = this.game.ctx;
-
-    ctx.fillStyle = '#fff';
-    if(this.isMouseEnter) ctx.fillText(
-      this.positionXP+','+this.positionYP + '[' + Math.floor(this.x)+','+Math.floor(this.y) + ']', 
-      this.x - this.radius, this.y - this.radius);
-    else if(this.game.mode == 'timer') this.renderTextInCenter(this.positionXP+','+this.positionYP);
-    else this.renderTextInCenter(Math.floor(this.x)+','+Math.floor(this.y));
+    if(ctx) {
+      ctx.fillStyle = '#fff';
+      if(this.isMouseEnter) ctx.fillText(
+        this.positionXP+','+this.positionYP + '[' + Math.floor(this.x)+','+Math.floor(this.y) + ']', 
+        this.x - this.radius, this.y - this.radius);
+      else if(this.game.mode == 'timer') this.renderTextInCenter(this.positionXP+','+this.positionYP);
+      else this.renderTextInCenter(Math.floor(this.x)+','+Math.floor(this.y));
+    }
   }
   renderTextInCenter(str : string, limitWidth = false, warpText = false, textSize : 'small'|'big' = 'small') {
     const ctx = this.game.ctx;
-
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = textSize == 'big' ? '17px Arial' : '11px Arial';
-    if(warpText && limitWidth) {
-      const padding = 5;
-      var lineWidth = 0, initHeight = this.y - padding, lastSubStrIndex = 0;
-      for(let i=0;i<str.length;i++){ 
-        lineWidth += ctx.measureText(str[i]).width; 
-        if(lineWidth > this.radius * 2 - padding * 4){  
-            ctx.fillText(str.substring(lastSubStrIndex,i), this.x + padding, initHeight);//绘制截取部分
-            initHeight += 16;//20为字体的高度
-            lineWidth=0;
-            lastSubStrIndex=i;
-        } 
-        if(i==str.length-1){//绘制剩余部分
-          ctx.fillText(str.substring(lastSubStrIndex,i+1), this.x + padding, initHeight);
+    if(ctx) {
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = textSize == 'big' ? '17px Arial' : '11px Arial';
+      if(warpText && limitWidth) {
+        const padding = 5;
+        let lineWidth = 0, initHeight = this.y - padding, lastSubStrIndex = 0;
+        for(let i=0;i<str.length;i++){ 
+          lineWidth += ctx.measureText(str[i]).width; 
+          if(lineWidth > this.radius * 2 - padding * 4){  
+              ctx.fillText(str.substring(lastSubStrIndex,i), this.x + padding, initHeight);//绘制截取部分
+              initHeight += 16;//20为字体的高度
+              lineWidth=0;
+              lastSubStrIndex=i;
+          } 
+          if(i==str.length-1){//绘制剩余部分
+            ctx.fillText(str.substring(lastSubStrIndex,i+1), this.x + padding, initHeight);
+          }
         }
-      }
-    }else ctx.fillText(str, this.x, this.y, limitWidth ? this.radius * 2 : undefined);
+      }else ctx.fillText(str, this.x, this.y, limitWidth ? this.radius * 2 : undefined);
+    }
   }
   resetPos() {
     this.alpha = 0;
@@ -175,11 +177,11 @@ export class Particle {
     if(this.alpha > 0.05) this.alpha -= 0.05;
     else if(this.alpha != 0) this.alpha = 0;
   }
-  moveCloseToPos(tx, ty, speed, speedMin) {
+  moveCloseToPos(tx : number, ty : number, speed : number, speedMin : number) {
     if(!this.positionArrived) {
 
-      let xDiff = Math.abs(this.x - tx);
-      let yDiff = Math.abs(this.y - ty);
+      const xDiff = Math.abs(this.x - tx);
+      const yDiff = Math.abs(this.y - ty);
 
       if(xDiff < 0.5 && yDiff < 0.5) {
         this.positionArrived = true;
@@ -194,7 +196,7 @@ export class Particle {
       if(xDiffPec > 1) xDiffPec = 1; if(yDiffPec > 1) yDiffPec = 1;
 
       let xSpeed = speed * xDiffPec;
-      let ySpeed = speed * yDiffPec;
+      let ySpeed = speed * yDiffPec;  
 
       if(xSpeed > xDiff) xSpeed = speedMin;
       if(ySpeed > yDiff) ySpeed = speedMin;
@@ -211,7 +213,7 @@ export class Particle {
   }
   move() {
 
-    var catchable = false;
+    let catchable = false;
 
     if(this.game.mode == 'text') {
       if(this.textPart) {
@@ -281,14 +283,14 @@ export class Particle {
 
     return true;
   }
-  testMouseInRect(x, y) {
+  testMouseInRect(x : number, y : number) {
     this.isMouseEnter = (x > this.x - this.radius && y > this.y - this.radius 
       && x < this.x + this.radius && y < this.y + this.radius);
     return this.isMouseEnter;
   }
 
   onMouseDown() {
-    
+    //
   }
   onMouseUp() {
     //创建文字粒子
@@ -296,7 +298,7 @@ export class Particle {
 
       this.game.autoSwitcherTimerRest();
 
-      let p = new Particle(0, false, this.game);
+      const p = new Particle(0, false, this.game);
       p.color = getRandomColor();
       p.isInfoConItem = true;
       p.radius = random(70, 130);
@@ -321,18 +323,18 @@ export class ClockGame extends CanvasGameProvider {
   info_particles_texts : Array<string> = [];
   question_particles_count = 30;
   
-  public setStarsConf(name : string, val) {
+  public setStarsConf(name : string, val : boolean|number|string[]) {
     switch(name) {
-      case 'info_particles_count': this.info_particles_count = val; break;
-      case 'question_particles_count': this.question_particles_count = val; break;
-      case 'info_particles_texts': this.info_particles_texts = val; break;
+      case 'info_particles_count': this.info_particles_count = val as number; break;
+      case 'question_particles_count': this.question_particles_count = val as number; break;
+      case 'info_particles_texts': this.info_particles_texts = val as string[]; break;
       case 'auto_switch': 
-      this.auto_switch = val; 
-        if(val && this.auto_explode_timer == null) this.autoSwitcherTimerRest();
-        else if(this.auto_explode_timer != null) this.autoSwitcherTimerRest();
+      this.auto_switch = val as boolean; 
+        if(val && this.auto_explode_timer == 0) this.autoSwitcherTimerRest();
+        else if(this.auto_explode_timer != 0) this.autoSwitcherTimerRest();
         break;
-      case 'show_pos': this.show_pos = val; break;
-      case 'show_box': this.show_box = val; break;
+      case 'show_pos': this.show_pos = val as boolean; break;
+      case 'show_box': this.show_box = val as boolean; break;
     }
   
   }
@@ -340,20 +342,22 @@ export class ClockGame extends CanvasGameProvider {
   openedinfo_particles_count = 0;
   first_text_mode = true;
   anim_running = false;
-  stars : HTMLCanvasElement = null;
+  stars : HTMLCanvasElement|null = null;
   width = 0;
   height = 0;
-  ctx : CanvasRenderingContext2D = null;
+  ctx : CanvasRenderingContext2D|null = null;
   particles : Array<Particle> = [];
   mode : StartsMode = 'normal';
-  auto_explode_timer = null;
-  time_update_timer = null;
+  auto_explode_timer = 0;
+  time_update_timer = 0;
   clockPointShow = false;
-  onModeChangedCallback : (mode : StartsMode) => void = null;
+  onModeChangedCallback : ((mode : StartsMode) => void) | null = null;
 
   public switchSpectrum(on : boolean) {
+    //Inhert
   }
   public drawSpectrum(analyser : AnalyserNode, voiceHeight : Uint8Array) {
+    //Inhert
   }
   public setStarsTimerForUpdate() {
     this.build_all_time_particles();
@@ -434,7 +438,7 @@ export class ClockGame extends CanvasGameProvider {
 
   private lastTimeString = '';
   private timerTimeUpdate() {
-    let nowTimeString = new Date().format('HH:ii:ss');
+    const nowTimeString = new Date().format('HH:ii:ss');
     if(nowTimeString != this.lastTimeString) {
       this.lastTimeString = nowTimeString;
       this.setStarsTimerForUpdate();
@@ -442,9 +446,9 @@ export class ClockGame extends CanvasGameProvider {
     }
   } 
   autoSwitcherTimerRest() {
-    if(this.auto_explode_timer != null) {
+    if(this.auto_explode_timer != 0) {
       clearTimeout(this.auto_explode_timer);
-      this.auto_explode_timer = null;
+      this.auto_explode_timer = 0;
     }
   }
   private autoSwitcherMode() {
@@ -456,20 +460,20 @@ export class ClockGame extends CanvasGameProvider {
     if(this.auto_switch) {
       if(this.mode == 'normal') {
         this.auto_explode_timer = setTimeout(() => {
-          this.auto_explode_timer = null;
+          this.auto_explode_timer = 0;
           if(this.first_text_mode) this.setStarsMode('text');
           else Math.random() > 0.7 ? this.setStarsMode('timer') : this.setStarsMode('text');
         }, random(auto_switch_mode_sec_min, auto_switch_mode_sec_max) * 1000);
       }else if(this.mode == 'text') {
         this.auto_explode_timer = setTimeout(() => {
-          this.auto_explode_timer = null;
+          this.auto_explode_timer = 0;
           if(this.first_text_mode) { this.first_text_mode = false; this.setStarsMode('timer'); } 
           else Math.random() > 0.7 ? this.setStarsMode('timer') : this.setStarsMode('explode');
         }, random(auto_switch_mode_sec_min_text, auto_switch_mode_sec_max_text) * 1000);
       }else if(this.mode == 'explode') {
         this.auto_explode_timer = setTimeout(() => {
           this.particles.forEach(element => element.resetPos());
-          this.auto_explode_timer = null;
+          this.auto_explode_timer = 0;
           this.setStarsMode('normal');
         }, 3000);
       }
@@ -477,9 +481,9 @@ export class ClockGame extends CanvasGameProvider {
   
     //Timer mode start and stop
     if(this.mode != 'timer') {
-      if(this.time_update_timer!=null) {
+      if(this.time_update_timer != 0) {
         clearInterval(this.time_update_timer);
-        this.time_update_timer = null;
+        this.time_update_timer = 0;
       }
     }else {
       this.resize_rest_particles();
@@ -492,10 +496,12 @@ export class ClockGame extends CanvasGameProvider {
   // base functions
 
   private clear() {
-    //ctx.globalAlpha = 0.05;
-    this.ctx.fillStyle = '#000';
-    this.ctx.fillRect(0, 0, this.width, this.height);
-    //ctx.globalAlpha = 1;
+    if(this.ctx) {
+      //ctx.globalAlpha = 0.05;
+      this.ctx.fillStyle = '#000';
+      this.ctx.fillRect(0, 0, this.width, this.height);
+      //ctx.globalAlpha = 1;
+    }
   }
   private update() {
     this.clear();
@@ -509,7 +515,7 @@ export class ClockGame extends CanvasGameProvider {
 
   // Mouse move
 
-  mouse_move_timer = null;
+  mouse_move_timer = 0;
   mouse_move_last_pos = [ 0,0 ];
   mouse_moved = false;
   mouse_downed = false;
@@ -519,8 +525,8 @@ export class ClockGame extends CanvasGameProvider {
     this.mouse_move_timer = setInterval(() => {
       if(this.mouse_moved) {
         this.mouse_moved = false;
-        let x = this.mouse_move_last_pos[0];
-        let y = this.mouse_move_last_pos[1];
+        const x = this.mouse_move_last_pos[0];
+        const y = this.mouse_move_last_pos[1];
         this.particles.forEach(e => {
           if(this.mouse_action=='up' && e.isMouseEnter) e.onMouseUp(); e.testMouseInRect(x, y)
           if(this.mouse_action=='down' && e.isMouseEnter) e.onMouseDown();
@@ -531,7 +537,7 @@ export class ClockGame extends CanvasGameProvider {
   private clearMouseMoveTimer() {
     clearInterval(this.mouse_move_timer);
   }
-  private handleMouseMove(x, y, act : 'move'|'down'|'up' = 'move') {
+  private handleMouseMove(x : number, y : number, act : 'move'|'down'|'up' = 'move') {
     this.mouse_move_last_pos[0] = x;
     this.mouse_move_last_pos[1] = y;
     this.mouse_moved = true;
@@ -542,12 +548,12 @@ export class ClockGame extends CanvasGameProvider {
   // particles control
 
   private build_all_particles() {
-    let p : Particle = null;
-    let textMapData = getHelloWorldTextMap();
-    let textPosArr = textMapData.pmap;
-    let textSize = this.getMapDisplaySize(true);
-    let textStartPos = [ (this.width - textSize[0]) / 2, (this.height - textSize[1] - (this.width <= text_sm_sp ? (this.height / 8 + text_display_height_sm) : this.height / 8)) / 2 ];
-    let textBlockSize = [ textSize[0] / textMapData.width, textSize[1] / textMapData.height ];
+    let p : Particle|null = null;
+    const textMapData = getHelloWorldTextMap();
+    const textPosArr = textMapData.pmap;
+    const textSize = this.getMapDisplaySize(true);
+    const textStartPos = [ (this.width - textSize[0]) / 2, (this.height - textSize[1] - (this.width <= text_sm_sp ? (this.height / 8 + text_display_height_sm) : this.height / 8)) / 2 ];
+    const textBlockSize = [ textSize[0] / textMapData.width, textSize[1] / textMapData.height ];
 
     let colorIndex = 0;
 
@@ -557,10 +563,10 @@ export class ClockGame extends CanvasGameProvider {
     }
 
     //gen particles info range
-    let askStart = random(30, 50);
-    let askEnd = random(60, max_particles);
-    let infoIndex = [];
-    let askIndex = [];
+    const askStart = random(30, 50);
+    const askEnd = random(60, max_particles);
+    const infoIndex = [];
+    const askIndex = [];
 
     for (let i = 0; i < this.question_particles_count; i++) askIndex.push(random(askStart, askEnd));
     for (let i = 0; i < this.info_particles_count; i++) infoIndex.push(random(askStart, askEnd));
@@ -606,14 +612,14 @@ export class ClockGame extends CanvasGameProvider {
 
   private build_all_time_particles() {
 
-    let now = new Date();
+    const now = new Date();
 
-    let min = now.getMinutes();
-    let hour = now.getHours();
-    let second = now.getSeconds();
+    const min = now.getMinutes();
+    const hour = now.getHours();
+    const second = now.getSeconds();
 
     //计算
-    let nowP = [ 
+    const nowP = [ 
       Math.floor(hour / 10  % 10),  
       Math.floor(hour % 10), 
       NUMBER_POINT_INDEX, 
@@ -624,15 +630,15 @@ export class ClockGame extends CanvasGameProvider {
       Math.floor(second % 10),
     ];
 
-    let textW = nowP.length * NUMBER_MAP_WIDTH;
-    let textH = NUMBER_MAP_HEIGHT;
+    const textW = nowP.length * NUMBER_MAP_WIDTH;
+    const textH = NUMBER_MAP_HEIGHT;
 
-    let p : Particle = null;
+    let p : Particle|null = null;
 
     //计算粒子所占空间大小
-    let textSize = this.getMapDisplaySize();
-    let textStartPos = [ (this.width - textSize[0]) / 2, (this.height - textSize[1] - this.height / 8) / 2 ];
-    let textBlockSize = [ textSize[0] / textW, textSize[1] / textH ];
+    const textSize = this.getMapDisplaySize();
+    const textStartPos = [ (this.width - textSize[0]) / 2, (this.height - textSize[1] - this.height / 8) / 2 ];
+    const textBlockSize = [ textSize[0] / textW, textSize[1] / textH ];
 
     //重置标志位
     for (let index = 0; index < this.particles.length; index++) {
@@ -642,12 +648,13 @@ export class ClockGame extends CanvasGameProvider {
       p.timePartIsSec = false;
     }
 
-    let j = 0, c = this.particles.length;
+    let j = 0;
+    const c = this.particles.length;
 
     for (let i = 0; i < nowP.length; i++) { 
 
       //获取每个字点阵图
-      let textMapData = getNumberTextPointMap(nowP[i]);
+      const textMapData = getNumberTextPointMap(nowP[i]);
 
       for (let k = 0, d = textMapData.length; k < d && j < c; k++) {
         
@@ -658,8 +665,8 @@ export class ClockGame extends CanvasGameProvider {
         
         p.timePartIsSec = i >= 6;
 
-        let x = textStartPos[0] + (textMapData[k][0] + i * NUMBER_MAP_WIDTH) * textBlockSize[0];
-        let y = textStartPos[1] + textMapData[k][1] * textBlockSize[1];
+        const x = textStartPos[0] + (textMapData[k][0] + i * NUMBER_MAP_WIDTH) * textBlockSize[0];
+        const y = textStartPos[1] + textMapData[k][1] * textBlockSize[1];
 
         if(this.lastP[i] != nowP[i] || nowP[i] == NUMBER_POINT_INDEX){//更新不一样的字
 
@@ -691,15 +698,9 @@ export class ClockGame extends CanvasGameProvider {
             if(p.positionYDiff > move_speed_into_time_text_min && p.positionYDiff < 10) 
               p.positionYDiff = 10;
           }
-
-        }else {
-
         }
-
       }
-      
     }
-
 
     this.lastP = nowP;
   }
@@ -732,7 +733,7 @@ export class ClockGame extends CanvasGameProvider {
     this.particles.forEach(element => element.resetPos());
   }
   private resize_rest_particles() {
-    this.resize_dely_timer = null;
+    this.resize_dely_timer = 0;
     this.lastP = [ 10, 10, 0, 10, 10, 0, 10, 10 ];
     if(this.particles)
       this.particles.forEach(p => p.resetPos());
@@ -756,15 +757,18 @@ export class ClockGame extends CanvasGameProvider {
   // Evevnt handler
   //
 
-  resize_dely_timer = null;
+  resize_dely_timer = 0;
 
   private onWindowResize() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(0, 0, this.width, this.height);
 
-    if(this.resize_dely_timer == null)
+    if(this.ctx) {
+      this.ctx.fillStyle = 'black';
+      this.ctx.fillRect(0, 0, this.width, this.height);
+    }
+
+    if(this.resize_dely_timer == 0)
     this.resize_dely_timer = setTimeout(this.resize_rest_particles, 1100);
   }
   private onWindowMouseMove(e : MouseEvent) {

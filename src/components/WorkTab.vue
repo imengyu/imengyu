@@ -9,27 +9,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
+import { defineComponent, PropType } from 'vue'
 
-@Component({
-  name: 'WorkTab'
+export default defineComponent({
+  pros: {
+    items: {
+      type: Object as PropType<Array<string>>,
+      default: null
+    },
+    value: {
+      type: String,
+      default: null
+    },
+  },
+  onClick(item : string) {
+    this.$emit('update:value', item);
+  },
 })
-export default class WorkTab extends Vue {
-  @Prop({default:null}) items : Array<any>;
-  @Prop({default:null}) value;
-
-  @Watch("value") 
-  onValueChanged() {
-   
-  }
-  onClick(item) {
-    this.$emit('input', item);
-  }
-
-  mounted() {
-    setTimeout(() => {
-    }, 100);
-  }
-
-}
 </script>

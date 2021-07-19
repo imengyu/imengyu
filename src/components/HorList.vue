@@ -35,67 +35,94 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
+import { defineComponent, PropType } from 'vue'
 
-@Component({
-  name: 'HorList'
-})
-export default class HorList extends Vue {
-  @Prop({default:null}) workItems : Array<any>;
-  @Prop({default:null}) value;
-  @Prop({default:3}) onePageCount;
+export interface IWorkItem {
+  id: number,
+  img: string,
+  title: string,
+  text: string,
+  link: string,
+  linkText: string,
+  category: string[],
+}
 
-  worksList : HTMLElement = null;
-  itemWidth = 0;
+export interface IHorList {
+  reloadListScroll: () => void;
+}
 
-  get cannotNext() {
-    return !(this.value < this.workItems.length - 1)
-  }
-  get cannotBack() {
-    return !(this.value > 0)
-  }
-
-  @Watch("onePageCount") 
-  reloadItemWidth() {
-    this.itemWidth = this.worksList.offsetWidth * (1/this.onePageCount) - 44;
-  }
-  
-  @Watch("value") 
-  reloadListScroll() {
-    let w = (this.value + (this.onePageCount == 1 ? 1 : 0)) * this.worksList.offsetWidth / this.onePageCount;
-    this.worksList.scrollTo({
-      left: w,
-      behavior: "smooth" 
-    })
-  }
-
-  listNext() {
-    if(this.value < this.workItems.length - 1)
-      this.$emit('input', this.value + 1);
-  }  
-  listPrev() {
-    if(this.value > 0)
-      this.$emit('input', this.value - 1);
-  }
- 
-  onMouseWhell(e : WheelEvent) {
-    if(e.deltaY < 0) {
-      this.listPrev();
-    } else if(e.deltaY > 0) {
-      this.listNext();
+export default defineComponent({
+  name: 'HorList',
+  props: {
+    workItems: {
+      type: Object as PropType<Array<IWorkItem>>,
+      default: null,
+    },
+    value: {
+      type: Number,
+      default: 0,
+    },
+    onePageCount: {
+      type: Number,
+      default: 3,
+    },
+  },
+  data() {
+    return {
+      worksList: null as HTMLElement|null,
+      itemWidth: 0,
     }
-    e.cancelBubble = true;
-    e.preventDefault();
-  }
-
+  },
+  computed: {
+    cannotNext() : boolean {
+      return !(this.value < this.workItems.length - 1)
+    },
+    cannotBack() : boolean {
+      return !(this.value > 0)
+    }
+  },
+  watch: {
+    onePageCount() { this.reloadItemWidth() },
+    value() { this.reloadListScroll() },
+  },
+  methods: {
+    reloadItemWidth() {
+      if(this.worksList)
+        this.itemWidth = this.worksList.offsetWidth * (1/this.onePageCount) - 44;
+    },
+    reloadListScroll() {
+      if(this.worksList) {
+        const w = (this.value + (this.onePageCount == 1 ? 1 : 0)) * this.worksList.offsetWidth / this.onePageCount;
+        this.worksList.scrollTo({
+          left: w,
+          behavior: "smooth" 
+        })
+      }
+    },
+    listNext() {
+      if(this.value < this.workItems.length - 1)
+        this.$emit('update:value', this.value + 1);
+    }  ,
+    listPrev() {
+      if(this.value > 0)
+        this.$emit('update:value', this.value - 1);
+    },
+    onMouseWhell(e : WheelEvent) {
+      if(e.deltaY < 0) {
+        this.listPrev();
+      } else if(e.deltaY > 0) {
+        this.listNext();
+      }
+      e.cancelBubble = true;
+      e.preventDefault();
+    }
+  },
   mounted() {
     setTimeout(() => {
-      this.worksList = <HTMLElement>this.$refs.worksList;
+      this.worksList = this.$refs.worksList as HTMLElement;
       this.reloadItemWidth();
       setTimeout(() => this.reloadListScroll(), 100);
     }, 200);
   }
-
-}
-
+})
 </script>

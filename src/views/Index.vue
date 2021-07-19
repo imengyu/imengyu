@@ -3,7 +3,6 @@
 
     <!--Canvas-->
     <CanvasAnimHost v-show="gameProvider==sortGameProvider" ref="sortGameCanvasAnimHost" :gameProvider="sortGameProvider"></CanvasAnimHost>
-    <CanvasAnimHost v-show="setEnableAnim && gameProvider==spaceGameProvider" ref="spaceGameCanvasAnimHost" :gameProvider="spaceGameProvider" :create2DCtx="false"></CanvasAnimHost>
     <CanvasAnimHost v-show="setEnableAnim && gameProvider==blackholeGameProvider" ref="blackholeGameCanvasAnimHost" :gameProvider="blackholeGameProvider" :create2DCtx="false"></CanvasAnimHost>
     <CanvasAnimHost v-show="setEnableAnim && gameProvider==clockGameProvider" ref="clockGameCanvasAnimHost" :gameProvider="clockGameProvider"></CanvasAnimHost>
     
@@ -11,44 +10,38 @@
     
     <div class="imengyu-intro animated fadeInRight" v-show="showIntro && (currentGameAnim=='sort' || !setEnableAnim)">
       <div class="imengyu-intro-box animated position-relative overflow-hidden" >
-        <div class="background">
-          <img class="hello" src="@/assets/images/hello.png" />
-          <img class="rainbow" src="@/assets/images/rainbow.png" />
-        </div>
-        <h1><span>你好，我是</span> <br/><small class="name">快乐的梦鱼</small></h1>
-        <i class="text animated fadeInLeft">我是一个程序员</i>
-        <i class="text animated fadeInRight">擅长前端开发/UI设计</i>
-        <i class="text animated fadeInLeft">在浙江杭州</i>
-        <i class="text tip animated fadeInRight">          
-          非常感谢您百忙之中来到这里,<br>
-          这是我的个人网站小作品,<br>
-          才学疏浅可能不能让您满意,<br>
-          但还是希望您能喜欢,
-        </i>
-        <div class="imengyu-go-button animated fadeInLeft" @click="onGo">
+
+        <h1>你好，我是快乐的梦鱼</h1>
+        <i class="text animated fadeInLeft">程序员 前端开发/UI设计</i>
+        <i class="text animated fadeInLeft">喜欢做一些酷酷的东西</i>
+
+        <div class="imengyu-go-button big animated fadeInLeft" @click="onGo">
           更多关于我
           <i class="iconfont icon-jiantou_xiangyouliangci_o"></i>
         </div>
+
       </div>
     </div>
     
     <!--Main-->
-    <transition v-show="!showIntro" enter-active-class="bounceInRight" leave-active-class="fadeOutLeft"> 
-      <router-view></router-view>
-    </transition>
+    <router-view v-slot="{ Component }">
+      <transition v-show="!showIntro" enter-active-class="bounceInRight" leave-active-class="fadeOutLeft"> 
+        <component :is="Component"/>
+      </transition>
+    </router-view>
 
     <!--版权提示-->
-    <AlertDialog v-model="showCopyright" title="Copyright" subTitle="网页版权信息">
+    <AlertDialog v-model:show="showCopyright" title="Copyright" subTitle="网页版权信息">
 
       <i class="iconfont icon-banquan"></i> 2021 快乐的梦鱼 版权所有
-      <br>本网站所有设计均为作者原创。
-      <br>仅本人使用，不在任何商业用途中使用。
+      <br>本网站所有设计与内容均为作者原创。
       <br>如须转载，请事先联系我。谢谢你!
 
       <div class="imengyu-content-line"></div>
-
-      <div class="imengyu-go-button" @click="showCopyright=false">
-        我知道了
+      <div class="text-center">
+        <div class="imengyu-go-button" @click="showCopyright=false">
+          好哒
+        </div>
       </div>
 
     </AlertDialog>
@@ -82,14 +75,6 @@
         <span>FPS</span>
         <div v-if="canvasAnimHost" class="imengyu-go-button mt-0">
           {{ canvasAnimHost.currentFpsShowVal }}
-        </div>
-      </div>
-      <div v-if="currentGameAnim=='space'" class="item">
-        <span>拖动视图</span>
-        <div>
-          <div class="imengyu-go-button mt-0" @click="setEnableDrag=!setEnableDrag;onEnableDragChanged()">
-            {{ setEnableDrag ? '开' : '关' }}
-          </div>
         </div>
       </div>
       <div v-if="currentGameAnim=='blackhole'" class="item">
@@ -138,179 +123,176 @@
     </MusicGameControll>
 
     <!--脚-->
-    <Footer v-model="showCopyright" />
+    <Footer @on-show-copyright="showCopyright=true" />
 
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import CanvasAnimHost from '../components/CanvasAnimHost.vue'
+import { defineComponent } from 'vue'
+import CanvasAnimHost, { ICanvasAnimHost } from '../components/CanvasAnimHost.vue'
 import Footer from '../components/Footer.vue'
 import AlertDialog from '../components/AlertDialog.vue'
 import MusicGameControll from '../components/MusicGameControll.vue'
 import Utils from '../utils/Utils'
 import { CanvasSortGame, SortMethodNames, SortMethods } from '../model/CanvasSortGame/CanvasSortGame'
-import { ThreeSpaceGame } from '../model/ThreeSpaceGame/ThreeSpaceGame'
 import { BlackHoleGame, BlackHoleWorkMode, getBlackHoleModes } from '../model/BlackHoleGame/BlackHoleGame'
 import { ClockGame, getStartsModes, StartsMode } from '../model/ClockGame/ClockGame'
 import { CanvasGameProvider } from '../model/CanvasGameProvider'
-import { bus } from '..'
+import { emitter } from '@/main'
+import Const from '@/const/Const'
 
-@Component({
+export default defineComponent({
+  name: 'Index',
   components: {
     CanvasAnimHost,
     Footer,
     AlertDialog,
     MusicGameControll,
-  }
-})
-export default class Index extends Vue {
+  },
+  data() {
+    return {
+      showIntro: true,
+      showCopyright: false,
+      showSetting: false,
+      showAnimTools: true,
 
-  showIntro = true;
-  showCopyright = false;
-  showSetting = false;
-  showAnimTools = true;
+      gameProvider: null as CanvasGameProvider|null,
+      sortGameProvider: new CanvasSortGame(),
+      blackholeGameProvider: new BlackHoleGame(),
+      clockGameProvider: new ClockGame(),
 
-  gameProvider : CanvasGameProvider = null;
-  sortGameProvider = new CanvasSortGame();
-  spaceGameProvider = new ThreeSpaceGame();
-  blackholeGameProvider = new BlackHoleGame();
-  clockGameProvider = new ClockGame();
+      gameAmins: [ 'sort', 'blackhole', 'clock' ],
+      gameProviders: [] as CanvasGameProvider[],
 
-  gameAmins = [ 'sort', 'space', 'blackhole', 'clock' ];
-  gameProviders = [ this.sortGameProvider, this.spaceGameProvider, this.blackholeGameProvider, this.clockGameProvider ];
+      canvasAnimHost: null as ICanvasAnimHost|null,
+      currentGameAnim: '',
+      sortMethodNames: SortMethodNames,
 
-  canvasAnimHost : CanvasAnimHost = null;
-  currentGameAnim = this.gameAmins[0];
-  sortMethodNames = SortMethodNames;
- 
-  onChangeGameAnim() {
-    this.currentGameAnim = (<HTMLSelectElement>this.$refs.selectGame).value;
-    switch(this.currentGameAnim) {
-      case 'sort': this.gameProvider = this.sortGameProvider; break;
-      case 'space': this.gameProvider = this.spaceGameProvider; break;
-      case 'blackhole': this.gameProvider = this.blackholeGameProvider; break;
-      case 'clock': this.gameProvider = this.clockGameProvider; break;
+      blackholeGameAmins: getBlackHoleModes(),
+      currentBlackholeGameAnim: getBlackHoleModes()[0] as BlackHoleWorkMode,
+      clockGameAmins: getStartsModes(),
+
+      setEnableAnim: true,
+      setVolume: 50,
+      setEnableDrag: false,
+
+      currentCanvasAnimHost: null as ICanvasAnimHost|null,
+      sortGameCanvasAnimHost: null as ICanvasAnimHost|null,
+      blackholeGameCanvasAnimHost: null as ICanvasAnimHost|null,
+      clockGameCanvasAnimHost: null as ICanvasAnimHost|null,
+
+      introInterval: 0,
     }
-    bus.$emit('updateDarkMode', this.currentGameAnim != 'sort');
-    this.onSetEnableAnimChanged();
-  }
-  onChangeSortMethod() {
-    this.sortGameProvider.changeSortMethod(<SortMethods>(<HTMLSelectElement>this.$refs.selectSortMethod).value);
-  }
+  },
+  methods: {
+    onChangeGameAnim() {
+      this.currentGameAnim = (this.$refs.selectGame as HTMLSelectElement).value;
+      switch(this.currentGameAnim) {
+        case 'sort': this.gameProvider = this.sortGameProvider; break;
+        case 'blackhole': this.gameProvider = this.blackholeGameProvider; break;
+        case 'clock': this.gameProvider = this.clockGameProvider; break;
+      }
+      emitter.emit('updateDarkMode', this.currentGameAnim != 'sort');
+      this.onSetEnableAnimChanged();
+    },
+    onChangeSortMethod() {
+      this.sortGameProvider.changeSortMethod((this.$refs.selectSortMethod as HTMLSelectElement).value as SortMethods);
+    },
+    onChangeBlackholeGameAnim() {
+      if(this.currentGameAnim === 'blackhole')
+        this.blackholeGameProvider.setBlackHoleWorkMode((this.$refs.selectBlackholeGame as HTMLSelectElement).value as BlackHoleWorkMode)
+    },
+    onChangeClockGameAnim() {
+      if(this.currentGameAnim === 'clock')
+        this.clockGameProvider.setStarsMode((this.$refs.selectClockGame as HTMLSelectElement).value as StartsMode)
+    },
+    onSetEnableAnimChanged() {
 
-  blackholeGameAmins = getBlackHoleModes();
-  currentBlackholeGameAnim = this.blackholeGameAmins[0];
+      if(this.currentCanvasAnimHost)
+        this.currentCanvasAnimHost.stop();
 
-  onChangeBlackholeGameAnim() {
-    if(this.currentGameAnim === 'blackhole')
-      this.blackholeGameProvider.setBlackHoleWorkMode((this.$refs.selectBlackholeGame as HTMLSelectElement).value as BlackHoleWorkMode)
-  }
+      if(this.currentGameAnim === 'sort') this.canvasAnimHost = this.sortGameCanvasAnimHost;
+      else if(this.currentGameAnim === 'blackhole') this.canvasAnimHost = this.blackholeGameCanvasAnimHost;
+      else if(this.currentGameAnim === 'clock') this.canvasAnimHost = this.clockGameCanvasAnimHost;
 
-  clockGameAmins = getStartsModes();
+      if(this.setEnableAnim && (this.currentGameAnim === 'blackhole' || this.currentGameAnim === 'clock')) 
+        emitter.emit('updateDarkMode', true);
+      if(!this.setEnableAnim || this.currentGameAnim === 'sort') 
+        emitter.emit('updateDarkMode', false);
 
-  onChangeClockGameAnim() {
-    if(this.currentGameAnim === 'clock')
-      this.clockGameProvider.setStarsMode((this.$refs.selectClockGame as HTMLSelectElement).value as StartsMode)
-  }
-
-  setEnableAnim = true;
-  setVolume = 50;
-  setEnableDrag = false;
-
-  onSetEnableAnimChanged() {
-
-    if(this.currentCanvasAnimHost)
-      this.currentCanvasAnimHost.stop();
-
-    if(this.currentGameAnim === 'sort') this.canvasAnimHost = this.sortGameCanvasAnimHost;
-    else if(this.currentGameAnim === 'space') this.canvasAnimHost = this.spaceGameCanvasAnimHost;
-    else if(this.currentGameAnim === 'blackhole') this.canvasAnimHost = this.blackholeGameCanvasAnimHost;
-    else if(this.currentGameAnim === 'clock') this.canvasAnimHost = this.clockGameCanvasAnimHost;
-
-    if(this.setEnableAnim && (this.currentGameAnim === 'space' || this.currentGameAnim === 'blackhole' || this.currentGameAnim === 'clock')) 
-      bus.$emit('updateDarkMode', true);
-    if(!this.setEnableAnim || this.currentGameAnim === 'sort') 
-      bus.$emit('updateDarkMode', false);
-
-    if(this.canvasAnimHost) {
-      if(this.setEnableAnim) this.canvasAnimHost.start();
-      else this.canvasAnimHost.stop();
+      if(this.canvasAnimHost) {
+        if(this.setEnableAnim) this.canvasAnimHost.start();
+        else this.canvasAnimHost.stop();
+      }
+      this.currentCanvasAnimHost = this.canvasAnimHost;
+    },
+    onAnimSwitchSpectrum(on : boolean) {
+      if(this.currentGameAnim === 'sort') this.sortGameProvider.switchSpectrum(on);
+      else if(this.currentGameAnim === 'blackhole') this.blackholeGameProvider.switchSpectrum(on);
+      else if(this.currentGameAnim === 'clock') this.clockGameProvider.switchSpectrum(on);
+    },
+    onGo() {
+      this.$router.push({name:'About'})
+    },
+    onRoute() {
+      this.showIntro = this.$route.path == '/';
+      window.scrollTo({ top: 0 })
+    },
+    hideLoadingMask() {
+      const loading = document.getElementById('imengyu-loading-mask');
+      if(loading) {
+        loading.classList.add('hide');
+        setTimeout(() => {
+          loading.style.display = 'none';
+        }, 300)
+      }
+    },
+    loadSettings() {
+      this.setEnableAnim = Utils.getSettingsBoolean('setEnableAnim', true);
+      this.showAnimTools = Utils.getSettingsBoolean('showAnimTools', true);
+      this.setVolume = Utils.getSettingsNumber('setVolume', 50);
+      if(window.outerWidth < 600)
+        this.showAnimTools = false;
+    },
+    saveSettings() {
+      Utils.setSettingsBoolean('setEnableAnim', this.setEnableAnim);
+      Utils.setSettingsBoolean('showAnimTools', this.showAnimTools);
+      Utils.setSettingsNumber('setVolume', this.setVolume);
     }
-    this.currentCanvasAnimHost = this.canvasAnimHost;
-  }
-  onAnimSwitchSpectrum(on : boolean) {
-    if(this.currentGameAnim === 'sort') this.sortGameProvider.switchSpectrum(on);
-    else if(this.currentGameAnim === 'space') this.spaceGameProvider.switchSpectrum(on);
-    else if(this.currentGameAnim === 'blackhole') this.blackholeGameProvider.switchSpectrum(on);
-    else if(this.currentGameAnim === 'clock') this.clockGameProvider.switchSpectrum(on);
-  }
-  onEnableDragChanged() {
-    this.spaceGameProvider.setDragEnable(this.setEnableDrag);
-  }
-
-
-  @Watch('$route')
-  onRoute() {
-    this.showIntro = this.$route.path == '/';
-    window.scrollTo({ top: 0 })
-  }
-  onGo() {
-    this.$router.push({name:'About'})
-  }
-  
-  currentCanvasAnimHost : CanvasAnimHost = null;
-  sortGameCanvasAnimHost : CanvasAnimHost = null;
-  spaceGameCanvasAnimHost : CanvasAnimHost = null;
-  blackholeGameCanvasAnimHost : CanvasAnimHost = null;
-  clockGameCanvasAnimHost : CanvasAnimHost = null;
-
-  introInterval = null;
-
-  hideLoadingMask() {
-    let loading = document.getElementById('imengyu-loading-mask');
-    loading.classList.add('hide');
-    setTimeout(() => {
-      loading.style.display = 'none';
-    }, 300)
-  }
+  },
+  watch: {
+    $route() { this.onRoute() }
+  },
   mounted() {
     this.loadSettings();
     this.onRoute();
     this.hideLoadingMask();
 
-    document.title = '快乐的梦鱼 个人网站小作品';
+    document.title = Const.SiteName;
 
+    this.currentGameAnim = 'sort';
     setTimeout(() => {
-      this.sortGameCanvasAnimHost = <CanvasAnimHost>this.$refs.sortGameCanvasAnimHost;
-      this.spaceGameCanvasAnimHost = <CanvasAnimHost>this.$refs.spaceGameCanvasAnimHost;
-      this.blackholeGameCanvasAnimHost = <CanvasAnimHost>this.$refs.blackholeGameCanvasAnimHost;
-      this.clockGameCanvasAnimHost = <CanvasAnimHost>this.$refs.clockGameCanvasAnimHost;
+      this.sortGameCanvasAnimHost = this.$refs.sortGameCanvasAnimHost as ICanvasAnimHost;
+      this.blackholeGameCanvasAnimHost = this.$refs.blackholeGameCanvasAnimHost as ICanvasAnimHost;
+      this.clockGameCanvasAnimHost = this.$refs.clockGameCanvasAnimHost as ICanvasAnimHost;
       this.gameProvider = this.sortGameProvider;
+      this.gameProviders = [ 
+        this.sortGameProvider, 
+        this.blackholeGameProvider, 
+        this.clockGameProvider 
+      ];
       if(this.setEnableAnim)
         this.onSetEnableAnimChanged();
     }, 350);
 
     window.onbeforeunload = () => { this.saveSettings(); };
-  }
-  beforeDestroy() {
+  },
+  beforeUnmount() {
     clearInterval(this.introInterval);
     this.saveSettings();
   }
 
-  loadSettings() {
-    this.setEnableAnim = Utils.getSettingsBoolean('setEnableAnim', true);
-    this.showAnimTools = Utils.getSettingsBoolean('showAnimTools', true);
-    this.setVolume = Utils.getSettingsNumber('setVolume', 50);
-    if(window.outerWidth < 600)
-      this.showAnimTools = false;
-  }
-  saveSettings() {
-    Utils.setSettings('setEnableAnim', this.setEnableAnim);
-    Utils.setSettings('showAnimTools', this.showAnimTools);
-    Utils.setSettings('setVolume', this.setVolume);
-  }
+})
 
-}
 </script>

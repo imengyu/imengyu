@@ -17,7 +17,7 @@ html, body {
   position: relative;
 }
 
-.imengyu,.imengyu-main {
+#imengyu-app, .imengyu,.imengyu-main {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -66,6 +66,10 @@ html, body {
   font-weight: bold;
   font-family: 'Engineer';
 
+  &.big {
+    padding: 6px 12px;
+  }
+
   i {
     font-size: 14px;
   }
@@ -101,8 +105,8 @@ html, body {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: $page-bottom;
-  top:20px;
+  bottom: $page-bottom + 150px;
+  top: 0px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -148,15 +152,42 @@ html, body {
 
 .imengyu-intro-box {
   padding: $page-padding-lg;
-  text-align: left;
-  background-color: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.03);
+  text-align: center;
+  //background-color: rgba(255, 255, 255, 0.55);
+  //box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.03);
   width: 600px;
+
+  h1 {
+    position: relative;
+    font-size: 50px;
+    padding-bottom: 40px;
+
+    &::after {
+      display: inline-block;
+      content: '';
+      background-color: #000;
+      width: 40px;
+      height: 4px;
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      margin-left: -20px;
+      transition: all ease-in-out 0.3s;
+    }
+
+    &:hover {
+      &::after {
+        width: 100px;
+        margin-left: -50px;
+      }
+    }
+  }
 
   .text {
     display: block;
     color: #000;
     font-size: 27px;
+    font-style: normal;
   }
   .tip {
     margin-top: 14px;
@@ -164,6 +195,10 @@ html, body {
     display: block;
     color: #979797;
     font-size: 12px;
+  }
+
+  .imengyu-go-button {
+    margin-top: 50px;
   }
 }
 
@@ -206,6 +241,10 @@ a {
   &:hover, &:active {
     color: #7e7e7e;
   }
+}
+
+code {
+  font-family: 'Engineer';
 }
 
 //copyright

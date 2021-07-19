@@ -3,9 +3,11 @@
  */
 import StringUtils from "./StringUtils";
 
-let dateProtoType = (<any>Date.prototype);
-let stringProtoType = (<any>String.prototype);
-let arrayProtoType = (<any>Array.prototype);
+/* eslint-disable */
+
+const dateProtoType = (<any>Date.prototype);
+const stringProtoType = (<any>String.prototype);
+const arrayProtoType = (<any>Array.prototype);
 
 /**
  * 日期格式化（原型扩展或重载）
@@ -17,8 +19,8 @@ let arrayProtoType = (<any>Array.prototype);
  * @returns 日期字符串
  */
 dateProtoType.format = function (formatStr : string) {
-  var str = formatStr ? formatStr : 'YYYY-MM-dd HH:ii:ss';
-  //var Week = ['日','一','二','三','四','五','六'];
+  let str = formatStr ? formatStr : 'YYYY-MM-dd HH:ii:ss';
+  //let Week = ['日','一','二','三','四','五','六'];
   str = str.replace(/yyyy|YYYY/, this.getFullYear());
   str = str.replace(/MM/, StringUtils.pad(this.getMonth() + 1, 2));
   str = str.replace(/M/, this.getMonth() + 1);
@@ -53,7 +55,7 @@ arrayProtoType.empty = function() {
 
 if(typeof arrayProtoType.remove !== 'function')
   arrayProtoType.remove = function(item : any) {
-    var index = this.indexOf(item);
+    const index = this.indexOf(item);
     if(index >= 0) {
       this.splice(index, 1);
       return true;
@@ -72,10 +74,10 @@ if(typeof arrayProtoType.contains !== 'function')
   }
 
 if(typeof arrayProtoType.findIndex !== 'function')
-  arrayProtoType.findIndex = function(predicateFn, thisArg){
-		var len = this.length
-		for (var i = 0; i < len; i++) {
-			var item = this[i];
+  arrayProtoType.findIndex = function(predicateFn : Function, thisArg : any){
+		const len = this.length
+		for (let i = 0; i < len; i++) {
+			const item = this[i];
 			if(predicateFn.call(thisArg,item,i,this)){
 				return i
 			}

@@ -13,33 +13,37 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 
-@Component({
-  name: 'Header'
+export default defineComponent({
+  name: 'Header',
+  props: {
+    dark: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      homeMenu: [
+        {
+          name: 'Home',
+          to: '/'
+        },
+        {
+          name: 'Blog',
+          to: 'https://blog.imengyu.top/'
+        },
+        {
+          name: 'Works',
+          to: 'Works'
+        },
+        {
+          name: 'About',
+          to: 'About'
+        },
+      ],
+    }
+  },
 })
-export default class Header extends Vue {
-
-  @Prop({default:false}) dark : boolean;
-
-  homeMenu = [
-    {
-      name: 'Home',
-      to: '/'
-    },
-    {
-      name: 'Blog',
-      to: 'https://blog.imengyu.top/'
-    },
-    {
-      name: 'Works',
-      to: 'Works'
-    },
-    {
-      name: 'About',
-      to: 'About'
-    },
-  ]
-
-}
 </script>

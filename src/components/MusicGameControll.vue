@@ -44,75 +44,92 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent, PropType } from 'vue'
 import { CanvasGameProvider } from '../model/CanvasGameProvider';
 import { MusicPlayer, MusicPlayerStatus } from '../model/MusicPlayer';
 
-@Component({
-  name: 'MusicGameControll'
-})
-export default class MusicGameControll extends Vue {
-  
-  @Prop({default:null}) canvasGames: CanvasGameProvider[];
-  @Prop({default:null}) currentCanvasGame: CanvasGameProvider;
-  @Prop({default:50}) playerVolume: number;
-  @Prop({default:true}) open: boolean;
-
-  public audioCurrentName = '';  
-
-  player : MusicPlayer = null;
-  playerUpdateSpectrumTimer = null;
-  playerVolumeToolShow = false;
-  playerStatus : MusicPlayerStatus = 'stopped';
-
-  initPlayer() {
-    this.player = new MusicPlayer();
-    this.player.initPlayer();
-    this.player.on('statuschanged', this.onPlayerStatuschanged.bind(this));
-    this.player.setVolume(this.playerVolume);
-
-    this.canvasGames.forEach((g) => g.setDrawSpectrumCallback(this.onPlayerUpdateSpectrum.bind(this)));
-  }
-  destroyPlayer() {
-    this.canvasGames.forEach((g) => g.setDrawSpectrumCallback(null));
-    this.player.off('statuschanged', this.onPlayerStatuschanged);
-    this.player.destroyPlayer();
-  }
-  onMusicInputFile() {
-    let file = (<HTMLInputElement>this.$refs.musicInputFile).files[0];
-    this.audioCurrentName = file.name;
-    this.player.openMusic(file);
-    (<HTMLInputElement>this.$refs.musicInputFile).value = '';
-  }
-  onOpenMusicClick() {
-    (<HTMLInputElement>this.$refs.musicInputFile).click();
-  }
-  onPlayerStatuschanged(status : MusicPlayerStatus) {
-    this.playerStatus = status;
-    if(status == 'opened') {
-      this.$emit('on-go-spectrum-mode');
-    }else if(status == 'stopped') {
-      clearInterval(this.playerUpdateSpectrumTimer);
-      this.$emit('on-quit-spectrum-mode');
+export default defineComponent({
+  name: 'MusicGameControll',
+  props: {
+    canvasGames: {
+      type: Object as PropType<CanvasGameProvider[]>,
+      default: null,
+    },
+    currentCanvasGame: {
+      type: Object as PropType<CanvasGameProvider>,
+      default: null,
+    },
+    playerVolume: {
+      type: Number,
+      default: 50,
+    },
+    open: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  data() {
+    return {
+      audioCurrentName: '',
+      player: null as MusicPlayer|null,
+      playerUpdateSpectrumTimer: 0,
+      playerVolumeToolShow: false,
+      playerStatus: 'stopped' as MusicPlayerStatus,
     }
-  }
-  onPlayerUpdateSpectrum() {
-    if(this.player.audioOpened)
-      this.currentCanvasGame.drawSpectrum(this.player.analyser, this.player.voiceHeight);
-  }
-  onPlayerVolumeChange() {
-    this.player.setVolume(parseInt((<HTMLInputElement>this.$refs.musicVolume).value));
-    this.$emit('update-volume', this.player.volume);
-  }
+  },
+  methods: {
+    initPlayer() {
+      this.player = new MusicPlayer();
+      this.player.initPlayer();
+      this.player.on('statuschanged', this.onPlayerStatuschanged.bind(this));
+      this.player.setVolume(this.playerVolume);
 
-  //load
-
+      this.canvasGames.forEach((g) => g.setDrawSpectrumCallback(this.onPlayerUpdateSpectrum.bind(this)));
+    },
+    destroyPlayer() {
+      this.canvasGames.forEach((g) => g.setDrawSpectrumCallback(null));
+      if(this.player) {
+        this.player.off('statuschanged', this.onPlayerStatuschanged);
+        this.player.destroyPlayer();
+      }
+    },
+    onMusicInputFile() {
+      const musicInputFile = (this.$refs.musicInputFile as HTMLInputElement);
+      if(musicInputFile && musicInputFile.files && this.player) {
+        const file = musicInputFile.files[0];
+        this.audioCurrentName = file.name;
+        this.player.openMusic(file);
+        musicInputFile.value = '';
+      }
+    },
+    onOpenMusicClick() {
+      (this.$refs.musicInputFile as HTMLInputElement).click();
+    },
+    onPlayerStatuschanged(status : MusicPlayerStatus) {
+      this.playerStatus = status;
+      if(status == 'opened') {
+        this.$emit('on-go-spectrum-mode');
+      }else if(status == 'stopped') {
+        clearInterval(this.playerUpdateSpectrumTimer);
+        this.$emit('on-quit-spectrum-mode');
+      }
+    },
+    onPlayerUpdateSpectrum() {
+      if(this.player && this.player.audioOpened)
+        this.currentCanvasGame.drawSpectrum(this.player.analyser as AnalyserNode, this.player.voiceHeight as Uint8Array);
+    },
+    onPlayerVolumeChange() {
+      if(this.player) {
+        this.player.setVolume(parseInt((this.$refs.musicVolume as HTMLInputElement).value));
+        this.$emit('update-volume', this.player.volume);
+      }
+    }
+  },
   mounted() {
     setTimeout(() => this.initPlayer(), 200)
-  }
-  beforeDestroy() {
+  },
+  beforeUnmount() {
     this.destroyPlayer();
   }
-
-}
+})
 </script>

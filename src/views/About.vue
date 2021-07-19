@@ -17,11 +17,9 @@
           是一个普通的刚刚入行的程序猿<br>
           正在努力学习工作<br>
 
-          <div class="imengyu-about-subtitle">正在学习 <i class="iconfont icon-jiantou_xiangyouliangci_o"></i> </div>
+          <div class="imengyu-about-subtitle">LIFE <i class="iconfont icon-jiantou_xiangyouliangci_o"></i> </div>
           <div class="imengyu-about-small">
-            Web 开发, App 开发, C, Java, Go, PHP, HTML5, <br>
-            Javascript, Python, 机器学习, TensorFlow ...<br>
-            51单片机, STM32单片机, Arduino, 树莓派, 物联网 ... <br>
+            人生太搞，梦想不老，<br>为了梦想，加油瞎搞<br>
           </div>
         </div>
 
@@ -63,23 +61,24 @@
         </div>
 
         <div class="text-center">
-          <div class="imengyu-go-button animated fadeInLeft" @click="onGoWorks">
+          <div class="imengyu-go-button big animated fadeInLeft" @click="onGoWorks">
             <i class="iconfont icon-jiantou_yemian_xiangzuo_o"></i> More of My works
           </div>
         </div>
       </div>
 
-      <!--Hello world-->
-      <div class="imengyu-content-box-innern" id="hello-world">
+      <!--Learning-->
+      <div class="imengyu-content-box-innern" id="learning">
 
         <div class="imengyu-content-sub-title">
-          HELLO WORLD
+          LEARNING MORE
           <span>
-            你好
+            学习永无止境<br>
+            努力学习提升自己中
           </span>
         </div>      
 
-        
+        <TextNetworkGraph />
 
       </div>
 
@@ -99,9 +98,9 @@
           一个普通的男生，长相一般，内向，不善闲聊。<br>
           喜欢新事物，新技术，对编程有浓厚兴趣，喜欢钻研。<br>
           想和有同样兴趣爱好的男生交朋友。<br>
-          努力学习提升自己中...<br>
+          ...
 
-          <div @click="showHiddenAbout=!showHiddenAbout" title="彩虹" style="display:inline-block; cursor: pointer;">🌈</div>
+          <div @click="showHiddenAbout=!showHiddenAbout" title="彩虹" class="display-inline-block cursor-pointer">🌈</div>
           <br><br>
 
           <div :class="'imengyu-hidden-area float '+(showHiddenAbout?'show':'')">
@@ -155,7 +154,7 @@
               <i class="icon iconfont icon-qq-copy"></i>
               <div class="sub">
                 QQ
-                <span>1501076885</span>
+                <span>&nbsp;</span>
               </div>
             </li>
           </ul>
@@ -167,77 +166,78 @@
         </div>
       </div>
 
-      <RightCatalog ref="catalog" v-model="currentItem" :items="catalogItems" @item-click="onCatalogClicked" :scrollHostClassAddedEle="scrollEle">
+      <RightCatalog ref="catalog" class="animated fadeInDown" v-model:value="currentItem" :items="catalogItems" @item-click="onCatalogClicked" :scrollHostClassAddedEle="scrollEle">
       </RightCatalog>
     </div>
   </div> 
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import RightCatalog from '../components/RightCatalog.vue'
+import { defineComponent } from 'vue'
+import RightCatalog, { RightCatalogItem } from '../components/RightCatalog.vue'
+import TextNetworkGraph from '../components/TextNetworkGraph.vue'
 
-@Component({
+export default defineComponent({
   components: {
-    RightCatalog
-  }
-})
-export default class About extends Vue {
-
-  showCode = false;
-  showHiddenAbout = false;
-  currentItem = '';
-  catalogItems = [
-    {
-      text: 'ABOUT ME',
-      id: 'about-me'
-    },
-    {
-      text: 'MY SKILLS',
-      id: 'my-skills'
-    },
-    {
-      text: 'HELLO WORLD',
-      id: 'hello-world'
-    },
-    {
-      text: 'MORE ABOUT ME',
-      id: 'more-about-me'
-    },
-    {
-      text: 'CONTACT ME',
-      id: 'contact-me'
+    RightCatalog,
+    TextNetworkGraph,
+  },
+  data() {
+    return {
+      showCode: false,
+      showHiddenAbout: false,
+      currentItem: '',
+      catalogItems: [
+        {
+          text: 'ABOUT ME',
+          id: 'about-me'
+        },
+        {
+          text: 'MY SKILLS',
+          id: 'my-skills'
+        },
+        {
+          text: 'LEARNING MORE',
+          id: 'learning'
+        },
+        {
+          text: 'MORE ABOUT ME',
+          id: 'more-about-me'
+        },
+        {
+          text: 'CONTACT ME',
+          id: 'contact-me'
+        }
+      ],
+      scrollEle: null as HTMLElement|null,
     }
-  ];
-  scrollEle : HTMLElement = null;
-  reloadScrollEle() {
-    setTimeout(() => {
-      this.scrollEle = document.getElementById('about-host');
-    }, 200);
-  }
-
-  onCatalogClicked(item) {
-    let el = document.getElementById(item.id);
-    if(el) {
-      this.scrollEle.scrollTo({
-        top: el.offsetTop,
-        behavior: "smooth" 
-      })
+  },
+  methods: {
+    reloadScrollEle() {
+      setTimeout(() => {
+        this.scrollEle = document.getElementById('about-host');
+      }, 200);
+    },
+    onCatalogClicked(item : RightCatalogItem) {
+      const el = document.getElementById(item.id);
+      if(el && this.scrollEle) {
+        this.scrollEle.scrollTo({
+          top: el.offsetTop,
+          behavior: "smooth" 
+        })
+      }
+    },
+    onGoWorks() {
+      this.$router.push({name:'Works'})
+    },
+  },
+  watch: {
+    $route() {
+      this.reloadScrollEle();
     }
-  }
-  onGoWorks() {
-    this.$router.push({name:'Works'})
-  }
-
-  @Watch('$route')
-  onRouteChanged() {
-    this.reloadScrollEle();
-  }
+  },
   mounted() {
     this.reloadScrollEle();
-    
   }
-}
-
-
+})
 </script>

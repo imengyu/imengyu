@@ -11,93 +11,106 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
+import { defineComponent, PropType } from 'vue'
 
-@Component({
-  name: 'RightCatalog'
-})
-export default class RightCatalog extends Vue {
-  @Prop({default:null}) items : Array<any>;
-  @Prop({default:null}) value;
-  @Prop({default:null}) scrollHostClassAddedEle : HTMLElement;
+export interface RightCatalogItem {
+  id: string,
+  el?: HTMLElement|null,
+}
 
-  arrowH = 0;
-  scrollHostClassAddedEleAdded : HTMLElement;
-
-  @Watch("scrollHostClassAddedEle")
-  onScrollHostClassAddedEleChanged() {
-    if(this.scrollHostClassAddedEle != null)
-      this.reloadScrollHost();
-  }
-  
-  @Watch("value")
-  onValue(v) {
-    let currIdex = 0;
-    for(let i = this.items.length - 1; i >= 0; i--) {
-      if(this.items[i].id == v) {
-        currIdex = i;
-        break;
-      }
+export default defineComponent({
+  name: 'RightCatalog',
+  props: {
+    items: {
+      type: Object as PropType<Array<RightCatalogItem>>,
+      default: null
+    },
+    value: {
+      type: String,
+      default: ''
+    },
+    scrollHostClassAddedEle: {
+      type: Object as PropType<HTMLElement>,
+      default: null
+    },
+  },
+  data() {
+    return {
+      arrowH: 0,
+      scrollHostClassAddedEleAdded: null as HTMLElement|null,
     }
-    this.arrowH = currIdex * 20 ;
-  }
-  @Watch("items")
-  onItemsChange(v) {
-    this.onScroll(null);
-  }
-
-  onGoItem(item) {
-    this.$emit('item-click', item);
-  }
-  onScroll(ev : Event) {
-    let top = this.scrollHostClassAddedEle.scrollTop;
-    let height = this.scrollHostClassAddedEle.offsetHeight;
-    let allheight = this.scrollHostClassAddedEle.scrollHeight;
-    let el : HTMLElement = null;
-    let activeItem = null;
-    let item = null;
-    if(this.items.length > 0) {
-      if(top >= allheight - height) {
-        activeItem = this.items[this.items.length - 1];
-      }else for(let i = this.items.length - 1; i >= 0; i--) {
-        item = this.items[i];
-        if(item.el) {
-          el = <HTMLElement>item.el;
-          if(el.offsetTop >= top - height / 6) 
-            activeItem = el;
-          else break;
-        }else {
-          item.el = document.getElementById(item.id);
+  },
+  watch: {
+    scrollHostClassAddedEle() {
+      if(this.scrollHostClassAddedEle != null)
+        this.reloadScrollHost();
+    },
+    value(v : string) {
+      let currIdex = 0;
+      for(let i = this.items.length - 1; i >= 0; i--) {
+        if(this.items[i].id == v) {
+          currIdex = i;
+          break;
         }
       }
+      this.arrowH = currIdex * 20 ;
+    },
+    items() {
+      this.onScroll();
     }
-    this.$emit('input', activeItem ? activeItem.id : null);
-  }
-
-  reloadScrollHost() {
-  if(this.scrollHostClassAddedEleAdded != null) 
-    this.scrollHostClassAddedEleAdded.removeEventListener('scroll', this.onScroll);
-  
-    if(this.scrollHostClassAddedEle) {
-      this.scrollHostClassAddedEleAdded = this.scrollHostClassAddedEle;
-      this.scrollHostClassAddedEle.addEventListener('scroll', this.onScroll);
-    }
-  }
-
+  },
+  methods: {
+    onGoItem(item : RightCatalogItem) {
+      this.$emit('item-click', item);
+    },
+    onScroll() {
+      const top = this.scrollHostClassAddedEle.scrollTop;
+      const height = this.scrollHostClassAddedEle.offsetHeight;
+      const allheight = this.scrollHostClassAddedEle.scrollHeight;
+      let el : HTMLElement|null = null;
+      let activeItem : RightCatalogItem|null = null;
+      let item : RightCatalogItem|null = null;
+      if(this.items.length > 0) {
+        if(top >= allheight - height) {
+          activeItem = this.items[this.items.length - 1];
+        }else for(let i = this.items.length - 1; i >= 0; i--) {
+          item = this.items[i];
+          if(item.el) {
+            el = item.el as HTMLElement;
+            if(el.offsetTop >= top - height / 6) 
+              activeItem = el;
+            else break;
+          }else {
+            item.el = document.getElementById(item.id);
+          }
+        }
+      }
+      this.$emit('update:value', activeItem ? activeItem.id : null);
+    },
+    reloadScrollHost() {
+      if(this.scrollHostClassAddedEleAdded != null) 
+        this.scrollHostClassAddedEleAdded.removeEventListener('scroll', this.onScroll);
+      
+      if(this.scrollHostClassAddedEle) {
+        this.scrollHostClassAddedEleAdded = this.scrollHostClassAddedEle;
+        this.scrollHostClassAddedEle.addEventListener('scroll', this.onScroll);
+      }
+    },
+  },
   mounted() {
     setTimeout(() => {
       this.reloadScrollHost();
       if(this.scrollHostClassAddedEle != null) {
-        this.onScroll(null);
-        this.onScroll(null);
+        this.onScroll();
+        this.onScroll();
       }
     }, 500);
-  }
-  beforeDestroy() {
+  },
+  beforeUnmount() {
     if(this.scrollHostClassAddedEleAdded != null)
       this.scrollHostClassAddedEleAdded.removeEventListener('scroll', this.onScroll);
   }
-}
+})
 </script>
 
 <style lang="scss">

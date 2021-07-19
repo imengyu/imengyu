@@ -1,34 +1,38 @@
-import VueRouter from 'vue-router';
-import Vue from 'vue';
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
+import Index from '../views/Index.vue';
 
-Vue.use(VueRouter);
-
-export function createRouter() {
-  return new VueRouter({
-    mode: 'hash',
-    routes: [
+const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    name: 'Index',
+    component: Index,
+    children: [
       {
-        path: '/',
-        name: 'Index',
-        component: () => import('../views/Index.vue'),
-        children: [
-          {
-            path: 'About',
-            name: 'About',
-            component: () => import('../views/About.vue'),
-          },
-          {
-            path: 'Works',
-            name: 'Works',
-            component: () => import('../views/Works.vue'),
-          },
-        ]
+        path: 'About',
+        name: 'About',
+        component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
       },
       {
-        path: '*',
-        name: 'NotFound',
-        component: () => import('../views/NotFound.vue')
-      }
+        path: 'Works',
+        name: 'Works',
+        component: () => import(/* webpackChunkName: "works" */ '../views/Works.vue'),
+      },
     ]
-  });
-}
+  },
+  {
+    path: '/404',
+    name: 'PageNotExist',
+    component: () => import(/* webpackChunkName: "notfoud" */ '../views/NotFound.vue')
+  },
+  {
+    path: "/:catchAll(.*)", // 不识别的path自动匹配404
+    redirect: '/404',
+  }
+]
+
+const router = createRouter({
+  history: createWebHashHistory(process.env.BASE_URL),
+  routes
+})
+
+export default router

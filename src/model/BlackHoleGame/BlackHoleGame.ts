@@ -1,5 +1,7 @@
+import Utils from "@/utils/Utils";
 import { CanvasGameProvider } from "../CanvasGameProvider";
-import { random } from "../ThreeSpaceGame/utils/RandomUtil";
+
+const random = Utils.randomNum;
 
 const shader_fs = '\
 varying mediump vec4 v_color;\
@@ -43,7 +45,7 @@ export function getBlackHoleModes() { return modeArr; }
 export type BlackHoleWorkMode = 'none'|'roate'|'explode'|'explode-quadrant'|'explode-2'|'fly'|
   'spectrum'|'hidden'|'love'|'wave';
 
-var globalRanom = 0;
+let globalRanom = 0;
 
 class Vector3 {
   x = 0.0;
@@ -105,9 +107,9 @@ class Particle {
     this.vertices = this.game.vertices
   }
 
-  vertices : Float32Array = null;
+  vertices : Float32Array|null = null;
 
-  private game : BlackHoleGame = null;
+  private game : BlackHoleGame;
 
   positionLast = new Vector3(0,0,0);
   position = new Vector3(0,0,0);
@@ -137,7 +139,7 @@ class Particle {
 
 
   holeAttraction() {
-    var sp = 
+    const sp = 
       min_blackhole_gravitation_speed +
       (Math.abs(max_radius - this.r) / max_radius) * 
       (max_blackhole_gravitation_speed - min_blackhole_gravitation_speed);
@@ -176,7 +178,7 @@ class Particle {
 
       this.positionLast.set(this.position);
 
-      let diff = this.position.sub(this.positionTransTarget).abs();
+      const diff = this.position.sub(this.positionTransTarget).abs();
       if(diff.y <= this.mst) {
         this.positionArrived = true;
         return;
@@ -193,7 +195,7 @@ class Particle {
 
       this.positionLast.set(this.position);
 
-      let diff = this.position.sub(this.positionTransTarget).abs();
+      const diff = this.position.sub(this.positionTransTarget).abs();
       if(diff.x < 0.5 && diff.y < 0.5) {
         this.positionArrived = true;
         return;
@@ -217,7 +219,7 @@ class Particle {
 
       this.positionLast.set(this.position);
 
-      let diff = this.position.sub(this.positionTransTarget);
+      const diff = this.position.sub(this.positionTransTarget);
 
       if(this.fType == 'x') {
         if(diff.x < 0) this.position.x += this.speed;
@@ -241,8 +243,8 @@ class Particle {
   move() {
     if(!this.positionArrived) {
 
-      let diffX = Math.abs(this.position.x - this.positionTransTarget.x);
-      let diffY = Math.abs(this.position.y - this.positionTransTarget.y);
+      const diffX = Math.abs(this.position.x - this.positionTransTarget.x);
+      const diffY = Math.abs(this.position.y - this.positionTransTarget.y);
       if(diffX < this.speed && diffY < this.speed) {
         this.positionArrived = true;
         this.position.set(this.positionTransTarget);
@@ -268,6 +270,12 @@ class Particle {
     yStart: number,
     height: number,
     offest: number,
+  } = {
+    xStart: 0,
+    x: 0,
+    yStart: 0,
+    height: 0,
+    offest: 0,
   };
   waveTransXLess = false;
   waveTransSpeed = 0.1;
@@ -298,18 +306,25 @@ class Particle {
   }
 
   copyPos(i : number) {
-    let width = this.game.width;
-    let height = this.game.height;
+    const width = this.game.width;
+    const height = this.game.height;
+    const vertices = this.vertices;
 
-    this.vertices[i * vertices_block_data_count + 0] = (this.position.x) / (width / 2);
-    this.vertices[i * vertices_block_data_count + 1] = (this.position.y) / (height / 2);
-    this.vertices[i * vertices_block_data_count + 2] = (this.position.z) / (height / 2);
+    if(vertices) {
+      vertices[i * vertices_block_data_count + 0] = (this.position.x) / (width / 2);
+      vertices[i * vertices_block_data_count + 1] = (this.position.y) / (height / 2);
+      vertices[i * vertices_block_data_count + 2] = (this.position.z) / (height / 2);
+    }
   }
   copyColor(i : number) {
-    this.vertices[i * vertices_block_data_count + 3] = this.color.x;
-    this.vertices[i * vertices_block_data_count + 4] = this.color.y;
-    this.vertices[i * vertices_block_data_count + 5] = this.color.z;
-    this.vertices[i * vertices_block_data_count + 6] = this.alpha;
+    const vertices = this.vertices;
+
+    if(vertices) {
+      vertices[i * vertices_block_data_count + 3] = this.color.x;
+      vertices[i * vertices_block_data_count + 4] = this.color.y;
+      vertices[i * vertices_block_data_count + 5] = this.color.z;
+      vertices[i * vertices_block_data_count + 6] = this.alpha;
+    }
   }
 
 
@@ -329,8 +344,8 @@ class Particle {
     if (this.speed < min_speed) this.speed = min_speed;
     if (this.speed > max_speed) this.speed = max_speed;
   }
-  calcAlpha(set : boolean = true) {
-    var a = (max_radius - this.r) / max_radius;
+  calcAlpha(set  = true) {
+    let a = (max_radius - this.r) / max_radius;
     if (a < 0.1) a = 0.1;
     if (a > 1) a= 1;
     if (set) this.alpha = a;
@@ -394,29 +409,34 @@ const vector3Temp = new Vector3(0, 0, 0);
 const particle_color = new Vector3(0.4, 0.5, 0.7);
 const particle_spectrum_color = new Vector3(0.12, 0.15, 0.17);
 
+export interface BlackholeWorkModeChangeCallbackFunction {
+  (mode: BlackHoleWorkMode): void;
+}
+
 export class BlackHoleGame extends CanvasGameProvider {
 
   anim_running = false;
-  anim_id = null;
-  gl: WebGLRenderingContext = null;
+  anim_id = 0;
+
+  gl: WebGLRenderingContext|null = null;
   particles: Array<Particle> = [];
   globalRanom = 0;
-  autoTimer = null;
-  autoTimer2 = null;
+  autoTimer = 0;
+  autoTimer2 = 0;
   autoTimer2Tick = 0;
   autoTimer2TickNext = 0;
 
   width = 0;
   height = 0;
 
-  vertexBuffer;
-  vertices : Float32Array;
+  vertexBuffer : WebGLBuffer|null = null;
+  vertices = new Float32Array();
 
   mode : BlackHoleWorkMode = 'none';
   modeInt = 0;
-  modeChangeCallback : Function  = null;
+  modeChangeCallback : BlackholeWorkModeChangeCallbackFunction|null  = null;
   
-  public setBlackholeWorkModeChangeCallback(callback: Function) {
+  public setBlackholeWorkModeChangeCallback(callback: BlackholeWorkModeChangeCallbackFunction) {
     this.modeChangeCallback = callback;
   }
 
@@ -434,25 +454,25 @@ export class BlackHoleGame extends CanvasGameProvider {
   public drawSpectrum(analyser : AnalyserNode, voiceHeight : Uint8Array) {
     analyser.getByteFrequencyData(voiceHeight);
 
-    var step = Math.round(voiceHeight.length / spectrum_width);
-    var lines = spectrum_width;
-    var rows = spectrum_height;
-    var index = 0;
-    var particle : Particle;
+    const step = Math.round(voiceHeight.length / spectrum_width);
+    const lines = spectrum_width;
+    const rows = spectrum_height;
+    let index = 0;
+    let particle : Particle;
 
     for (let i = 0; i < max_particles; i++){
       this.particles[i].alpha = 1;
       this.particles[i].color.set(particle_spectrum_color);
     }
 
-    var loopInnern = (i : number, h : number) => {
+    const loopInnern = (i : number, h : number) => {
 
-      for(var j = 1; j < rows; j++) {
+      for(let j = 1; j < rows; j++) {
         index = i * spectrum_height + j;
 
-        var r = (i / center) * ((h / spectrum_height));
-        var g = ((rows - j) / rows) * (h / spectrum_height);
-        var b = (j / rows) * ((center - i) / center) * (1 - (h / spectrum_height));
+        const r = (i / center) * ((h / spectrum_height));
+        const g = ((rows - j) / rows) * (h / spectrum_height);
+        const b = (j / rows) * ((center - i) / center) * (1 - (h / spectrum_height));
 
         if(index < max_particles) {
           particle = this.particles[index];
@@ -467,10 +487,10 @@ export class BlackHoleGame extends CanvasGameProvider {
       }
     }
 
-    var center = Math.ceil(lines / 2);
-    for (var i = center; i >= 0; i--) 
+    const center = Math.ceil(lines / 2);
+    for (let i = center; i >= 0; i--) 
       loopInnern(i, (voiceHeight[step * (center - i)] / 250) * rows)
-    for (var i = center; i < lines; i++) 
+    for (let i = center; i < lines; i++) 
       loopInnern(i, (voiceHeight[step * (i - center)] / 250) * rows)
     
   }
@@ -483,10 +503,18 @@ export class BlackHoleGame extends CanvasGameProvider {
   public init(canvas : HTMLCanvasElement, ctx : CanvasRenderingContext2D) {
     super.init(canvas, ctx);
 
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
+    if(this.canvas) {
+      this.width = this.canvas.width;
+      this.height = this.canvas.height;
+      this.gl = this.canvas.getContext('webgl') as WebGL2RenderingContext;
+    }
 
-    const gl = this.gl = this.canvas.getContext('webgl');
+    const gl = this.gl;
+    if(!gl) {
+      alert("getContext failed! ");
+      return;
+    }
+
     gl.viewport(0, 0, this.width, this.height);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);/*清空画板上的颜色，并初始化颜色*/
     gl.clearDepth(0.4);//设定canvas初始化时候的深度
@@ -497,19 +525,24 @@ export class BlackHoleGame extends CanvasGameProvider {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
     
     //顶点着色器和片段着色器生成
-    var v_shader = create_shader(gl, shader_vs, 'x-shader/x-vertex');
-    var f_shader = create_shader(gl, shader_fs, 'x-shader/x-fragment');
-    var program = create_program(gl, v_shader, f_shader); // 程序对象的生成和连接
-  
+    const v_shader = create_shader(gl, shader_vs, 'x-shader/x-vertex');
+    const f_shader = create_shader(gl, shader_fs, 'x-shader/x-fragment');
+    if(!v_shader || !f_shader)
+      return;
+
+    const program = create_program(gl, v_shader, f_shader); // 程序对象的生成和连接
+    if(!program)
+      return;
+
     this.initParticles();//初始化粒子
   
-    var vertexPosition = gl.getAttribLocation(program, "vertexPosition");
-    var vertexColor = gl.getAttribLocation(program, "vertexColor");
+    const vertexPosition = gl.getAttribLocation(program, "vertexPosition");
+    const vertexColor = gl.getAttribLocation(program, "vertexColor");
   
     this.vertexBuffer = gl.createBuffer(); //创建缓冲区
     if(!this.vertexBuffer){
-      console.error("Failed to createthe buffer object vertexBuffer");//缓冲区创建失败
-      return;
+      console.error("Failed to createthe buffer object vertexBuffer");//缓冲区创建失败
+      return;
     }
   
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer); //将缓冲区绑定到目标对象
@@ -525,7 +558,7 @@ export class BlackHoleGame extends CanvasGameProvider {
   }
   public destroy() {
     this.stop();
-    this.particles = null;
+    this.particles.splice(0, this.particles.length);
   }
   public render(deltatime : number) {
     globalRanom = random(0, 360);
@@ -555,7 +588,7 @@ export class BlackHoleGame extends CanvasGameProvider {
     clearInterval(this.autoTimer);
     this.autoTimer = setTimeout(() => {
       cancelAnimationFrame(this.anim_id);
-      this.anim_id = null;
+      this.anim_id = 0;
     }, 2000);
 
     clearInterval(this.autoTimer2);
@@ -578,7 +611,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       this.autoTimer2Tick = 0;
   
       if(this.getBlackHoleWorkMode() == 'roate') {
-        var re = random(0, 1);
+        const re = random(0, 1);
         if(re == 2){
           this.autoTimer2TickNext = random(30, 60);
           this.blackholeRandomExplode('wave');
@@ -604,7 +637,7 @@ export class BlackHoleGame extends CanvasGameProvider {
     }
   }
   blackholeRandomExplode(nextMode : BlackHoleWorkMode = 'roate') {
-    var r = random(0, 30);
+    const r = random(0, 30);
     clearInterval(this.autoTimer);
     this.autoTimer = setTimeout(() => {
       if(r % 2 == 0) {
@@ -625,7 +658,7 @@ export class BlackHoleGame extends CanvasGameProvider {
 
   getBlackHoleWorkMode() { return this.mode; }
   setBlackHoleWorkMode(newMode : BlackHoleWorkMode) {
-    let oldMode = this.mode;
+    const oldMode = this.mode;
 
     this.mode = newMode;
     this.modeInt = modeArr.indexOf(newMode);
@@ -664,13 +697,17 @@ export class BlackHoleGame extends CanvasGameProvider {
   }
 
   update() {
-    let gl = this.gl;
-    let particles = this.particles;
-    let particle : Particle = null;
-    let modeInt = this.modeInt;
+    const gl = this.gl;
+    const particles = this.particles;
+    const modeInt = this.modeInt;
+
+    let particle : Particle|null = null;
+
+    if(!gl)
+      return;
   
     if(modeInt == 1) {
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         particle.holeAttraction();
         particle.roate();
@@ -683,7 +720,7 @@ export class BlackHoleGame extends CanvasGameProvider {
   
       }
     }else if(modeInt == 2) {
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         if(particle.mstTrans)
           particle.transMstExplode();
@@ -693,7 +730,7 @@ export class BlackHoleGame extends CanvasGameProvider {
         particle.copyColor(i);
       }
     }else if(modeInt == 3) {
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         particle.explodeMoveQuadrant();
         particle.transAlphaExplode();
@@ -702,7 +739,7 @@ export class BlackHoleGame extends CanvasGameProvider {
         
       }
     }else if(modeInt == 4) {
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         particle.explodeMove2();
         particle.transAlphaExplode();
@@ -710,7 +747,7 @@ export class BlackHoleGame extends CanvasGameProvider {
         particle.copyColor(i);
       }
     }else if(modeInt == 5) {
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         if(particle.alphaTrans) particle.transAlphaRoate();
         if(particle.move())
@@ -719,7 +756,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       }
     }else if(modeInt == 6) {
       if(this.drawSpectrumCallback) this.drawSpectrumCallback();
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         if(particle.alphaTrans) particle.transAlphaRoate();
         particle.roate();
@@ -727,7 +764,7 @@ export class BlackHoleGame extends CanvasGameProvider {
         particle.copyColor(i);
       }
     }else if(modeInt == 7) {
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         particle.transAlphaHidden();
         particle.roate();
@@ -735,7 +772,7 @@ export class BlackHoleGame extends CanvasGameProvider {
         particle.copyColor(i);
       }
     }else if(modeInt == 8) {
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         
         if(particle.move())
@@ -752,7 +789,7 @@ export class BlackHoleGame extends CanvasGameProvider {
         particle.copyColor(i);
       }
     }else if(modeInt == 9) {
-      for(var i = 0; i < max_particles; i++) {
+      for(let i = 0; i < max_particles; i++) {
         particle = particles[i];
         if(particle.positionArrived) particle.wave();
         else particle.move();
@@ -771,8 +808,8 @@ export class BlackHoleGame extends CanvasGameProvider {
   //mode builders
 
   buildParticles() {
-    let particles = this.particles;
-    let particle: Particle = null;
+    const particles = this.particles;
+    let particle: Particle|null = null;
 
     for (let i = 0; i < max_particles; i++) {
       particle = particles[i];
@@ -789,10 +826,10 @@ export class BlackHoleGame extends CanvasGameProvider {
     }
   }
   buildExplodeParticles() {
-    let particle: Particle = null;
-    let dt = 0, oldSp = 0;
-    let particles = this.particles;
-    let height = this.height;
+    const particles = this.particles;
+    const height = this.height;
+    let particle: Particle|null = null;
+    let dt = 0;
 
     for (let i = 0; i < max_particles; i++) {
       particle = particles[i];
@@ -803,13 +840,12 @@ export class BlackHoleGame extends CanvasGameProvider {
       dt = particle.getD() + 90;
       if(dt >= 360) dt = dt - 360;
 
-      //x*x0+y*y0=r^2 
+      //x*x0+y*y0=r^2
 
       particle.positionTransTarget.y = height + 40;
       particle.positionTransTarget.x = (Math.pow(particle.r, 2) - height * particle.positionTransStart.y) / particle.positionTransStart.x;//yb
       particle.lt = Math.sqrt(Math.pow(particle.positionTransTarget.x, 2) + Math.pow(particle.positionTransTarget.y, 2));
 
-      oldSp = particle.speed;
       particle.speed = min_explode_speed + 
         ((Math.sqrt(Math.pow(particle.positionTransStart.x, 2) + Math.pow(particle.positionTransStart.y, 2)) - min_radius) / 
         (max_radius - min_radius)) * (max_explode_speed - min_explode_speed);
@@ -818,10 +854,10 @@ export class BlackHoleGame extends CanvasGameProvider {
     }
   }
   buildExplodeQuadrantParticles() {
-    let particle: Particle = null;
-    let particles = this.particles;
-    let height = this.height;
-    let width = this.width;
+    const particles = this.particles;
+    const height = this.height;
+    const width = this.width;
+    let particle: Particle|null = null;
 
     for (let i = 0; i < max_particles; i++) {
       particle = particles[i];
@@ -862,9 +898,10 @@ export class BlackHoleGame extends CanvasGameProvider {
     }
   }
   buildExplode2Particles() {
-    let particle: Particle = null;
-    let particles = this.particles;
-    let height = this.height;
+    const particles = this.particles;
+    const height = this.height;
+
+    let particle: Particle|null = null;
     for (let i = 0; i < max_particles; i++) {
       particle = particles[i];
       particle.positionArrived = false;
@@ -890,13 +927,14 @@ export class BlackHoleGame extends CanvasGameProvider {
     }
   }
   buildSpectrumParticlesEnd() {
-    var particle: Particle = null;
-    var w = spectrum_width;
-    var h = spectrum_height;
-    var dsp = 360 / w;
-    var d = 0;
-    var i = 0;
-    var hi = 0;
+    const w = spectrum_width;
+    const h = spectrum_height;
+    const dsp = 360 / w;
+
+    let particle: Particle|null = null;
+    let d = 0;
+    let i = 0;
+    let hi = 0;
 
     while(i < max_particles) {
 
@@ -923,8 +961,9 @@ export class BlackHoleGame extends CanvasGameProvider {
     }
   }
   buildSpectrumParticlesStart() {
-    let particle: Particle = null;
-    let particles = this.particles;
+    const particles = this.particles;
+
+    let particle: Particle|null = null;
     for (let i = 0; i < max_particles; i++) {
       particle = particles[i];
       particle.alphaTrans = true;
@@ -933,12 +972,15 @@ export class BlackHoleGame extends CanvasGameProvider {
     }
   }
   buildLoveParticles() {
-    var x = 0, center = max_particles/10;
-    var particles = this.particles
-    var index = 0;
-    var max = 1.14;
-    var step = max*2 / center;
-    var y = 0;
+    
+    const center = max_particles/10;
+    const particles = this.particles
+    const max = 1.14;
+    const step = max*2 / center;
+
+    let y = 0;
+    let index = 0;
+    let x = 0;
   
     for(x = 0; x <= max && index < max_particles; x += step) {
       y = (Math.pow(x,(2/3))+Math.sqrt(Math.pow(x,(4/3))-4*Math.pow(x,2)+4))/2;
@@ -961,8 +1003,9 @@ export class BlackHoleGame extends CanvasGameProvider {
       particles[index+1].alpha = x / max;
       index+=2;
     }
-  
-    for(var lim = index, index = 0; index < lim; index++) {
+    const lim = index;
+    index = 0;
+    for(; index < lim; index++) {
       particles[index].positionTransTarget.x *= 150;
       particles[index].positionTransTarget.y *= 130;
       particles[index].positionArrived = false;
@@ -985,30 +1028,30 @@ export class BlackHoleGame extends CanvasGameProvider {
   buildWaveParticles() {
 
     const wave_row_count = 40;
+    const particles = this.particles;
+    const height = this.height;
+    const width = this.width;
+    const wave_line_count = Math.floor(max_particles / wave_row_count); 
 
-    let particles = this.particles;
-    let height = this.height;
-    let width = this.width;
-    let wave_line_count = Math.floor(max_particles / wave_row_count); 
+    const line_height = height / wave_row_count;
+    const line_width = width / wave_line_count;
+    const sin_x_ince = Math.PI * 7 / wave_line_count; 
 
-    let line_height = height / wave_row_count;
-    let line_width = width / wave_line_count;
-
-    let sin_x = 0, sin_x_ince = Math.PI * 7 / wave_line_count; 
+    let sin_x = 0;
 
     let index = 0;
-    let particle : Particle = null;
+    let particle : Particle|null = null;
 
-    let w2 = width / 2;
-    let h2 = height / 2;
+    const w2 = width / 2;
+    const h2 = height / 2;
     let sp = 0;
 
-    for(var i = 0; i < wave_row_count; i++) {
+    for(let i = 0; i < wave_row_count; i++) {
 
       sin_x = i * Math.PI / 8;
       sp =  0.01 + 0.8 * (1 - Math.abs((i / 2) - i) / (i / 2));
 
-      for(var j = 0; j < wave_line_count && index < max_particles; j++) {
+      for(let j = 0; j < wave_line_count && index < max_particles; j++) {
 
         particle = particles[index];
         particle.positionArrived = true;
@@ -1034,10 +1077,13 @@ export class BlackHoleGame extends CanvasGameProvider {
         index++;
       }
     }
-    for(;index < max_particles;index++) {
-      particle.waveOn = false;
-      particle = particles[index];
-      particle.alpha = 0;
+
+    if(particle) {
+      for(;index < max_particles;index++) {
+        particle.waveOn = false;
+        particle = particles[index];
+        particle.alpha = 0;
+      }
     }
   }
 
@@ -1045,47 +1091,48 @@ export class BlackHoleGame extends CanvasGameProvider {
 
 }
 
-function create_shader(gl, str, type) {
-  //用来保存着色器的变量
-  var shader; //根据id从HTML中获取指定的script标签
-
+function create_shader(gl : WebGLRenderingContext, str : string, type : string) {
+  let shader : WebGLShader; 
   switch (type) {
     case 'x-shader/x-vertex':
-      shader = gl.createShader(gl.VERTEX_SHADER); //生成顶点着色器
-      break; // 片段着色器的时候
-
+      shader = gl.createShader(gl.VERTEX_SHADER) as WebGLShader; //生成顶点着色器
+      break; 
     case 'x-shader/x-fragment':
-      shader = gl.createShader(gl.FRAGMENT_SHADER); //生成片元着色器
+      shader = gl.createShader(gl.FRAGMENT_SHADER) as WebGLShader; //生成片元着色器
       break;
     default:
       return;
-  } //将标签中的代码分配给生成的着色器
+  }
 
-  gl.shaderSource(shader, str); //编译着色器
-  gl.compileShader(shader); //判断一下着色器是否编译成功
+  //编译着色器
+  gl.shaderSource(shader, str); 
+  gl.compileShader(shader);
 
-  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    // 编译成功，则返回着色器
+  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) 
     return shader;
-  } else {
+  else {
     // 编译失败，弹出错误消息
     alert(gl.getShaderInfoLog(shader));
     console.error(gl.getShaderInfoLog(shader));
   }
 }
-function create_program(gl, vs, fs) {
-  //程序对象的生成
-  var program = gl.createProgram(); //向程序对象里分配着色器
+function create_program(gl : WebGLRenderingContext, vs : WebGLShader, fs : WebGLShader) {
+  const program = gl.createProgram(); //向程序对象里分配着色器
+
+  if(!program) {
+    alert('Failed to create program!');
+    return;
+  }
 
   gl.attachShader(program, vs);
-  gl.attachShader(program, fs); //将着色器连接
-
-  gl.linkProgram(program); //判断着色器的连接是否成功
-
+  gl.attachShader(program, fs);
+  
+  //将着色器连接
+  gl.linkProgram(program); 
+  
+  //判断着色器的连接是否成功
   if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    // 成功的话，将程序对象设置为有效
-    gl.useProgram(program); // 返回程序对象
-
+    gl.useProgram(program); 
     return program;
   } else {
     // 如果失败，弹出错误信息

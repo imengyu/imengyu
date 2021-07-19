@@ -5,93 +5,112 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
+import { defineComponent, PropType } from 'vue'
 import { CanvasGameProvider } from '../model/CanvasGameProvider'
 
-@Component({
-  name: 'CanvasAnimHost'
-})
-export default class CanvasAnimHost extends Vue {
-  canvas : HTMLCanvasElement;
-  ctx : CanvasRenderingContext2D;
+export interface ICanvasAnimHost {
+  start() : void;
+  stop() : void;
+}
 
-  @Prop({default:null}) gameProvider : CanvasGameProvider; 
-  @Prop({default:true}) create2DCtx : boolean;
-  @Prop({default:'#000'}) background : string;
-
+export default defineComponent({
+  name: 'CanvasAnimHost',
+  props: {
+    gameProvider: {
+      type: Object as PropType<CanvasGameProvider>,
+      default: null,
+    },
+    create2DCtx: {
+      type: Boolean,
+      default: true,
+    },
+    background: {
+      type: String,
+      default: '#000',
+    },
+  },
+  data() {
+    return {
+      canvas: null as HTMLCanvasElement|null,
+      ctx: null as CanvasRenderingContext2D|null,
+      renderTickHandle: 0,
+      renderLastTime: new Date(),
+      currentFps: 0,
+      currentFpsShowVal: '00.00',
+      playing: false,
+      tick: 0,
+    }
+  },
   mounted() {
     setTimeout(() => {
-      this.canvas = <HTMLCanvasElement>this.$refs.canvas;
+      this.canvas = this.$refs.canvas as HTMLCanvasElement;
       this.initCanvas();
        window.addEventListener('resize', this.onWindowResize);
     }, 400);
-  }
-  beforeDestroy() {
+  },
+  beforeUnmount() {
     this.destroyCanvas();
-     window.removeEventListener('resize', this.onWindowResize);
-  }
+    window.removeEventListener('resize', this.onWindowResize);
+  },
+  methods: {
+    onWindowResize() {
+      const canvas = this.canvas;
+      if(canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        this.gameProvider.resize(canvas.width, canvas.height);
+      }
+    },
+    renderTick() {
+      const canvas = this.canvas;
+      if(canvas) {
+        const currentTime = new Date();
+        const detiaTime = currentTime.getTime() - this.renderLastTime.getTime();
 
-  onWindowResize() {
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-    this.gameProvider.resize(this.canvas.width,  this.canvas.height);
-  }
+        this.currentFps = 1000 / detiaTime;
+        this.renderLastTime = currentTime;
 
-  renderTickHandle = null;
-  renderLastTime = new Date();
-  currentFps = 0;
-  currentFpsShowVal = '00.00';
-  playing = false;
+        if(this.ctx) this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  tick = 0;
+        this.tick ++;
 
-  renderTick() {
-    var currentTime = new Date();
-    var detiaTime = currentTime.getTime() - this.renderLastTime.getTime();
+        if(this.tick >= 60) {
+          this.tick = 0;
+          this.currentFpsShowVal = this.currentFps.toFixed(2);
+        }
 
-    this.currentFps = 1000 / detiaTime;
-    this.renderLastTime = currentTime;
-
-    if(this.ctx) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.tick ++;
-
-    if(this.tick >= 60) {
-      this.tick = 0;
-      this.currentFpsShowVal = this.currentFps.toFixed(2);
+        this.gameProvider.render(1 / this.currentFps);
+        this.renderTickHandle = requestAnimationFrame(this.renderTick);
+      }
+    },
+    initCanvas() {
+      const canvas = this.canvas;
+      if(canvas) {
+        if(this.create2DCtx) this.ctx = canvas.getContext('2d');
+        this.onWindowResize();
+        this.gameProvider.init(canvas, this.ctx as CanvasRenderingContext2D);
+      }
+    },
+    destroyCanvas() {
+      this.stop();
+      this.gameProvider.destroy();
+    },
+    start() {
+      if(this.renderTickHandle != 0) this.stop();
+      if(this.renderTickHandle == 0) {
+        this.playing = true;
+        setTimeout(() => {
+          this.gameProvider.start();
+          this.renderTick();
+        }, 300);
+      }
+    },
+    stop() {
+      this.playing = false;
+      this.gameProvider.stop();
+      cancelAnimationFrame(this.renderTickHandle);
+      this.renderTickHandle = 0;
     }
-
-    this.gameProvider.render(1 / this.currentFps);
-    this.renderTickHandle = requestAnimationFrame(this.renderTick);
   }
-  initCanvas() {
-    if(this.create2DCtx) this.ctx = this.canvas.getContext('2d');
-    this.onWindowResize();
-    this.gameProvider.init(this.canvas, this.ctx);
-  }
-
-  destroyCanvas() {
-    this.stop();
-    this.gameProvider.destroy();
-  }
-
-  public start() {
-
-    if(this.renderTickHandle != null) this.stop();
-    if(this.renderTickHandle == null) {
-      this.playing = true;
-      setTimeout(() => {
-        this.gameProvider.start();
-        this.renderTick();
-      }, 300);
-    }
-  }
-  public stop() {
-    this.playing = false;
-    this.gameProvider.stop();
-    cancelAnimationFrame(this.renderTickHandle);
-    this.renderTickHandle = null;
-  }
-
-}
+})
 </script>

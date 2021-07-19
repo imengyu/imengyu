@@ -1,4 +1,4 @@
-var StringUtils = {
+const StringUtils = {
   /**
    * 字符串判空
    * @param str 字符串
@@ -14,7 +14,7 @@ var StringUtils = {
   pad,
   formatNumberWithComma,
   getFileName(path : string) {
-    var pos = path.lastIndexOf('/');
+    let pos = path.lastIndexOf('/');
     if(pos < 0) pos = path.lastIndexOf('\\');
     return path.substring(pos + 1);  
   }
@@ -34,8 +34,8 @@ function isBase64(str : string) {
  * @param {String} val 
  */
 function isNumber(val : string) {
-  var regPos = /^\d+(\.\d+)?$/; //非负浮点数
-  var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+  const regPos = /^\d+(\.\d+)?$/; //非负浮点数
+  const regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
   if (regPos.test(val) || regNeg.test(val)) {
     return true;
   } else {
@@ -47,7 +47,7 @@ function isNumber(val : string) {
  * @param str 字符串
  */
 function isChinaPoneNumber(str : string) {
-  var myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
+  const myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
   if (!myreg.test(str)) {
       return false;
   } else {
@@ -59,7 +59,7 @@ function isChinaPoneNumber(str : string) {
  * @param str 字符串
  */
 function isEmail(str : string){
-  var re=/^\w+((-\w+)|(\.\w+))*@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+  const re=/^\w+((-\w+)|(\.\w+))*@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
   if (re.test(str) !== true) {
     return false;
   }else{
@@ -73,9 +73,9 @@ function isEmail(str : string){
 function strToHexCharCode(str : string, with0x = true) : string {
   if(str === "")
     return "";
-  var hexCharCode = [];
+  const hexCharCode = [];
   if(with0x) hexCharCode.push("0x"); 
-  for(var i = 0; i < str.length; i++) {
+  for(let i = 0; i < str.length; i++) {
     hexCharCode.push((str.charCodeAt(i)).toString(16));
   }
   return hexCharCode.join("");
@@ -86,8 +86,8 @@ function strToHexCharCode(str : string, with0x = true) : string {
  * @param n 如果数字不足n位，则自动补0
  */
 function pad(num : number, n : number) {
-  var strNum = num.toString();
-  var len = strNum.length;
+  let strNum = num.toString();
+  let len = strNum.length;
   while (len < n) {
     strNum = "0" + strNum;
     len++;
@@ -107,12 +107,12 @@ function formatNumberWithComma(s : string, addComma : boolean) {
   s = s.toString().replace(/^(\d*)$/, "$1.");
   s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
   s = s.replace(".", ",");
-  var re = /(\d)(\d{3},)/;
+  const re = /(\d)(\d{3},)/;
   while (re.test(s))
       s = s.replace(re, "$1,$2");
   s = s.replace(/,(\d\d)$/, ".$1");
   if (!addComma) { // 不带小数位(默认是有小数位)
-      var a = s.split(".");
+      const a = s.split(".");
       if (a[1] === "00") {
           s = a[0];
       }

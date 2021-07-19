@@ -1,6 +1,6 @@
 <template>
   <transition enter-active-class="fadeIn" leave-active-class="fadeOut">
-    <div v-show="value" class="imengyu-alert-box animated" style="animation-duration: 200ms;" @click="onOutBoxClick($event)">
+    <div v-show="show" class="imengyu-alert-box animated" style="animation-duration: 200ms;" @click="onOutBoxClick($event)">
       <div class="box animated zoomIn" style="animation-duration: 500ms;" @click="onBoxClick($event)">
         <div class="imengyu-content-sub-title">
           {{title}}
@@ -15,21 +15,32 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { defineComponent } from 'vue'
 
-@Component({
-  name: 'AlertDialog'
+export default defineComponent({
+  name: 'AlertDialog',
+  emits: [ 'update:show' ],
+  props: {
+    show: {
+      type: Boolean,
+      default: false,
+    },
+    title: {
+      type: String,
+      default: '',
+    },
+    subTitle: {
+      type: String,
+      default: '',
+    }
+  },
+  methods: {
+    onOutBoxClick() {
+      this.$emit('update:show', false)
+    },
+    onBoxClick(e : MouseEvent) {
+      e.cancelBubble = true;
+    }
+  },
 })
-export default class AlertDialog extends Vue {
-  @Prop({default:false}) value : boolean;
-  @Prop({default:''}) title : string;
-  @Prop({default:''}) subTitle : string;
-
-  onOutBoxClick(e : MouseEvent) {
-    this.$emit('input', false)
-  }
-  onBoxClick(e : MouseEvent) {
-    e.cancelBubble = true;
-  }
-}
 </script>
