@@ -15,6 +15,13 @@ html, body {
   margin: 0;
   padding: 0;
   position: relative;
+  font-family: 'Microsoft YaHei', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 15px;
+}
+input, textarea, select, button {
+  font-family: 'AaLGH', 'Microsoft YaHei', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: normal;
 }
 
 #imengyu-app, .imengyu,.imengyu-main {
@@ -24,7 +31,7 @@ html, body {
   margin: 0;
   padding: 0;
   position: relative;
-  font-size: 13px;
+  font-size: 1rem;
 }
 .imengyu-main,.imengyu-dark {
   background-color: #f3f3f3;
@@ -63,8 +70,9 @@ html, body {
   cursor: pointer;
   color: #fff;
   background-color: #000;
+  font-size: 14px;
   font-weight: bold;
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
 
   &.big {
     padding: 6px 12px;
@@ -87,7 +95,7 @@ html, body {
   transition: all ease-in-out 0.2s;
   cursor: pointer;
   font-weight: bold;
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
   font-size: 22px;
   outline: none;
 
@@ -101,7 +109,7 @@ html, body {
 
 .imengyu-intro {
 
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
   position: absolute;
   left: 0;
   right: 0;
@@ -205,7 +213,7 @@ html, body {
 //404
 
 .imengyu-404 {
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
   position: absolute;
   left: 0;
   right: 0;
@@ -244,8 +252,16 @@ a {
 }
 
 code {
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
 }
+
+ul, ol {
+  margin-block-start: 5px;
+  margin-block-end: 10px;
+  padding-inline-start: 30px;
+}
+
+
 
 //copyright
 
@@ -256,6 +272,8 @@ code {
   right: 0;
   text-align: center;
   padding: 0 0 20px 0;
+  font-family: 'AaLGH';
+  font-size: 1rem;
 
   a {
     text-decoration: none;

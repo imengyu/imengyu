@@ -18,14 +18,14 @@ const colors = [
   'rgb(255, 87, 34)',
 ];
 
-export function getColors() {
+export function getColors() : string[] {
   return colors;
 }
-export function getColorByIndex(i : number) {
+export function getColorByIndex(i : number) : string {
   if(i < colors.length) return colors[i];
   else return colors[(i % colors.length)];
 }
-export function getRandomColor() {
+export function getRandomColor() : string {
   const r = Math.floor(Math.random() * colors.length);
   return colors[r];
 }

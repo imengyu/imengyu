@@ -35,12 +35,12 @@ export class CanvasSortGame extends CanvasGameProvider {
     super();
   }
 
-  public changeSortMethod(method: SortMethods) {
+  public changeSortMethod(method: SortMethods) : void {
     this.currentSortMethod = method;
     this.currentForceUseSortMethod = true;
     this.goGenData(true);
   }
-  public switchSpectrum(on: boolean) {
+  public switchSpectrum(on: boolean) : void {
     if (on) {
       this.resetStart();
       this.dataCount = spectrum_line;
@@ -50,7 +50,7 @@ export class CanvasSortGame extends CanvasGameProvider {
       this.currentSortMethod = "spectrum";
     } else this.goGenData();
   }
-  public drawSpectrum(analyser: AnalyserNode, voiceHeight: Uint8Array) {
+  public drawSpectrum(analyser: AnalyserNode, voiceHeight: Uint8Array) : void {
     analyser.getByteFrequencyData(voiceHeight);
 
     let step = Math.round(voiceHeight.length / spectrum_width);
@@ -80,12 +80,12 @@ export class CanvasSortGame extends CanvasGameProvider {
     }
   }
 
-  public stop() {
+  public stop() : void {
     clearInterval(this.workInterval);
     this.workInterval = 0;
     this.resetStart();
   }
-  public start() {
+  public start() : void {
     if (this.workInterval != 0) clearInterval(this.workInterval);
     this.workInterval = setInterval(this.work.bind(this), 20);
   }
@@ -110,18 +110,19 @@ export class CanvasSortGame extends CanvasGameProvider {
 
   private currentForceUseSortMethod = false;
 
-  public init(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  public init(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) : void {
     super.init(canvas, ctx);
   }
-  public destroy() {
+  public destroy() : void {
     super.destroy();
     this.dataPool = [];
   }
-  public render(deltatime: number) {
+  public render(deltatime: number) : void {
     super.render(deltatime);
 
-    if (this.currentMode == "spectrum" && this.drawSpectrumCallback != null)
+    if (this.currentMode == "spectrum" && this.drawSpectrumCallback != null) {
       this.drawSpectrumCallback();
+    }
 
     const ctx = this.ctx;
     if (ctx) {
@@ -624,7 +625,7 @@ export class CanvasSortGame extends CanvasGameProvider {
     this.currentSortJumped = true;
     this.quickSort(this.sortStepGetTempData());
   }
-  private quickSort(arr: Array<any>, left?: number, right?: number) {
+  private quickSort(arr: Array<number>, left?: number, right?: number) {
     let partitionIndex;
     const _left = typeof left == "undefined" ? 0 : left;
     const _right = typeof right == "undefined" ? arr.length - 1 : right;

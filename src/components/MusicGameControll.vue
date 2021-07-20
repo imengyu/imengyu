@@ -126,7 +126,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    setTimeout(() => this.initPlayer(), 200)
+    setTimeout(() => this.initPlayer(), 1000)
   },
   beforeUnmount() {
     this.destroyPlayer();

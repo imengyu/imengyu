@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 interface Array<T> {
   /**
    * 查找元素在数组中的索引

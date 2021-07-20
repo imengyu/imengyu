@@ -3,7 +3,7 @@ const StringUtils = {
    * 字符串判空
    * @param str 字符串
    */
-  isNullOrEmpty(str : string | undefined | null){
+  isNullOrEmpty(str : string | undefined | null | unknown) : boolean {
     return !str || typeof str === 'undefined' || str === ''
   },
   isBase64,
@@ -13,7 +13,7 @@ const StringUtils = {
   strToHexCharCode,
   pad,
   formatNumberWithComma,
-  getFileName(path : string) {
+  getFileName(path : string) : string {
     let pos = path.lastIndexOf('/');
     if(pos < 0) pos = path.lastIndexOf('\\');
     return path.substring(pos + 1);  
@@ -26,14 +26,14 @@ export default StringUtils;
 * 判断字符串是否是 Base64 编码
 * @param {String} str 
 */
-function isBase64(str : string) {
+function isBase64(str : string) : boolean {
   return /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/.test(str);
 }
 /**
  * 检测字符串是否是一串数字
  * @param {String} val 
  */
-function isNumber(val : string) {
+function isNumber(val : string) : boolean {
   const regPos = /^\d+(\.\d+)?$/; //非负浮点数
   const regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
   if (regPos.test(val) || regNeg.test(val)) {
@@ -46,7 +46,7 @@ function isNumber(val : string) {
  * 检查字符串是否是中国的11位手机号
  * @param str 字符串
  */
-function isChinaPoneNumber(str : string) {
+function isChinaPoneNumber(str : string) : boolean {
   const myreg=/^[1][3,4,5,7,8][0-9]{9}$/;
   if (!myreg.test(str)) {
       return false;
@@ -58,7 +58,7 @@ function isChinaPoneNumber(str : string) {
  * 检查字符串是否是邮箱
  * @param str 字符串
  */
-function isEmail(str : string){
+function isEmail(str : string) : boolean {
   const re=/^\w+((-\w+)|(\.\w+))*@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
   if (re.test(str) !== true) {
     return false;
@@ -85,7 +85,7 @@ function strToHexCharCode(str : string, with0x = true) : string {
  * @param num 数字
  * @param n 如果数字不足n位，则自动补0
  */
-function pad(num : number, n : number) {
+function pad(num : number, n : number) : string {
   let strNum = num.toString();
   let len = strNum.length;
   while (len < n) {
@@ -99,7 +99,7 @@ function pad(num : number, n : number) {
  * @param s 需要格式化的数值.
  * @param type 判断格式化后是否需要小数位.
  */
-function formatNumberWithComma(s : string, addComma : boolean) {
+function formatNumberWithComma(s : string, addComma : boolean) : string {
   if (/[^0-9]/.test(s))
       return "0";
   if (s === null || s === "")

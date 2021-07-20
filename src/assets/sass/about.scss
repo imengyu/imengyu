@@ -19,6 +19,7 @@
     font-size: 22px;
     padding: 0 6px;
     width: 23%;
+    margin-top: 10px;
   
     .title {
       font-size: 17px;
@@ -28,13 +29,13 @@
       padding-bottom: 10px;
       position: relative;
       text-align: center;
-      font-family: 'Engineer';
+      font-family: 'AaLGH';
 
       @include mark-underline-center(10px, 0px);
     }
     .subtitle {
       font-size: 14px;
-      color: #6e6e6e;
+      color: #a8a8a8;
       text-align: center;
       margin-top: 15px;
     }
@@ -125,7 +126,7 @@
     background-color: #303030;
     color: #fff;
     border-radius: 5px;
-    padding: 4px 6px 2px 6px;
+    padding: 2px 6px;
   }
 
   &.float {
@@ -162,7 +163,7 @@
 .imengyu-about-contact-list {
   display: inline-block;
   position: relative;
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
 
   ul {
     position: relative;
@@ -233,6 +234,9 @@
       left: -$page-padding-md;
       right: -$page-padding-md;
     }
+  }
+  .imengyu-about-big-image {
+    right: 30px;
   }
 }
 

@@ -14,7 +14,7 @@
         <div class="imengyu-about-content-left">
           我是 快乐的梦鱼<br>
           一个普普通通的男孩子<br>
-          是一个普通的刚刚入行的程序猿<br>
+          是一个刚刚入行的程序猿<br>
           正在努力学习工作<br>
 
           <div class="imengyu-about-subtitle">LIFE <i class="iconfont icon-jiantou_xiangyouliangci_o"></i> </div>
@@ -68,7 +68,7 @@
       </div>
 
       <!--Learning-->
-      <div class="imengyu-content-box-innern" id="learning">
+      <div class="imengyu-content-box-innern no-left-right-padding" id="learning">
 
         <div class="imengyu-content-sub-title">
           LEARNING MORE
@@ -78,7 +78,7 @@
           </span>
         </div>      
 
-        <TextNetworkGraph />
+        <TextNetworkGraph :data="learningData" />
 
       </div>
 
@@ -94,6 +94,14 @@
 
         <div class="imengyu-about-list show overflow-visible">
 
+          <div class="imengyu-content-innern-subtitle">主要擅长技能</div>
+          前端开发，Vue、React，Electron、Uniapp。<br>
+          Unity 游戏开发，或者是H5小游戏，Cocos2d小游戏。<br>
+          会画一点画（但好久没有深入学习了），喜欢唱歌（虽然很难听）。<br>
+          初学摄影，目前拍的照片一般般。<br>
+          单身宅男，想和喜欢的人天天一起出去玩。<br>
+  
+
           <div class="imengyu-content-innern-subtitle">我是什么样的？</div>
           一个普通的男生，长相一般，内向，不善闲聊。<br>
           喜欢新事物，新技术，对编程有浓厚兴趣，喜欢钻研。<br>
@@ -105,8 +113,8 @@
 
           <div :class="'imengyu-hidden-area float '+(showHiddenAbout?'show':'')">
             <code class="mb-3 display-inline-block">21/170/50/0</code><br>
-            我好想要一个男朋友啊<br>
-            不颜控，只求合得来真心的，不是非常喜欢10<br>
+            好想要一个男朋友，<br>
+            不颜控，真心的合得来就好，不是非常喜欢10。<br>
             一直期待能遇见你，我能陪着你一起<br>
             一起经历人生的种种冒险，把最好的都给你...<br>
             （我比较内向，刚开始可能不大会聊天，<br>
@@ -115,7 +123,6 @@
           </div>
           <div :class="'imengyu-hidden-area-placeholder '+(showHiddenAbout?'show':'')">
           </div>
-
           
         </div>
       </div>
@@ -141,20 +148,14 @@
               <i class="icon iconfont icon-yingdaicon04"></i>
               <div class="sub">
                 WeChart
-                <i class="iconfont icon-erweima-copy display-block position-relative" @mouseenter="showCode=true" @mouseleave="showCode=false">
-                  <transition enter-active-class="zoomIn" leave-active-class="zoomOut">
-                    <div v-show="showCode" class="imengyu-float-tip animated" :style="{width:'100px',height:'100px',left:'-50px',top:'-50px',animationDuration: '500ms'}">
-                      <img src="../assets/images/wechart.jpg" :style="{width:'100px',height:'100px'}" />
-                    </div>
-                  </transition>
-                </i>
+                <i class="iconfont icon-erweima-copy display-block position-relative cursor-pointer" @click="showCode=true"></i>
               </div>
             </li>
             <li>
-              <i class="icon iconfont icon-qq-copy"></i>
+              <i class="icon iconfont icon-github"></i>
               <div class="sub">
-                QQ
-                <span>&nbsp;</span>
+                Github
+                <span><a href="https://github.com/imengyu" target="_blank">https://github.com/imengyu</a></span>
               </div>
             </li>
           </ul>
@@ -168,19 +169,37 @@
 
       <RightCatalog ref="catalog" class="animated fadeInDown" v-model:value="currentItem" :items="catalogItems" @item-click="onCatalogClicked" :scrollHostClassAddedEle="scrollEle">
       </RightCatalog>
+
+      <!--微信二维码-->
+      <AlertDialog v-model:show="showCode" title="WeChart" subTitle="扫一扫下面的二维码加我微信">
+
+        <img src="../assets/images/wechart.jpg" :style="{width:'200px',height:'200px'}" />
+
+        <div class="imengyu-content-line"></div>
+        <div class="text-center">
+          <div class="imengyu-go-button" @click="showCode=false">
+            好哒
+          </div>
+        </div>
+
+      </AlertDialog>
+
     </div>
   </div> 
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { getLearningData } from '../const/LearningData'
 import RightCatalog, { RightCatalogItem } from '../components/RightCatalog.vue'
 import TextNetworkGraph from '../components/TextNetworkGraph.vue'
+import AlertDialog from '../components/AlertDialog.vue'
 
 export default defineComponent({
   components: {
     RightCatalog,
     TextNetworkGraph,
+    AlertDialog,
   },
   data() {
     return {
@@ -209,6 +228,7 @@ export default defineComponent({
           id: 'contact-me'
         }
       ],
+      learningData: getLearningData(),
       scrollEle: null as HTMLElement|null,
     }
   },

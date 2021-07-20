@@ -88,7 +88,7 @@ export default defineComponent({
   methods: {
     reloadItemWidth() {
       if(this.worksList)
-        this.itemWidth = this.worksList.offsetWidth * (1/this.onePageCount) - 44;
+        this.itemWidth = this.worksList.offsetWidth * (1 / this.onePageCount) - 40;
     },
     reloadListScroll() {
       if(this.worksList) {

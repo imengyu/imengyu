@@ -31,7 +31,7 @@ export class MusicPlayer extends EventEmitter {
   private audioFading = false;
   private audioFadeInterval = 0;
 
-  initPlayer() {
+  initPlayer() : void {
 
     this.audio = document.createElement('audio');
     this.audio.autoplay = false;
@@ -42,7 +42,7 @@ export class MusicPlayer extends EventEmitter {
 
     document.body.appendChild(this.audio);
   }
-  initContext() {
+  initContext() : void {
     this.oCtx = new AudioContext();
     this.audioSrc = this.oCtx.createMediaElementSource(this.audio as HTMLAudioElement);
     this.analyser = this.oCtx.createAnalyser();
@@ -52,7 +52,7 @@ export class MusicPlayer extends EventEmitter {
 
     this.voiceHeight = new Uint8Array(this.analyser.frequencyBinCount);
   }
-  destroyPlayer() {
+  destroyPlayer() : void {
 
     if(this.audio) {
       this.audio.onended = null;
@@ -67,7 +67,7 @@ export class MusicPlayer extends EventEmitter {
     this.analyser = null;
     this.voiceHeight = null; 
   }
-  openMusic(src : File) {
+  openMusic(src : File) : void {
     const audio = this.audio;
     if(audio) {
       audio.src = window.URL.createObjectURL(src);
@@ -92,7 +92,7 @@ export class MusicPlayer extends EventEmitter {
       }, 600);
     }
   }
-  stopMusic(autoEnd = false) {
+  stopMusic(autoEnd = false) : void {
     const audio = this.audio;
     if(audio) {
       if(autoEnd) {
@@ -110,14 +110,14 @@ export class MusicPlayer extends EventEmitter {
       this.updateStatus('stopped');
     }
   }
-  playPause() {
+  playPause() : void {
     const audio = this.audio;
     if(audio) {
       if(audio.paused) this.play();
       else this.pause();
     }
   }
-  pause() {
+  pause() : void {
     const audio = this.audio;
     if(audio) {
       if(!audio.paused && !this.audioFading) {
@@ -128,7 +128,7 @@ export class MusicPlayer extends EventEmitter {
       }
     }
   }
-  play() {
+  play() : void {
     const audio = this.audio;
     if(audio) {
       if(audio.paused && !this.audioFading) {
@@ -141,7 +141,7 @@ export class MusicPlayer extends EventEmitter {
     }
   }
 
-  private doFadeOut(callback : () => void) {
+  private doFadeOut(callback : () => void) : void {
     const audio = this.audio;
     if(audio) {
       if(this.status == 'playing'){
@@ -168,7 +168,7 @@ export class MusicPlayer extends EventEmitter {
       }else callback();
     }
   }
-  private doFadeIn(callback : () => void) {
+  private doFadeIn(callback : () => void) : void {
     const audio = this.audio;
     if(audio) {
       if(audio.currentTime > 0){
@@ -196,17 +196,17 @@ export class MusicPlayer extends EventEmitter {
     }
   }
 
-  setVolume(v : number) {
+  setVolume(v : number) : void {
     const audio = this.audio;
     if(audio) {
       this.volume = v;
       audio.volume = v / 100;
     }
   }
-  trackStart() {
+  trackStart() : void {
     this.audioTracking = true;
   }
-  trackEnd(val : number) {
+  trackEnd(val : number) : void {
     const audio = this.audio;
     if(audio) {
       this.audioTracking = false;
@@ -218,15 +218,15 @@ export class MusicPlayer extends EventEmitter {
       }
     }
   }
-  updateTrack() {
+  updateTrack() : void {
     this.emit('update-track',  (this.playProgress*100));
     this.emit('update-time',  this.playtimeString, this.playtime);
   }
-  updateStatus(status : MusicPlayerStatus) {
+  updateStatus(status : MusicPlayerStatus) : void {
     this.status = status;
     this.emit('statuschanged', status);
   }
-  onPlayerCanPlay() {
+  onPlayerCanPlay() : void {
     const audio = this.audio;
     if(audio) {
       this.audioDurtion = audio.duration;
@@ -236,14 +236,14 @@ export class MusicPlayer extends EventEmitter {
       }
     }
   }
-  onPlayerEnded() {
+  onPlayerEnded() : void {
     this.stopMusic(true);
   }
-  onPlayerPause() {
+  onPlayerPause() : void {
     this.updateStatus('paused');
     clearInterval(this.audioTimer);
   }
-  onPlayerPlay() {
+  onPlayerPlay() : void {
     setInterval(this.onPlayerTick.bind(this), 1000);
     this.updateStatus('playing');
   }
@@ -252,7 +252,7 @@ export class MusicPlayer extends EventEmitter {
   public playtimeString = '';
   public playProgress = 0;
 
-  onPlayerTick() {
+  onPlayerTick() : void {
     const audio = this.audio;
     if(audio) {
       if(!this.audioTracking) {

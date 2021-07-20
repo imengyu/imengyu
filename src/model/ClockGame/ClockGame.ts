@@ -29,7 +29,7 @@ const text_display_height_sm = 65;
 
 export type StartsMode = 'normal'|'text'|'explode'|'timer';
 
-export function getStartsModes() {
+export function getStartsModes() : string[] {
   return [ 'normal','text','explode','timer' ]
 }
 
@@ -101,7 +101,7 @@ export class Particle {
   }
 
 
-  render() {
+  render() : void {
     if(this.alpha == 0) return;
 
     const ctx = this.game.ctx;
@@ -129,7 +129,7 @@ export class Particle {
       if(this.game.show_pos) this.renderTextPos();
     }
   }
-  renderTextPos() {
+  renderTextPos() : void {
     //Render pos text
     if(this.game.mode == 'text') this.renderTextInCenter(this.positionXPText+','+this.positionYPText);
     
@@ -143,7 +143,7 @@ export class Particle {
       else this.renderTextInCenter(Math.floor(this.x)+','+Math.floor(this.y));
     }
   }
-  renderTextInCenter(str : string, limitWidth = false, warpText = false, textSize : 'small'|'big' = 'small') {
+  renderTextInCenter(str : string, limitWidth = false, warpText = false, textSize : 'small'|'big' = 'small') : void {
     const ctx = this.game.ctx;
     if(ctx) {
       ctx.fillStyle = '#fff';
@@ -168,16 +168,16 @@ export class Particle {
       }else ctx.fillText(str, this.x, this.y, limitWidth ? this.radius * 2 : undefined);
     }
   }
-  resetPos() {
+  resetPos() : void {
     this.alpha = 0;
     this.x = this.game.width / 2 + (Math.random() * 400 - Math.random() * 400);
     this.y = this.game.height / 2 + (Math.random() * 200 - Math.random() * 200);
   }
-  fastHidden() {
+  fastHidden() : void {
     if(this.alpha > 0.05) this.alpha -= 0.05;
     else if(this.alpha != 0) this.alpha = 0;
   }
-  moveCloseToPos(tx : number, ty : number, speed : number, speedMin : number) {
+  moveCloseToPos(tx : number, ty : number, speed : number, speedMin : number) : void {
     if(!this.positionArrived) {
 
       const xDiff = Math.abs(this.x - tx);
@@ -211,7 +211,7 @@ export class Particle {
       else if(this.y > ty) this.y -= ySpeed;
     }
   }
-  move() {
+  move() : boolean {
 
     let catchable = false;
 
@@ -283,16 +283,16 @@ export class Particle {
 
     return true;
   }
-  testMouseInRect(x : number, y : number) {
+  testMouseInRect(x : number, y : number) : boolean {
     this.isMouseEnter = (x > this.x - this.radius && y > this.y - this.radius 
       && x < this.x + this.radius && y < this.y + this.radius);
     return this.isMouseEnter;
   }
 
-  onMouseDown() {
+  onMouseDown() : void {
     //
   }
-  onMouseUp() {
+  onMouseUp() : void {
     //创建文字粒子
     if(this.game.mode == 'normal' && this.isInfoItem) {
 
@@ -323,7 +323,7 @@ export class ClockGame extends CanvasGameProvider {
   info_particles_texts : Array<string> = [];
   question_particles_count = 30;
   
-  public setStarsConf(name : string, val : boolean|number|string[]) {
+  public setStarsConf(name : string, val : boolean|number|string[]) : void {
     switch(name) {
       case 'info_particles_count': this.info_particles_count = val as number; break;
       case 'question_particles_count': this.question_particles_count = val as number; break;
@@ -339,6 +339,8 @@ export class ClockGame extends CanvasGameProvider {
   
   }
 
+  deltatime = 0;
+
   openedinfo_particles_count = 0;
   first_text_mode = true;
   anim_running = false;
@@ -353,16 +355,10 @@ export class ClockGame extends CanvasGameProvider {
   clockPointShow = false;
   onModeChangedCallback : ((mode : StartsMode) => void) | null = null;
 
-  public switchSpectrum(on : boolean) {
-    //Inhert
-  }
-  public drawSpectrum(analyser : AnalyserNode, voiceHeight : Uint8Array) {
-    //Inhert
-  }
-  public setStarsTimerForUpdate() {
+  public setStarsTimerForUpdate() : void {
     this.build_all_time_particles();
   }
-  public setStarsMode(newMode : StartsMode) {
+  public setStarsMode(newMode : StartsMode) : void {
     if(this.mode != newMode){
       this.mode = newMode;
       if(this.onModeChangedCallback != null) this.onModeChangedCallback(newMode);
@@ -379,23 +375,23 @@ export class ClockGame extends CanvasGameProvider {
       }
     }
   }
-  public setStarsModeChangedCallback(fn : (mode : StartsMode) => void) {
+  public setStarsModeChangedCallback(fn : (mode : StartsMode) => void) : void {
     this.onModeChangedCallback = fn;
   }
-  public getStarsMode() {
+  public getStarsMode() : StartsMode {
     return this.mode;
   }
-  public getStarsTextMode() {
+  public getStarsTextMode() : boolean {
     return this.mode == 'text';
   }
 
 
-  public resize(w : number, h: number) {
+  public resize(w : number, h: number) : void {
     this.width = w;
     this.height = h;
     this.resize_rest_particles();
   }
-  public init(canvas : HTMLCanvasElement, ctx : CanvasRenderingContext2D) {
+  public init(canvas : HTMLCanvasElement, ctx : CanvasRenderingContext2D) : void {
     super.init(canvas, ctx)
 
     this.onWindowResize = this.onWindowResize.bind(this);
@@ -413,31 +409,32 @@ export class ClockGame extends CanvasGameProvider {
     this.build_all_particles();
     this.resize_rest_particles();
   }
-  public destroy() {
+  public destroy() : void {
     this.clear();
     this.clearMouseMoveTimer();
     this.removeEvents();
 
     this.particles = [];
   }
-  public render(deltatime : number) {
+  public render(deltatime : number) : void {
+    this.deltatime = deltatime;
     this.update();
   }
-  public start() {
+  public start() : void {
     if(this.anim_running) return;
 
     this.anim_running = true;
 
     this.setStarsMode('timer')
   }
-  public stop() {
+  public stop() : void {
     if(!this.anim_running) return;
 
     this.anim_running = false;
   }
 
   private lastTimeString = '';
-  private timerTimeUpdate() {
+  private timerTimeUpdate() : void {
     const nowTimeString = new Date().format('HH:ii:ss');
     if(nowTimeString != this.lastTimeString) {
       this.lastTimeString = nowTimeString;
@@ -445,13 +442,13 @@ export class ClockGame extends CanvasGameProvider {
       this.clockPointShow = !this.clockPointShow;
     }
   } 
-  autoSwitcherTimerRest() {
+  autoSwitcherTimerRest() : void {
     if(this.auto_explode_timer != 0) {
       clearTimeout(this.auto_explode_timer);
       this.auto_explode_timer = 0;
     }
   }
-  private autoSwitcherMode() {
+  private autoSwitcherMode() : void {
   
     //Claer running timer
     this.autoSwitcherTimerRest();

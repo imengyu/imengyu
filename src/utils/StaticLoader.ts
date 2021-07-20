@@ -7,7 +7,7 @@ const staticCss = [
 const staticJs = [
 ] as Array<string>;
 
-export function doLoadAll() { 
+export function doLoadAll() : void { 
   staticCss.forEach((n) => doLoadCss(n));
   
   let loadJsCurrent = 0;
@@ -20,14 +20,14 @@ export function doLoadAll() {
 
   loadJs();
 }
-export function doLoadCss(name : string) {
+export function doLoadCss(name : string) : void {
   const s = document.createElement("link");
   s.rel="stylesheet";
   s.type="text/css";
   s.href="./static/" + name;
   document.body.appendChild(s);
 }
-export function doLoadJs(name : string, callback : VoidFunction) {
+export function doLoadJs(name : string, callback : VoidFunction) : void {
   const script = document.createElement("script");
   script.onload = function() { callback(); };
   script.type="text/javascript";

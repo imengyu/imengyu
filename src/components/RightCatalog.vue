@@ -115,7 +115,7 @@ export default defineComponent({
 
 <style lang="scss">
 .imengyu-right-catalog {
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
   position: fixed;
   right: 25%;
   top: 45%;

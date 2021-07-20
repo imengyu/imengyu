@@ -29,7 +29,7 @@
   font-weight: bold;
   text-align: center;
   color: #000;
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
 
   &.left {
     text-align: left;
@@ -58,7 +58,7 @@
   font-weight: bold;
   text-align: center;
   color: #000;
-  font-family: 'Engineer';
+  font-family: 'AaLGH';
 
   @include text-underline-center(20px, 10px);
 
@@ -81,6 +81,11 @@
   font-size: 17px;
   color: #000;
   text-align: left;
+
+  &.no-left-right-padding {
+    padding-left: 0!important;
+    padding-right: 0!important;
+  }
 }
 .imengyu-content-box-left-right {
  

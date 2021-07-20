@@ -41,7 +41,7 @@ const spectrum_spacing = 6;
 const vertices_block_data_count = 7;
 const modeArr = ['none','roate','explode','explode-quadrant','explode-2','fly','spectrum','hidden', 'love', 'wave'];
 
-export function getBlackHoleModes() { return modeArr; }
+export function getBlackHoleModes() : string[] { return modeArr; }
 export type BlackHoleWorkMode = 'none'|'roate'|'explode'|'explode-quadrant'|'explode-2'|'fly'|
   'spectrum'|'hidden'|'love'|'wave';
 
@@ -429,6 +429,8 @@ export class BlackHoleGame extends CanvasGameProvider {
   width = 0;
   height = 0;
 
+  deltatime = 0;
+
   vertexBuffer : WebGLBuffer|null = null;
   vertices = new Float32Array();
 
@@ -436,11 +438,11 @@ export class BlackHoleGame extends CanvasGameProvider {
   modeInt = 0;
   modeChangeCallback : BlackholeWorkModeChangeCallbackFunction|null  = null;
   
-  public setBlackholeWorkModeChangeCallback(callback: BlackholeWorkModeChangeCallbackFunction) {
+  public setBlackholeWorkModeChangeCallback(callback: BlackholeWorkModeChangeCallbackFunction) : void {
     this.modeChangeCallback = callback;
   }
 
-  public switchSpectrum(on : boolean) {
+  public switchSpectrum(on : boolean) : void {
     if(on) this.setBlackHoleWorkMode('spectrum')
     else{
       for (let i = 0; i < max_particles; i++){
@@ -451,7 +453,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       this.blackholeRandomExplode('roate');
     }
   }
-  public drawSpectrum(analyser : AnalyserNode, voiceHeight : Uint8Array) {
+  public drawSpectrum(analyser : AnalyserNode, voiceHeight : Uint8Array) : void {
     analyser.getByteFrequencyData(voiceHeight);
 
     const step = Math.round(voiceHeight.length / spectrum_width);
@@ -494,13 +496,13 @@ export class BlackHoleGame extends CanvasGameProvider {
       loopInnern(i, (voiceHeight[step * (i - center)] / 250) * rows)
     
   }
-  public resize(w : number, h: number) {
+  public resize(w : number, h: number) : void {
     this.width = w;
     this.height = h;
     if(this.gl)
       this.gl.viewport(0, 0, this.width, this.height);
   }
-  public init(canvas : HTMLCanvasElement, ctx : CanvasRenderingContext2D) {
+  public init(canvas : HTMLCanvasElement, ctx : CanvasRenderingContext2D) : void {
     super.init(canvas, ctx);
 
     if(this.canvas) {
@@ -556,16 +558,16 @@ export class BlackHoleGame extends CanvasGameProvider {
   
     gl.lineWidth(1);
   }
-  public destroy() {
+  public destroy() : void {
     this.stop();
     this.particles.splice(0, this.particles.length);
   }
-  public render(deltatime : number) {
+  public render(deltatime : number) : void {
+    this.deltatime = deltatime;
     globalRanom = random(0, 360);
-
     this.update();
   }
-  public start() {
+  public start() : void {
     if (this.anim_running) return;
 
     this.anim_running = true;
@@ -578,7 +580,7 @@ export class BlackHoleGame extends CanvasGameProvider {
     this.autoTimer2TickNext = random(40, 60);
     //this.autoTimer = setTimeout(() => setBlackHoleWorkMode('explode'), random(350000, 600000));
   }
-  public stop() {
+  public stop() : void {
     if (!this.anim_running) return;
 
     this.anim_running = false;
@@ -604,7 +606,7 @@ export class BlackHoleGame extends CanvasGameProvider {
   loveTick = 0;
   waveTick = 0;
 
-  autoTimerWorker() {
+  autoTimerWorker() : void {
     this.autoTimer2Tick++;
     //console.log(`autoTimerWorker: ${this.autoTimer2Tick} > ${this.autoTimer2TickNext}`);
     if(this.autoTimer2Tick > this.autoTimer2TickNext) {
@@ -636,7 +638,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       }
     }
   }
-  blackholeRandomExplode(nextMode : BlackHoleWorkMode = 'roate') {
+  blackholeRandomExplode(nextMode : BlackHoleWorkMode = 'roate') : void {
     const r = random(0, 30);
     clearInterval(this.autoTimer);
     this.autoTimer = setTimeout(() => {
@@ -656,8 +658,8 @@ export class BlackHoleGame extends CanvasGameProvider {
     }, 1200);
   }
 
-  getBlackHoleWorkMode() { return this.mode; }
-  setBlackHoleWorkMode(newMode : BlackHoleWorkMode) {
+  getBlackHoleWorkMode() : BlackHoleWorkMode { return this.mode; }
+  setBlackHoleWorkMode(newMode : BlackHoleWorkMode) : void {
     const oldMode = this.mode;
 
     this.mode = newMode;
@@ -696,7 +698,7 @@ export class BlackHoleGame extends CanvasGameProvider {
     }
   }
 
-  update() {
+  update() : void {
     const gl = this.gl;
     const particles = this.particles;
     const modeInt = this.modeInt;
@@ -807,7 +809,7 @@ export class BlackHoleGame extends CanvasGameProvider {
 
   //mode builders
 
-  buildParticles() {
+  buildParticles() : void {
     const particles = this.particles;
     let particle: Particle|null = null;
 
@@ -825,7 +827,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       particle.alphaTransSpeed = alpha_trans_speed;
     }
   }
-  buildExplodeParticles() {
+  buildExplodeParticles() : void {
     const particles = this.particles;
     const height = this.height;
     let particle: Particle|null = null;
@@ -853,7 +855,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       particle.mst = particle.speed * Math.sin(dt * Math.PI / 180);
     }
   }
-  buildExplodeQuadrantParticles() {
+  buildExplodeQuadrantParticles() : void {
     const particles = this.particles;
     const height = this.height;
     const width = this.width;
@@ -897,7 +899,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       particle.speed = particle.speed * 20;
     }
   }
-  buildExplode2Particles() {
+  buildExplode2Particles() : void {
     const particles = this.particles;
     const height = this.height;
 
@@ -926,7 +928,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       particle.speed = particle.speed * 20;
     }
   }
-  buildSpectrumParticlesEnd() {
+  buildSpectrumParticlesEnd() : void {
     const w = spectrum_width;
     const h = spectrum_height;
     const dsp = 360 / w;
@@ -960,7 +962,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       i++;
     }
   }
-  buildSpectrumParticlesStart() {
+  buildSpectrumParticlesStart() : void {
     const particles = this.particles;
 
     let particle: Particle|null = null;
@@ -971,7 +973,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       particle.alphaEnd = 0;
     }
   }
-  buildLoveParticles() {
+  buildLoveParticles() : void {
     
     const center = max_particles/10;
     const particles = this.particles
@@ -1025,7 +1027,7 @@ export class BlackHoleGame extends CanvasGameProvider {
       particles[index].isLove = false;
     }
   }
-  buildWaveParticles() {
+  buildWaveParticles() : void {
 
     const wave_row_count = 40;
     const particles = this.particles;

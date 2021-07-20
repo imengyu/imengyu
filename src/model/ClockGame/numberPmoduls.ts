@@ -1,4 +1,4 @@
-export function getNumberTextPointMap(n : number, startCount = 0) {
+export function getNumberTextPointMap(n : number) : number[][] {
   return map[n];
 }
 
