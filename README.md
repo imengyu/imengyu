@@ -7,7 +7,6 @@ Hello 你好
 * 🌈 想与同样爱好的大佬们交朋友
 * ✅ 会用 C/C++/C#/Java/JavaScript/Vue/React
 * 🆙 经常整一些 前端的东东/Android App/Electron 小应用/Unity或Unreal的小游戏
-* 🔝 欢迎访问我的[煮页](https://imengyu.top)
 * 📚 正在努力学习更多知识
 
 ---
@@ -16,7 +15,6 @@ Hello!
 * 🙂 I am an ordinary college student
 * 🎁 Like program development, do some interesting gadgets or applications
 * 🙂 I want to make more friends
-* 🔝 Welcome to visit my [home page](https://imengyu.top)
 * 📚 I'm learning more knowledge and skills
 
 Stats 一些状态
@@ -25,8 +23,7 @@ Stats 一些状态
 [![imengyu's GitHub stats](https://github-readme-stats.vercel.app/api?username=imengyu)](https://github.com/anuraghazra/github-readme-stats)
 
 
-
-Contract me 我
+Contract
 ---
 
 * Home page: [https://imengyu.top](https://imengyu.top)
