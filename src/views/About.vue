@@ -34,7 +34,7 @@
 
         <div class="imengyu-content-sub-title">
           MY SKILLS
-          <span>我擅长的</span>
+          <span>我的技能</span>
         </div>
 
         <div class="imengyu-icon-list">         
@@ -94,19 +94,17 @@
 
         <div class="imengyu-about-list show overflow-visible">
 
-          <div class="imengyu-content-innern-subtitle">主要擅长技能</div>
+          <div class="imengyu-content-innern-subtitle">主要擅长</div>
           前端开发，Vue、React，Electron、Uniapp。<br>
           Unity 游戏开发，或者是H5小游戏，Cocos2d小游戏。<br>
           会画一点画（但好久没有深入学习了），喜欢唱歌（虽然很难听）。<br>
           初学摄影，目前拍的照片一般般。<br>
-          单身宅男，想和喜欢的人天天一起出去玩。<br>
-  
-
+          
           <div class="imengyu-content-innern-subtitle">我是什么样的？</div>
           一个普通的男生，长相一般，内向，不善闲聊。<br>
           喜欢新事物，新技术，对编程有浓厚兴趣，喜欢钻研。<br>
-          想和有同样兴趣爱好的男生交朋友。<br>
-          ...
+          单身宅男，想和喜欢的人天天一起出去玩。<br>
+          ...<br>
 
           <div @click="showHiddenAbout=!showHiddenAbout" title="彩虹" class="display-inline-block cursor-pointer">🌈</div>
           <br><br>
