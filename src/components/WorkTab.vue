@@ -12,7 +12,7 @@
 import { defineComponent, PropType } from 'vue'
 
 export default defineComponent({
-  pros: {
+  props: {
     items: {
       type: Object as PropType<Array<string>>,
       default: null
@@ -22,8 +22,10 @@ export default defineComponent({
       default: null
     },
   },
-  onClick(item : string) {
-    this.$emit('update:value', item);
+  methods: {
+    onClick(item : string) {
+      this.$emit('update:value', item);
+    },
   },
 })
 </script>

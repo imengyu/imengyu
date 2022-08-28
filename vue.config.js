@@ -5,6 +5,7 @@ const JavaScriptObfuscator = require('webpack-obfuscator');
  */
 module.exports = {
   productionSourceMap: false,
+  lintOnSave: false,
   configureWebpack: config => {
     if (process.env.NODE_ENV === 'production') {
       config.plugins = config.plugins.concat([

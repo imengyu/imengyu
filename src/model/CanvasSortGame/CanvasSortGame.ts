@@ -15,17 +15,7 @@ export const SortMethodNames = [
   "radix",
 ];
 
-export type SortMethods =
-  | "bobble"
-  | "insertion"
-  | "selection"
-  | "quick"
-  | "shell"
-  | "merge"
-  | "heap"
-  | "radix"
-  | "spectrum"
-  | "";
+export type SortMethods = ''|'spectrum'|"bobble"|"insertion"|"selection"|"quick"|"shell"|"merge"|"heap"|"radix";
 
 const spectrum_width = 128;
 const spectrum_line = 512;

@@ -31,10 +31,6 @@ export default defineComponent({
           to: '/'
         },
         {
-          name: 'Blog',
-          to: 'https://blog.imengyu.top/'
-        },
-        {
           name: 'Works',
           to: 'Works'
         },

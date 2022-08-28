@@ -23,6 +23,8 @@ export default defineComponent({
     emitter.on('updateDarkMode', (e) => {
       this.darkMode = e as boolean;
     })
+
+    console.log(`%c欢迎来到梦鱼的小主页`, 'color:#fff;background:#56a;padding:3px 6px');
   },
 
 })

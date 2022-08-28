@@ -14,7 +14,7 @@
         <div class="imengyu-about-content-left">
           我是 快乐的梦鱼<br>
           一个普普通通的男孩子<br>
-          是一个刚刚入行的程序猿<br>
+          是一只小程序员<br>
           正在努力学习工作<br>
 
           <div class="imengyu-about-subtitle">LIFE <i class="iconfont icon-jiantou_xiangyouliangci_o"></i> </div>
@@ -67,21 +67,6 @@
         </div>
       </div>
 
-      <!--Learning-->
-      <div class="imengyu-content-box-innern no-left-right-padding" id="learning">
-
-        <div class="imengyu-content-sub-title">
-          LEARNING MORE
-          <span>
-            学习永无止境<br>
-            努力学习提升自己中
-          </span>
-        </div>      
-
-        <TextNetworkGraph :data="learningData" />
-
-      </div>
-
       <!--更多-->
       <div class="imengyu-content-box-innern overflow-visible" id="more-about-me">
 
@@ -95,7 +80,7 @@
         <div class="imengyu-about-list show overflow-visible">
 
           <div class="imengyu-content-innern-subtitle">主要擅长</div>
-          前端开发，Vue、React，Electron、Uniapp。<br>
+          前端开发，Vue、React，、Uniapp、RN、Flutter、Electron。<br>
           Unity 游戏开发，或者是H5小游戏，Cocos2d小游戏。<br>
           会画一点画（但好久没有深入学习了），喜欢唱歌（虽然很难听）。<br>
           初学摄影，目前拍的照片一般般。<br>
@@ -103,7 +88,7 @@
           <div class="imengyu-content-innern-subtitle">我是什么样的？</div>
           一个普通的男生，长相一般，内向，不善闲聊。<br>
           喜欢新事物，新技术，对编程有浓厚兴趣，喜欢钻研。<br>
-          单身宅男，想和喜欢的人天天一起出去玩。<br>
+          单身宅男，还没有对象。<br>
           ...<br>
 
           <div @click="showHiddenAbout=!showHiddenAbout" title="彩虹" class="display-inline-block cursor-pointer">🌈</div>
@@ -111,18 +96,32 @@
 
           <div :class="'imengyu-hidden-area float '+(showHiddenAbout?'show':'')">
             <code class="mb-3 display-inline-block">21/170/50/0</code><br>
-            好想要一个男朋友，<br>
-            不颜控，真心的合得来就好，不是非常喜欢10。<br>
+            找男朋友中，不颜控，真心的合得来就好，不是非常喜欢10。<br>
+            是小m，喜欢蛮多东西，但不乱，是一个很正经的男孩子，<br>
+            希望和未来的男朋友能有共同爱好，能一起玩就太好啦(/▽＼)<br>
+            呜呜呜 (≧﹏ ≦)，我的男朋友你到底在哪里呀<br>
             一直期待能遇见你，我能陪着你一起<br>
             一起经历人生的种种冒险，把最好的都给你...<br>
-            （我比较内向，刚开始可能不大会聊天，<br>
-            成为你的男孩之后就会无话不说啦，另外是不是<br>
-            两个内向的人在一起会有更多共同话语呢？）
           </div>
           <div :class="'imengyu-hidden-area-placeholder '+(showHiddenAbout?'show':'')">
           </div>
           
         </div>
+      </div>
+
+      <!--Learning-->
+      <div class="imengyu-content-box-innern no-left-right-padding no-top-bottom-padding" id="learning">
+
+        <div class="imengyu-content-sub-title">
+          LEARNING MORE
+          <span>
+            学习永无止境<br>
+            努力学习提升自己中
+          </span>
+        </div>      
+
+        <TextNetworkGraph :data="learningData" />
+
       </div>
 
       <div class="imengyu-content-line" id="contact-me"></div>
@@ -139,7 +138,7 @@
               <i class="icon iconfont icon-youxiang"></i>
               <div class="sub">
                 Mail
-                <span><a href="mailto:yuzecheng@imengyu.top">yuzecheng@imengyu.top</a></span>
+                <span><a href="mailto:1501076885@qq.com">1501076885@qq.com</a></span>
               </div>
             </li>
             <li>
@@ -165,8 +164,14 @@
         </div>
       </div>
 
-      <RightCatalog ref="catalog" class="animated fadeInDown" v-model:value="currentItem" :items="catalogItems" @item-click="onCatalogClicked" :scrollHostClassAddedEle="scrollEle">
-      </RightCatalog>
+      <RightCatalog
+        ref="catalog"
+        class="animated fadeInDown"
+        v-model:value="currentItem"
+        :items="catalogItems"
+        :scrollHostClassAddedEle="scrollEle || undefined"
+        @item-click="onCatalogClicked" 
+      />
 
       <!--微信二维码-->
       <AlertDialog v-model:show="showCode" title="WeChart" subTitle="扫一扫下面的二维码加我微信">

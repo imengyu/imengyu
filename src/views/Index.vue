@@ -2,18 +2,17 @@
   <div :class="'imengyu-main '+((setEnableAnim && currentGameAnim != 'sort')?'dark':'')">  
 
     <!--Canvas-->
-    <CanvasAnimHost v-show="gameProvider==sortGameProvider" ref="sortGameCanvasAnimHost" :gameProvider="sortGameProvider"></CanvasAnimHost>
-    <CanvasAnimHost v-show="setEnableAnim && gameProvider==blackholeGameProvider" ref="blackholeGameCanvasAnimHost" :gameProvider="blackholeGameProvider" :create2DCtx="false"></CanvasAnimHost>
-    <CanvasAnimHost v-show="setEnableAnim && gameProvider==clockGameProvider" ref="clockGameCanvasAnimHost" :gameProvider="clockGameProvider"></CanvasAnimHost>
+    <CanvasAnimHost v-show="gameProvider==sortGameProvider" ref="sortGameCanvasAnimHost" :gameProvider="(sortGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
+    <!-- <CanvasAnimHost v-show="setEnableAnim && gameProvider==blackholeGameProvider" ref="blackholeGameCanvasAnimHost" :gameProvider="(blackholeGameProvider as unknown as CanvasGameProvider)" :create2DCtx="false"></CanvasAnimHost> -->
+    <CanvasAnimHost v-show="setEnableAnim && gameProvider==clockGameProvider" ref="clockGameCanvasAnimHost" :gameProvider="(clockGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
     
     <!--Intro-->
-    
     <div class="imengyu-intro animated fadeInRight" v-show="showIntro && (currentGameAnim=='sort' || !setEnableAnim)">
       <div class="imengyu-intro-box animated position-relative overflow-hidden" >
 
         <h1>你好，我是快乐的梦鱼</h1>
-        <i class="text animated fadeInLeft">程序员 前端开发/UI设计</i>
-        <i class="text animated fadeInLeft">喜欢做一些酷酷的东西</i>
+        <i class="text animated fadeInLeft">是一只小程序员 前端开发/UI设计</i>
+        <i class="text animated fadeInLeft">很开心你来访问 ヾ(•ω•`)o</i>
 
         <div class="imengyu-go-button big animated fadeInLeft" @click="onGo">
           更多关于我
@@ -49,8 +48,8 @@
     <!--音乐控件-->
     <MusicGameControll 
       ref="musicGameControll"
-      :canvasGames="gameProviders"
-      :currentCanvasGame="gameProvider"
+      :canvasGames="(gameProviders as CanvasGameProvider[])"
+      :currentCanvasGame="(gameProvider as CanvasGameProvider)"
       :playerVolume="setVolume"
       :class="showAnimTools?'open':''"
       :open="showAnimTools"
@@ -69,6 +68,7 @@
           <select ref="selectGame" class="imengyu-sort-mode-select" :value="currentGameAnim" @change="onChangeGameAnim">
             <option v-for="(i, ind) in gameAmins" :key="ind" :value="i">{{i}}</option>
           </select>
+          <span class="imengyu-icon-down">▼</span>
         </div>
       </div>
       <div class="item">
@@ -77,7 +77,7 @@
           {{ canvasAnimHost.currentFpsShowVal }}
         </div>
       </div>
-      <div v-if="currentGameAnim=='blackhole'" class="item">
+      <!-- <div v-if="currentGameAnim=='blackhole'" class="item">
         <span>模式</span>
         <div>
           <div class="imengyu-go-button mt-0">
@@ -87,7 +87,7 @@
             </select>
           </div>
         </div>
-      </div>
+      </div> -->
       <div v-if="currentGameAnim=='clock'" class="item">
         <span>模式</span>
         <div>
@@ -96,20 +96,26 @@
             <select ref="selectClockGame" class="imengyu-sort-mode-select" @change="onChangeClockGameAnim">
               <option v-for="(i, ind) in clockGameAmins" :key="ind" :value="i">{{i}}</option>
             </select>
+            <span class="imengyu-icon-down light">▼</span>
           </div>
         </div>
       </div>
-      <div v-if="currentGameAnim=='sort' && sortGameProvider.currentSortMethod!='spectrum'" class="item">
+      <div v-if="currentGameAnim=='sort' && sortGameProvider.currentSortMethod !== 'spectrum'" class="item">
         <span>排序方法</span>
-        <div v-if="gameProvider" :class="'imengyu-icon-sort-text '+(sortGameProvider.currentSortMethod=='spectrum'?'spectrum':'')"
-          :title="sortGameProvider.currentSortMethod!='spectrum'?'点击更改当前动画排序方式':'正在播放音乐'">
+        <div v-if="gameProvider" class="imengyu-icon-sort-text" title="点击更改当前动画排序方式">
           <div class="inn" :style="'width:'+sortGameProvider.sortStepPrecent+'%'">
-            <span>{{ sortGameProvider.currentSortMethod }} {{sortGameProvider.currentSortMethod!='spectrum'?'sort':''}}</span>
+            <span>{{ sortGameProvider.currentSortMethod }} sor</span>
           </div>
-          {{ sortGameProvider.currentSortMethod!='spectrum'?sortGameProvider.currentSortMethod:'' }} {{sortGameProvider.currentSortMethod!='spectrum'?'sort':''}}
-          <select v-show="sortGameProvider.currentSortMethod!='spectrum'" ref="selectSortMethod" class="imengyu-sort-mode-select" :value="sortGameProvider.currentSortMethod" @change="onChangeSortMethod">
+          {{ sortGameProvider.currentSortMethod }} sort
+          <select
+            ref="selectSortMethod"
+            class="imengyu-sort-mode-select"
+            :value="sortGameProvider.currentSortMethod"
+            @change="onChangeSortMethod"
+          >
             <option v-for="(i, ind) in sortMethodNames" :key="ind" :value="i">{{i}} sort</option>
           </select>
+          <span class="imengyu-icon-down">▼</span>
         </div>
       </div>
       <div v-if="currentGameAnim=='sort'" class="item">
@@ -136,7 +142,7 @@ import AlertDialog from '../components/AlertDialog.vue'
 import MusicGameControll from '../components/MusicGameControll.vue'
 import Utils from '../utils/Utils'
 import { CanvasSortGame, SortMethodNames, SortMethods } from '../model/CanvasSortGame/CanvasSortGame'
-import { BlackHoleGame, BlackHoleWorkMode, getBlackHoleModes } from '../model/BlackHoleGame/BlackHoleGame'
+//import { BlackHoleGame, BlackHoleWorkMode, getBlackHoleModes } from '../model/BlackHoleGame/BlackHoleGame'
 import { ClockGame, getStartsModes, StartsMode } from '../model/ClockGame/ClockGame'
 import { CanvasGameProvider } from '../model/CanvasGameProvider'
 import { emitter } from '@/main'
@@ -159,18 +165,18 @@ export default defineComponent({
 
       gameProvider: null as CanvasGameProvider|null,
       sortGameProvider: new CanvasSortGame(),
-      blackholeGameProvider: new BlackHoleGame(),
+      //blackholeGameProvider: new BlackHoleGame(),
       clockGameProvider: new ClockGame(),
 
-      gameAmins: [ 'sort', 'blackhole', 'clock' ],
+      gameAmins: [ 'sort', /*'blackhole',*/ 'clock' ],
       gameProviders: [] as CanvasGameProvider[],
 
       canvasAnimHost: null as ICanvasAnimHost|null,
       currentGameAnim: '',
       sortMethodNames: SortMethodNames,
 
-      blackholeGameAmins: getBlackHoleModes(),
-      currentBlackholeGameAnim: getBlackHoleModes()[0] as BlackHoleWorkMode,
+      //blackholeGameAmins: getBlackHoleModes(),
+      //currentBlackholeGameAnim: getBlackHoleModes()[0] as BlackHoleWorkMode,
       clockGameAmins: getStartsModes(),
 
       setEnableAnim: true,
@@ -179,7 +185,7 @@ export default defineComponent({
 
       currentCanvasAnimHost: null as ICanvasAnimHost|null,
       sortGameCanvasAnimHost: null as ICanvasAnimHost|null,
-      blackholeGameCanvasAnimHost: null as ICanvasAnimHost|null,
+      //blackholeGameCanvasAnimHost: null as ICanvasAnimHost|null,
       clockGameCanvasAnimHost: null as ICanvasAnimHost|null,
 
       introInterval: 0,
@@ -190,7 +196,7 @@ export default defineComponent({
       this.currentGameAnim = (this.$refs.selectGame as HTMLSelectElement).value;
       switch(this.currentGameAnim) {
         case 'sort': this.gameProvider = this.sortGameProvider; break;
-        case 'blackhole': this.gameProvider = this.blackholeGameProvider; break;
+        //case 'blackhole': this.gameProvider = this.blackholeGameProvider; break;
         case 'clock': this.gameProvider = this.clockGameProvider; break;
       }
       emitter.emit('updateDarkMode', this.currentGameAnim != 'sort');
@@ -199,10 +205,10 @@ export default defineComponent({
     onChangeSortMethod() {
       this.sortGameProvider.changeSortMethod((this.$refs.selectSortMethod as HTMLSelectElement).value as SortMethods);
     },
-    onChangeBlackholeGameAnim() {
+    /* onChangeBlackholeGameAnim() {
       if(this.currentGameAnim === 'blackhole')
         this.blackholeGameProvider.setBlackHoleWorkMode((this.$refs.selectBlackholeGame as HTMLSelectElement).value as BlackHoleWorkMode)
-    },
+    }, */
     onChangeClockGameAnim() {
       if(this.currentGameAnim === 'clock')
         this.clockGameProvider.setStarsMode((this.$refs.selectClockGame as HTMLSelectElement).value as StartsMode)
@@ -213,7 +219,7 @@ export default defineComponent({
         this.currentCanvasAnimHost.stop();
 
       if(this.currentGameAnim === 'sort') this.canvasAnimHost = this.sortGameCanvasAnimHost;
-      else if(this.currentGameAnim === 'blackhole') this.canvasAnimHost = this.blackholeGameCanvasAnimHost;
+      //else if(this.currentGameAnim === 'blackhole') this.canvasAnimHost = this.blackholeGameCanvasAnimHost;
       else if(this.currentGameAnim === 'clock') this.canvasAnimHost = this.clockGameCanvasAnimHost;
 
       if(this.setEnableAnim && (this.currentGameAnim === 'blackhole' || this.currentGameAnim === 'clock')) 
@@ -229,7 +235,7 @@ export default defineComponent({
     },
     onAnimSwitchSpectrum(on : boolean) {
       if(this.currentGameAnim === 'sort') this.sortGameProvider.switchSpectrum(on);
-      else if(this.currentGameAnim === 'blackhole') this.blackholeGameProvider.switchSpectrum(on);
+      //else if(this.currentGameAnim === 'blackhole') this.blackholeGameProvider.switchSpectrum(on);
       else if(this.currentGameAnim === 'clock') this.clockGameProvider.switchSpectrum(on);
     },
     onGo() {
@@ -274,12 +280,12 @@ export default defineComponent({
     this.currentGameAnim = 'sort';
     setTimeout(() => {
       this.sortGameCanvasAnimHost = this.$refs.sortGameCanvasAnimHost as ICanvasAnimHost;
-      this.blackholeGameCanvasAnimHost = this.$refs.blackholeGameCanvasAnimHost as ICanvasAnimHost;
+      //this.blackholeGameCanvasAnimHost = this.$refs.blackholeGameCanvasAnimHost as ICanvasAnimHost;
       this.clockGameCanvasAnimHost = this.$refs.clockGameCanvasAnimHost as ICanvasAnimHost;
       this.gameProvider = this.sortGameProvider;
       this.gameProviders = [ 
         this.sortGameProvider, 
-        this.blackholeGameProvider, 
+        //this.blackholeGameProvider, 
         this.clockGameProvider 
       ];
       if(this.setEnableAnim)

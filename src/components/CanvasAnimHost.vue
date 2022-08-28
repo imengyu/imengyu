@@ -11,6 +11,7 @@ import { CanvasGameProvider } from '../model/CanvasGameProvider'
 export interface ICanvasAnimHost {
   start() : void;
   stop() : void;
+  currentFpsShowVal: number,
 }
 
 export default defineComponent({

@@ -3,56 +3,7 @@ import { NetworkData } from '../components/TextNetworkGraph'
 const learningData = {
   name: 'Hello world',
   children: [
-    {
-      name: '计算机世界',
-      children: [
-        {
-          name: '计算机原理',
-          children: [
-            {
-              name: '数据结构和算法',
-            },
-            {
-              name: '编译原理',
-            },
-            {
-              name: '单片机原理',
-            },
-            {
-              name: '网络原理',
-            },
-            {
-              name: '计算机图形学',
-            },
-          ]
-        },
-        {
-          name: '硬件',
-          children: [
-            {
-              name: '垃圾佬捡垃圾',
-            },
-            {
-              name: '处理器/主板/硬盘50包邮',
-            },
-            {
-              name: '单片机',
-              children: [
-                {
-                  name: '51单片机',
-                  children: []
-                },
-                {
-                  name: 'STM32单片机',
-                  children: []
-                },
-              ]
-            },
-          ]
-        },
-      ]
-    },
-    
+
     {
       name: '软件世界',
       children: [
@@ -271,6 +222,20 @@ const learningData = {
           name: 'APP开发',
           children: [
             {
+              name: '跨平台',
+              children: [
+                {
+                  name: 'Flutter'
+                },
+                {
+                  name: 'React Native'
+                },
+                {
+                  name: 'Uniapp',
+                },
+              ]
+            },
+            {
               name: 'Android',
               children: [
                 {
@@ -291,12 +256,6 @@ const learningData = {
                   name: 'Swift'
                 },
               ]
-            },
-            {
-              name: 'Uniapp',
-            },
-            {
-              name: 'Windows通用应用',
             },
           ]
         },
@@ -340,6 +299,57 @@ const learningData = {
         }
       ]
     },
+
+    {
+      name: '计算机世界',
+      children: [
+        {
+          name: '计算机原理',
+          children: [
+            {
+              name: '数据结构和算法',
+            },
+            {
+              name: '编译原理',
+            },
+            {
+              name: '单片机原理',
+            },
+            {
+              name: '网络原理',
+            },
+            {
+              name: '计算机图形学',
+            },
+          ]
+        },
+        {
+          name: '硬件',
+          children: [
+            {
+              name: '垃圾佬捡垃圾',
+            },
+            {
+              name: '处理器/主板/硬盘50包邮',
+            },
+            {
+              name: '单片机',
+              children: [
+                {
+                  name: '51单片机',
+                  children: []
+                },
+                {
+                  name: 'STM32单片机',
+                  children: []
+                },
+              ]
+            },
+          ]
+        },
+      ]
+    },
+    
   ]
 } as NetworkData;
 

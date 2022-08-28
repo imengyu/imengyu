@@ -148,6 +148,14 @@
   padding: 6px 10px;
   color: #000;
 }
+.imengyu-icon-down {
+  font-weight: normal;
+  font-family: initial;
+
+  &.light {
+    color: #fff;
+  }
+}
 .imengyu-icon-sort-text {
   position: relative;
   background-color: #fff;

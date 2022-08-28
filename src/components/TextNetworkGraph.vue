@@ -49,7 +49,7 @@ export default defineComponent({
         if(ctx) {
           ctx.lineWidth = 1;
           ctx.strokeStyle = '#eee';
-          ctx.font = '13px Arial';
+          ctx.font = '11px Arial';
         }
 
         setTimeout(() => {
@@ -79,7 +79,7 @@ export default defineComponent({
 
       //重置数据基础位置
       computedDataMap.positionX = _canvas.width / 2;
-      computedDataMap.positionY = _canvas.height / 2 - _canvas.height / 8;
+      computedDataMap.positionY = _canvas.height / 2 + _canvas.height / 8;
     }
 
 
@@ -277,7 +277,7 @@ export default defineComponent({
 
   > canvas {
     width: 100%;
-    height: 1000px;
+    height: 1100px;
   }
 }
 

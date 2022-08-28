@@ -5,7 +5,7 @@
       <div class="imengyu-404-box animated bounceInDown">
         <img src="../assets/images/404.svg" />
         <h1>Oh ! 404 Not found</h1>
-        <span>没有找到你要的东西呢，说不定它被外星人掳走了...</span>
+        <span>没有找到你要的东西呢，说不定它被谁偷走了...</span>
         
         <div class="imengyu-go-button big animated fadeInLeft" @click="onBack">
           <i class="iconfont icon-jiantou_yemian_xiangzuo_o"></i>
