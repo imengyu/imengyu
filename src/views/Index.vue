@@ -1,8 +1,9 @@
 <template>
-  <div :class="'imengyu-main '+((setEnableAnim && currentGameAnim != 'sort')?'dark':'')">  
+  <div :class="'imengyu-main '+((setEnableAnim && (currentGameAnim != 'sort' && currentGameAnim != 'rbtree' ))?'dark':'')">  
 
     <!--Canvas-->
-    <CanvasAnimHost v-show="gameProvider==sortGameProvider" ref="sortGameCanvasAnimHost" :gameProvider="(sortGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
+    <CanvasAnimHost v-show="gameProvider==rbTreeGameProvider" ref="rbTreeGameCanvasAnimHost" :gameProvider="(rbTreeGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
+    <CanvasAnimHost v-show="setEnableAnim && gameProvider==sortGameProvider" ref="sortGameCanvasAnimHost" :gameProvider="(sortGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
     <!-- <CanvasAnimHost v-show="setEnableAnim && gameProvider==blackholeGameProvider" ref="blackholeGameCanvasAnimHost" :gameProvider="(blackholeGameProvider as unknown as CanvasGameProvider)" :create2DCtx="false"></CanvasAnimHost> -->
     <CanvasAnimHost v-show="setEnableAnim && gameProvider==clockGameProvider" ref="clockGameCanvasAnimHost" :gameProvider="(clockGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
     
@@ -135,7 +136,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, markRaw } from 'vue'
 import CanvasAnimHost, { ICanvasAnimHost } from '../components/CanvasAnimHost.vue'
 import Footer from '../components/Footer.vue'
 import AlertDialog from '../components/AlertDialog.vue'
@@ -147,6 +148,7 @@ import { ClockGame, getStartsModes, StartsMode } from '../model/ClockGame/ClockG
 import { CanvasGameProvider } from '../model/CanvasGameProvider'
 import { emitter } from '@/main'
 import Const from '@/const/Const'
+import { RedBlackTreeGame } from '@/model/RBTreeGame/RedBlackTreeGame'
 
 export default defineComponent({
   name: 'Index',
@@ -164,11 +166,12 @@ export default defineComponent({
       showAnimTools: true,
 
       gameProvider: null as CanvasGameProvider|null,
-      sortGameProvider: new CanvasSortGame(),
-      //blackholeGameProvider: new BlackHoleGame(),
-      clockGameProvider: new ClockGame(),
+      sortGameProvider: markRaw(new CanvasSortGame()),
+      //blackholeGameProvider: markRaw(new BlackHoleGame()),
+      rbTreeGameProvider: markRaw(new RedBlackTreeGame()),
+      clockGameProvider: markRaw(new ClockGame()),
 
-      gameAmins: [ 'sort', /*'blackhole',*/ 'clock' ],
+      gameAmins: [ 'rbtree', 'sort', /*'blackhole',*/ 'clock' ],
       gameProviders: [] as CanvasGameProvider[],
 
       canvasAnimHost: null as ICanvasAnimHost|null,
@@ -186,6 +189,7 @@ export default defineComponent({
       currentCanvasAnimHost: null as ICanvasAnimHost|null,
       sortGameCanvasAnimHost: null as ICanvasAnimHost|null,
       //blackholeGameCanvasAnimHost: null as ICanvasAnimHost|null,
+      rbTreeGameCanvasAnimHost: null as ICanvasAnimHost|null,
       clockGameCanvasAnimHost: null as ICanvasAnimHost|null,
 
       introInterval: 0,
@@ -197,6 +201,7 @@ export default defineComponent({
       switch(this.currentGameAnim) {
         case 'sort': this.gameProvider = this.sortGameProvider; break;
         //case 'blackhole': this.gameProvider = this.blackholeGameProvider; break;
+        case 'rbtree': this.gameProvider = this.rbTreeGameProvider; break;
         case 'clock': this.gameProvider = this.clockGameProvider; break;
       }
       emitter.emit('updateDarkMode', this.currentGameAnim != 'sort');
@@ -220,11 +225,12 @@ export default defineComponent({
 
       if(this.currentGameAnim === 'sort') this.canvasAnimHost = this.sortGameCanvasAnimHost;
       //else if(this.currentGameAnim === 'blackhole') this.canvasAnimHost = this.blackholeGameCanvasAnimHost;
+      else if(this.currentGameAnim === 'rbtree') this.canvasAnimHost = this.rbTreeGameCanvasAnimHost;
       else if(this.currentGameAnim === 'clock') this.canvasAnimHost = this.clockGameCanvasAnimHost;
 
       if(this.setEnableAnim && (this.currentGameAnim === 'blackhole' || this.currentGameAnim === 'clock')) 
         emitter.emit('updateDarkMode', true);
-      if(!this.setEnableAnim || this.currentGameAnim === 'sort') 
+      if(!this.setEnableAnim || (this.currentGameAnim === 'sort' || this.currentGameAnim === 'rbtree')) 
         emitter.emit('updateDarkMode', false);
 
       if(this.canvasAnimHost) {
@@ -236,6 +242,7 @@ export default defineComponent({
     onAnimSwitchSpectrum(on : boolean) {
       if(this.currentGameAnim === 'sort') this.sortGameProvider.switchSpectrum(on);
       //else if(this.currentGameAnim === 'blackhole') this.blackholeGameProvider.switchSpectrum(on);
+      else if(this.currentGameAnim === 'rbtree') this.rbTreeGameProvider.switchSpectrum(on);
       else if(this.currentGameAnim === 'clock') this.clockGameProvider.switchSpectrum(on);
     },
     onGo() {
@@ -277,13 +284,15 @@ export default defineComponent({
 
     document.title = Const.SiteName;
 
-    this.currentGameAnim = 'sort';
+    this.currentGameAnim = 'rbtree';
     setTimeout(() => {
+      this.rbTreeGameCanvasAnimHost = this.$refs.rbTreeGameCanvasAnimHost as ICanvasAnimHost;
       this.sortGameCanvasAnimHost = this.$refs.sortGameCanvasAnimHost as ICanvasAnimHost;
       //this.blackholeGameCanvasAnimHost = this.$refs.blackholeGameCanvasAnimHost as ICanvasAnimHost;
       this.clockGameCanvasAnimHost = this.$refs.clockGameCanvasAnimHost as ICanvasAnimHost;
       this.gameProvider = this.sortGameProvider;
       this.gameProviders = [ 
+        this.rbTreeGameProvider, 
         this.sortGameProvider, 
         //this.blackholeGameProvider, 
         this.clockGameProvider 
