@@ -1,18 +1,18 @@
 <template>
   <div class="imengyu">
-    <Header :dark="darkMode"></Header>
+    <MyHeader :dark="darkMode"></MyHeader>
     <router-view />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Header from './components/Header.vue'
+import MyHeader from './components/Header.vue'
 import { emitter } from './main'
 
 export default defineComponent({
   components: {
-    Header,
+    MyHeader,
   },
   data() {
     return {

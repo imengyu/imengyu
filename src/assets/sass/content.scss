@@ -199,7 +199,7 @@
   
   }
   .imengyu-content-box-innern {
-    padding: $page-padding-md/2 $page-padding-md;
+    padding: math.div($page-padding-md, 2) $page-padding-md;
     font-size: 17px;
   }
   .imengyu-content-box-left-right {
@@ -207,10 +207,10 @@
     font-size: 17px;
   
     > .left {
-      padding: $page-padding-md/2 $page-padding-md;
+      padding: math.div($page-padding-md, 2) $page-padding-md;
     }
     > .right {
-      padding: $page-padding-md/2 $page-padding-md;
+      padding: math.div($page-padding-md, 2) $page-padding-md;
     }
   
   }
@@ -268,7 +268,7 @@
   
   }
   .imengyu-content-box-innern {
-    padding: $page-padding-sm/2 $page-padding-sm;
+    padding: math.div($page-padding-sm, 2) $page-padding-sm;
     font-size: 17px;
   }
   .imengyu-content-box-left-right {
@@ -276,10 +276,10 @@
     font-size: 17px;
   
     > .left {
-      padding: $page-padding-sm/2 $page-padding-sm;
+      padding: math.div($page-padding-sm, 2) $page-padding-sm;
     }
     > .right {
-      padding: $page-padding-sm/2 $page-padding-sm;
+      padding: math.div($page-padding-sm, 2) $page-padding-sm;
     }
   
   }

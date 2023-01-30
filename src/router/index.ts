@@ -1,5 +1,9 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import Index from '../views/Index.vue';
+import About from '../views/About.vue';
+import Works from '../views/Works.vue';
+import NotFound from '../views/NotFound.vue';
+import Test from '../views/Test.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -10,24 +14,24 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'About',
         name: 'About',
-        component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+        component: About,
       },
       {
         path: 'Works',
         name: 'Works',
-        component: () => import(/* webpackChunkName: "works" */ '../views/Works.vue'),
+        component: Works,
       },
     ]
   },
   {
     path: '/Test',
     name: 'Test',
-    component: () => import(/* webpackChunkName: "test" */ '../views/Test.vue')
+    component: Test
   },
   {
     path: '/404',
     name: 'PageNotExist',
-    component: () => import(/* webpackChunkName: "notfoud" */ '../views/NotFound.vue')
+    component: NotFound
   },
   {
     path: "/:catchAll(.*)", // 不识别的path自动匹配404
@@ -36,7 +40,7 @@ const routes: Array<RouteRecordRaw> = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes
 })
 

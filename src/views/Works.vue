@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="imengyu-main-host animated">
     <div class="imengyu-content-box full imengyu-works background-transparent" style="height:100%">
@@ -43,6 +44,24 @@ import { defineComponent } from 'vue'
 import HorList, { IHorList, IWorkItem } from '../components/HorList.vue'
 import WorkTab from '../components/WorkTab.vue'
 
+import ProjectImage0 from '../assets/images/projects/0.png'
+import ProjectImage1 from '../assets/images/projects/1.png'
+import ProjectImage2 from '../assets/images/projects/2.png'
+import ProjectImage3 from '../assets/images/projects/3.png'
+import ProjectImage5 from '../assets/images/projects/5.png'
+import ProjectImage6 from '../assets/images/projects/6.png'
+import ProjectImage7 from '../assets/images/projects/7.png'
+import ProjectImage8 from '../assets/images/projects/8.png'
+import ProjectImage9 from '../assets/images/projects/9.png'
+import ProjectImage10 from '../assets/images/projects/10.png'
+import ProjectImage11 from '../assets/images/projects/11.png'
+import ProjectImage12 from '../assets/images/projects/12.png'
+import ProjectImage13 from '../assets/images/projects/13.png'
+import ProjectImage14 from '../assets/images/projects/14.png'
+import ProjectImage15 from '../assets/images/projects/15.png'
+import ProjectImage16 from '../assets/images/projects/16.png'
+import ProjectImage17 from '../assets/images/projects/17.jpg'
+
 export default defineComponent({
   components: {
     HorList,
@@ -53,7 +72,7 @@ export default defineComponent({
       workItemsAll: [
         {
           id: 0,
-          img: require('../assets/images/projects/17.jpg'),
+          img: ProjectImage17,
           title: 'vue3-context-menu',
           text: '一个简洁美观简单的Vue3右键菜单组件',
           link: 'https://github.com/imengyu/vue3-context-menu',
@@ -62,7 +81,7 @@ export default defineComponent({
         },
         {
           id: 10,
-          img: require('../assets/images/projects/7.png'),
+          img: ProjectImage7,
           title: 'Ballance Rebuild',
           text: '一个曾经的经典滚球游戏复刻',
           link: 'https://github.com/imengyu/Ballance',
@@ -71,7 +90,7 @@ export default defineComponent({
         },
         {
           id: 2,
-          img: require('../assets/images/projects/10.png'),
+          img: ProjectImage10,
           title: 'Blueprint',
           text: '类似于 Unreal Engine 的蓝图脚本的设计软件(使用 Javascript 实现)',
           link: 'https://github.com/imengyu/node-blueprint',
@@ -80,7 +99,7 @@ export default defineComponent({
         },
         {
           id: 1,
-          img: require('../assets/images/projects/16.png'),
+          img: ProjectImage16,
           title: 'VR720 安卓端720°全景浏览软件',
           text: 'A 720 Panorama viewer for Android<br>一个安卓端的720°全景图片/全景视频浏览软件',
           link: 'https://github.com/imengyu/VR720',
@@ -89,7 +108,7 @@ export default defineComponent({
         },
         {
           id: 3,
-          img: require('../assets/images/projects/5.png'),
+          img: ProjectImage5,
           title: '一个 Java 开发的博客系统',
           text: 'Spring+MyBatis+MySQL+VUE,RestFul API<br> 目前仅自己使用',
           link: 'https://github.com/imengyu/FishBlog',
@@ -98,7 +117,7 @@ export default defineComponent({
         },
         {
           id: 4,
-          img: require('../assets/images/projects/3.png'),
+          img: ProjectImage3,
           title: '温州教育在线网站前台+后台系统（合作开发）',
           text: '基于PHP(Laravel), MySQL，Vue（nuxtjs）<br>www.wzjyzx.com',
           link: 'https://www.wzjyzx.com',
@@ -107,7 +126,7 @@ export default defineComponent({
         },
         {
           id: 5,
-          img: require('../assets/images/projects/8.png'),
+          img: ProjectImage8,
           title: '基于FFmpeg的屏幕录制程序',
           text: '一个基于FFmpeg使用 C# 、C++ 开发的最简单的屏幕录制软件',
           link: 'https://github.com/imengyu/ScreenRecoder',
@@ -116,7 +135,7 @@ export default defineComponent({
         },
         {
           id: 7,
-          img: require('../assets/images/projects/9.png'),
+          img: ProjectImage9,
           title: '720度全景查看软件',
           text: '基于OpenGL的720度全景查看软件，使用C++编写<br>可快速打开并查看720度全景图像',
           link: 'https://github.com/imengyu/3DImageViewer',
@@ -125,7 +144,7 @@ export default defineComponent({
         },
         {
           id: 8,
-          img: require('../assets/images/projects/0.png'),
+          img: ProjectImage0,
           title: 'ControlSwitch',
           text: 'STM32单片机，ESP8266+MQTT协议接入阿里云物联网平台 的一个自己制作的一个小电器，在自己家使里用',
           link: 'https://github.com/imengyu/ControlSwitch',
@@ -134,7 +153,7 @@ export default defineComponent({
         },
         {
           id: 11,
-          img: require('../assets/images/projects/2.png'),
+          img: ProjectImage2,
           title: '',
           text: '网页设计1',
           link: '',
@@ -143,7 +162,7 @@ export default defineComponent({
         },
         {
           id: 12,
-          img: require('../assets/images/projects/13.png'),
+          img: ProjectImage13,
           title: '',
           text: '网页设计2',
           link: '',
@@ -152,7 +171,7 @@ export default defineComponent({
         },
         {
           id: 13,
-          img: require('../assets/images/projects/11.png'),
+          img: ProjectImage11,
           title: '',
           text: '网页设计3',
           link: '',
@@ -161,7 +180,7 @@ export default defineComponent({
         },
         {
           id: 14,
-          img: require('../assets/images/projects/6.png'),
+          img: ProjectImage6,
           title: '我的个人主页',
           text: '就是你现在所在的这个网站了。这是自己玩玩的，结合了多个技术栈，但是功能上有很多不足，现在也更新好多次了',
           link: '',
@@ -170,7 +189,7 @@ export default defineComponent({
         }, 
         {
           id: 15,
-          img: require('../assets/images/projects/14.png'),
+          img: ProjectImage14,
           title: '',
           text: 'WebGl动画设计1',
           link: '',
@@ -179,7 +198,7 @@ export default defineComponent({
         },
         {
           id: 16,
-          img: require('../assets/images/projects/12.png'),
+          img: ProjectImage12,
           title: '',
           text: 'WebGl动画设计2',
           link: '',
@@ -188,7 +207,7 @@ export default defineComponent({
         },
         {
           id: 17,
-          img: require('../assets/images/projects/1.png'),
+          img: ProjectImage1,
           title: '',
           text: 'ThreeJs动画',
           link: '',

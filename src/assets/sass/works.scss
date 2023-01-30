@@ -246,7 +246,7 @@
     padding: 25px 0 20px 0;
 
     .imengyu-content-box-innern  {
-      padding: $page-padding-sm/2 $page-padding-sm $page-padding-sm $page-padding-sm;
+      padding: math.div($page-padding-sm, 2) $page-padding-sm $page-padding-sm $page-padding-sm;
     }
   }
   .imengyu-works-tab {

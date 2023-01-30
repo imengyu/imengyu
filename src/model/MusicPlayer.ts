@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from '../utils/EventEmitter';
 import { getTimeStringSec } from '../utils/Utils'
 
 

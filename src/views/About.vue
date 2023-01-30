@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="imengyu-main-host animated" id="about-host">
     <div class="imengyu-content-box">
@@ -219,12 +220,12 @@ export default defineComponent({
           id: 'my-skills'
         },
         {
-          text: 'LEARNING MORE',
-          id: 'learning'
-        },
-        {
           text: 'MORE ABOUT ME',
           id: 'more-about-me'
+        },
+        {
+          text: 'LEARNING MORE',
+          id: 'learning'
         },
         {
           text: 'CONTACT ME',

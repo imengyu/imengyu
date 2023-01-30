@@ -8,7 +8,7 @@
     position: absolute;
     bottom: $bottom;
     left: 50%;
-    margin-left: -($width / 2);
+    margin-left: math.div(-$width, 2);
     transition: all ease-in-out 0.3s;
   }
 }
@@ -23,7 +23,7 @@
     position: absolute;
     bottom: $bottom;
     left: 50%;
-    margin-left: -($width / 2);
+    margin-left: math.div(-$width, 2);
     transition: all ease-in-out 0.3s;
   }
 }
