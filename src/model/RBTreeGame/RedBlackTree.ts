@@ -1,4 +1,3 @@
-import { assert } from "@vue/compiler-core";
 import { RedBlackTreeGameNodeData } from "./RedBlackTreeGame";
 
 /**
@@ -13,9 +12,73 @@ export class RedBlackTree {
 
   /**
    * 根黑色，NULL节点黑色。
-   * 红色节点的子节点必须是黑色（不能出现相连红色节点）。
-   * 从节点（包括根）到其任何后代NULL节点(叶子结点下方挂的两个空节点，并且认为他们是黑色的)的每条路径都具有相同数量的黑色节点。
+   *
+   * 
+   * 红黑树是一种含有红黑结点并能自平衡的二叉查找树。它必须满足下面性质：
+
+      性质1：每个节点要么是黑色，要么是红色。
+      性质2：根节点是黑色。
+      性质3：每个叶子节点（NIL）是黑色。
+      性质4：每个红色结点的两个子结点一定都是黑色。
+      性质5：任意一结点到每个叶子结点的路径都包含数量相同的黑结点
+   * 
+   * 
    */
+
+  /**
+   * 按节点node左旋
+   * @param node 
+   */
+  rotateLeft(node: RedBlackTreeNode) {
+    const parent = node.parent as RedBlackTreeNode;
+    const right = node.right as RedBlackTreeNode;
+    if (right) {
+      const rightLeft = right.left;
+
+      if (parent) {
+        const childPos = parent.checkIsChild(node);
+        if (childPos === -1)
+          parent.setLeftChild(right);
+        else if (childPos === 1)
+          parent.setRightChild(right);
+      } else {
+        this.root = right;
+        right.clearParent();
+      }
+
+      right.setLeftChild(node);
+      node.setRightChild(rightLeft)
+    } else {
+      console.log('node ', node.value , ' has no right child, can\'t rotateLeft');
+    }
+  }
+  /**
+   * 按节点node右旋
+   * @param node 
+   */
+  rotateRight(node: RedBlackTreeNode) {
+    const parent = node.parent as RedBlackTreeNode;
+    const left = node.left as RedBlackTreeNode;
+    if (left) {
+      const leftRight = left.right;
+
+      if (parent) {
+        const childPos = parent.checkIsChild(node);
+        if (childPos === -1)
+          parent.setLeftChild(left);
+        else if (childPos === 1)
+          parent.setRightChild(left);
+      } else {
+        this.root = left;
+        left.clearParent();
+      }
+      
+      left.setRightChild(node);
+      node.setLeftChild(leftRight);
+    } else {
+      console.log('node ', node.value , ' has no left child, can\'t rotateRight');
+    }
+  }
 
   /**
    * 插入
@@ -30,178 +93,147 @@ export class RedBlackTree {
     if (this.root === null) {
       this.root = newNode; 
       newNode.isBlack = true;//根黑色
-    } else {
-      //二分查找，以找到插入位置
-      let currFind : RedBlackTreeNode|null = this.root;
-      while(currFind) {
-        if (val < currFind.value) {
-          //左侧
-          if (currFind.left) {
-            //左边有孩子，继续在左边查找
-            currFind = currFind.left; 
-          }
-          else {
-            //就在当前节点插入
-            currFind.setLeftChild(newNode);
-            currFind = null;//停止循环
-          }
-        } else if (val > currFind.value) {
-          //右侧
-          if (currFind.right) {
-            //右边有孩子，继续在右边查找
-            currFind = currFind.right; 
-          }
-          else {
-            //就在当前节点插入
-            currFind.setRightChild(newNode);
-            currFind = null;//停止循环
-          }
-        } else {
-          //重复的节点，忽略
-          console.warn('Duplicate element ' + val + ' , ignore');
-          return;
+      return;
+    } 
+    
+    //二分查找，以找到插入位置
+    let currFind : RedBlackTreeNode|null = this.root;
+    while(currFind) {
+      if (val < currFind.value) {
+        //左侧
+        if (currFind.left) {
+          //左边有孩子，继续在左边查找
+          currFind = currFind.left; 
         }
+        else {
+          //就在当前节点插入
+          currFind.setLeftChild(newNode);
+          currFind = null;//停止循环
+        }
+      } else if (val > currFind.value) {
+        //右侧
+        if (currFind.right) {
+          //右边有孩子，继续在右边查找
+          currFind = currFind.right; 
+        }
+        else {
+          //就在当前节点插入
+          currFind.setRightChild(newNode);
+          currFind = null;//停止循环
+        }
+      } else {
+        //插入情景2：插入结点的Key已存在
+        console.log('[RedBlackTree] Duplicate element ' + val + ' , ignore');
+        return;
       }
+    }
 
-      const balanceNode = (node: RedBlackTreeNode) => {
-        //如果是根节点，返回，不做操作
-        if (node === this.root) {
-          node.isBlack = true;
-          return;
-        }
-        if (node.parent == null) {
-          console.error('node parent is null but not root!', node);
-          return;
-        }
-        //获取父级
-        const parent = node.parent as RedBlackTreeNode;
-        if (parent.isBlack) {
-          //情形2. 父节点为黑色时，无需其他操作，已然平衡
-          return;
-        } else {
-          const grandpa = parent.parent as RedBlackTreeNode;
-          const uncle = (grandpa.left === parent ? grandpa.right : grandpa.left) as RedBlackTreeNode; //获取父亲的兄弟节点
-          
-          if (uncle && uncle.isBlack) { 
-            //情况4, 父亲是红色，叔叔也是黑色，需要平衡
+    const balanceNode = (node: RedBlackTreeNode) => {
+      //插入情景1：红黑树为空树
+      if (node === this.root) {
+        node.isBlack = true;
+        return;
+      }
+      if (node.parent == null) {
+        console.error('node parent is null but not root!', node);
+        return;
+      }
+      //获取父级
+      const parent = node.parent as RedBlackTreeNode;
+      if (parent.isBlack) {
+        //插入情景3：插入结点的父结点为黑结点
+        //由于插入的结点是红色的，并不会影响红黑树的平衡，直接插入即可，无需做自平衡。
+        return;
+      } 
 
-            //情形4.1 父节点和N在同一边
-            if (parent === grandpa.left && node === parent.left) {
-              //情形4.1.1 父N同左
-              //“父N同左”指的是：父节点为祖父节点的左子，N为父节点的左子。
-              //此时以祖父节点(GP)为支点进行右旋；然后将P涂黑，将GP涂红。
-
-              //代码操作步骤 p挂载到gp的父级，gp挂到p右子，如果之前p有右子，则挂载到gp左子
-
-              const greatGrandfather = grandpa.parent;
-              if (greatGrandfather) {
-                //检查下原先挂载的是左子还是右子
-                const childPos = greatGrandfather.checkIsChild(grandpa);
-                if (childPos === -1)
-                  greatGrandfather.setLeftChild(parent);
-                else if (childPos === 1)
-                  greatGrandfather.setRightChild(parent);
-              } else {
-                this.root = parent;
-                parent.isBlack = true;
-                parent.parent = null;
-              }
-
-              parent.isBlack = true;//涂黑
-
-              //如果p之前有右子，则挂载到gp左子
-              const oldParentRight = parent.right;
-              if (oldParentRight)
-                grandpa.setLeftChild(oldParentRight);
-              else
-                grandpa.left = null; //清空之前的连接
-
-              //gp挂到p右子
-              parent.setRightChild(grandpa);
-
-              grandpa.isBlack = false; //GP涂红
-            }
-            else if (parent === grandpa.right && node === parent.right) {
-              //情形4.1.2 父N同右
-              //4.1.1 的镜像版
-              //此时以祖父节点(GP)为支点进行左旋；将P涂黑，将GP涂红。
-
-              //代码操作步骤 p挂载到gp的父级，gp挂到p左子，如果之前p有左子，则挂载到gp右子
-
-              const greatGrandfather = grandpa.parent;
-              if (greatGrandfather) {
-                //检查下原先挂载的是左子还是右子
-                const childPos = greatGrandfather.checkIsChild(grandpa);
-                if (childPos === -1)
-                  greatGrandfather.setLeftChild(parent);
-                else if (childPos === 1)
-                  greatGrandfather.setRightChild(parent);
-              } else {
-                this.root = parent;
-                parent.isBlack = true;
-                parent.parent = null;
-              }
-
-              parent.isBlack = true;//涂黑
-
-              //如果p之前有左子，则挂载到gp右子
-              const oldParentLeft = parent.left;
-              if (oldParentLeft)
-                grandpa.setRightChild(oldParentLeft);
-              else
-                grandpa.right = null; //清空之前的连接
-
-              //gp挂到p左子
-              parent.setLeftChild(grandpa);
-
-              grandpa.isBlack = false; //GP涂红
-            }
-            //情形4.2 父节点和N不在同一边
-            else if (parent === grandpa.left && node === parent.right) {
-              //情形4.2.1 父左N右
-              //“父左N右”指的是：父节点是祖父节点的左子，N为父节点的右子。
-              //此时，以父节点(P)进行左旋，旋转后，以P作为新的平衡节点N，转至 [情形4.1.1 父N同左] 处理。
-
-              //代码操作步骤 n挂载到gp的左子，p成为n左子，然后递归对p节点进行平衡
-
-              grandpa.setLeftChild(node);
-              node.setLeftChild(parent);
-              parent.right = null; //置空
-
-              balanceNode(parent);
-            }
-            else if (parent === grandpa.right && node === parent.left) {
-              //情形4.2.2 父右N左
-              // “父右N左”指的是：父节点是祖父节点的右子，N为父节点的左子。
-              // 此时，以父节点(P)进行右旋，旋转后，以P作为新的平衡节点，此时再进行【情形4.1.2 父N同右】处理。
-
-              grandpa.setRightChild(node);
-              node.setRightChild(parent);
-              parent.left = null; //置空
-
-              balanceNode(parent);
-            }
-          } else {
-            //情况3, 父亲是红色，叔叔也是红色, 或者压根没有叔叔，则递归，为父叔涂黑色，祖父红色
-            if (uncle)
-              uncle.isBlack = true;
+      //插入情景4：插入结点的父结点为红结点
+      const grandpa = parent.parent as RedBlackTreeNode;
+      const parentIsLeft = grandpa.left === parent;
+      const uncle = (parentIsLeft ? grandpa.right : grandpa.left) as RedBlackTreeNode; //获取父亲的兄弟节点
+      
+      if (uncle && !uncle.isBlack) {
+        //插入情景4.1：叔叔结点存在并且为红结点
+        uncle.isBlack = true;
+        parent.isBlack = true;
+        grandpa.isBlack = false;
+        balanceNode(grandpa); //递归平衡祖父
+      } else {
+        if (grandpa.isRight(parent)) {
+          //插入情景4.3：叔叔结点不存在或为黑结点，并且插入结点的父亲结点是祖父结点的右子结点
+          //插入情景4.3.1：插入结点是其父结点的右子结点
+          if (parent.isRight(node)) {
             parent.isBlack = true;
             grandpa.isBlack = false;
-            balanceNode(grandpa); //递归平衡祖父
+            this.rotateLeft(grandpa);
+          } 
+          //插入情景4.3.2：插入结点是其父结点的左子结点
+          else if (parent.isLeft(node)) {
+            this.rotateRight(parent);
+            balanceNode(parent);
+          }
+        } else {
+          //插入情景4.2：叔叔结点不存在或为黑结点
+          //插入情景4.2.1：插入结点是其父结点的左子结点
+          if (parent.isLeft(node)) {
+            parent.isBlack = true;
+            grandpa.isBlack = false;
+            this.rotateRight(grandpa);
+          } 
+          //插入情景4.2.2：插入结点是其父结点的右子结点
+          else if (parent.isRight(node)) {
+            this.rotateLeft(parent);
+            balanceNode(parent);
           }
         }
-      };
+      }
+    };
 
-      //平衡这个节点
-      balanceNode(newNode);
-    }
+    //平衡这个节点
+    balanceNode(newNode);
   }
+
+  /**
+   * 查找节点
+   * @param val 
+   */
+  public findNode(val: number) {
+    let currFind : RedBlackTreeNode|null = this.root;
+    while(currFind) {
+      if (val < currFind.value) {
+        //左侧
+        currFind = currFind.left;
+      } else if (val > currFind.value) {
+        //右侧
+        currFind = currFind.right; 
+      } else {
+        return currFind;
+      }
+    }
+    return null;
+  }
+
   /**
    * 删除
    * @param val 
    */
   public delete(val: number) : void {
-    //TODO: 删除
+    //
+    const deleteNode = this.findNode(val);
+    if (deleteNode) {
+
+      //情景1：若删除结点无子结点，直接删除
+      if (deleteNode.left === null && deleteNode.right === null) {
+        deleteNode.clearParent();
+      } 
+      //情景2：若删除结点只有一个子结点，用子结点替换删除结点
+      else if (deleteNode.left === null && deleteNode.right !== null) {
+        
+      }
+      else if (deleteNode.left !== null && deleteNode.right === null) {
+        
+      }
+    }
+    
     console.log('delete ' + val);
   }
 }
@@ -248,19 +280,55 @@ export class RedBlackTreeNode {
     return 0;
   }
   /**
+   * 检查某个节点是不是当前节点的左子
+   * @param node 节点
+   * @returns 
+   */
+  public isLeft(node : RedBlackTreeNode) : boolean {
+    return (node === this.left);
+  }
+  /**
+   * 检查某个节点是不是当前节点的右子
+   * @param node 节点
+   * @returns 
+   */
+  public isRight(node : RedBlackTreeNode) : boolean {
+    return (node === this.right);
+  }
+  /**
+   * 清除父级节点连接
+   */
+  public clearParent() {
+    if (this.parent) {
+      if (this.parent.isLeft(this))
+        this.parent.left = null;
+      if (this.parent.isRight(this))
+        this.parent.right = null;
+      this.parent = null;
+    }
+  }
+  /**
    * 设置当前节点的左子
    * @param left 
    */
-  public setLeftChild(left : RedBlackTreeNode) : void {
+  public setLeftChild(left : RedBlackTreeNode|null) : void {
+    console.assert(left != this, 'Left child can not be it self!');
+
+    left?.clearParent();
     this.left = left;
-    this.left.parent = this;
+    if (this.left)
+      this.left.parent = this;
   }
   /**
    * 设置当前节点的右子
    * @param right 
    */
-  public setRightChild(right : RedBlackTreeNode) : void {
+  public setRightChild(right : RedBlackTreeNode|null) : void {
+    console.assert(right != this, 'Right child can not be it self!');
+
+    right?.clearParent();
     this.right = right;
-    this.right.parent = this;
+    if (this.right)
+      this.right.parent = this;
   }
 }

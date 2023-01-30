@@ -91,6 +91,8 @@ export class RedBlackTreeGame extends CanvasGameProvider {
       //首先需要计算树的高度，以供图标绘制坐标计算
       const height = getTreeHeight(this.tree.root);
       //生成相关位置数据
+      this.tree.root!.gameData.generatePosition.x = 0;
+      this.tree.root!.gameData.generatePosition.y = 0;
       genNode(height, height, 0.6, this.tree.root);
     } else {
       //生成相关位置数据
