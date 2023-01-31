@@ -15,6 +15,17 @@ export class RedBlackTreeGame extends CanvasGameProvider {
   private treeDataPoolSize = 64;//数据个数
   private addedDataPool = [] as number[];
 
+  private debugNextDelData = 0;
+  private debugNextAddData = 0;
+
+  private getDebugNextData() {
+    let randIndex = MathUtils.randomNum(0, this.treeDataPool.length - 2);
+    this.debugNextAddData = this.treeDataPool[randIndex];
+    randIndex = MathUtils.randomNum(0, this.addedDataPool.length - 2);
+    this.debugNextDelData = this.addedDataPool[randIndex];
+    this.emit('debugNextDataChanged', this.debugNextAddData, this.debugNextDelData)
+  }
+
   //生成数据
   private genData() {
     let data = 0;
@@ -23,29 +34,40 @@ export class RedBlackTreeGame extends CanvasGameProvider {
       this.treeDataPool[i] = data;
     }
   }
-  private pushData() : void {
-    const randIndex = MathUtils.randomNum(0, this.treeDataPool.length - 2);
-    const data = this.treeDataPool[randIndex];
-
+  private pushData(data?: number) : void {
+    let dataIndex = 0;
+    if (data) {
+      dataIndex = this.treeDataPool.indexOf(data);
+    } else {
+      dataIndex = MathUtils.randomNum(0, this.treeDataPool.length - 2);
+      data = this.treeDataPool[dataIndex];
+    }
     this.tree.insert(data);
-    this.treeDataPool.splice(randIndex, 1);
+    this.treeDataPool.splice(dataIndex, 1);
     this.addedDataPool.push(data);
   }
-  private deleteData() : void {
-    const randIndex = MathUtils.randomNum(0, this.addedDataPool.length - 2);
-    const data = this.addedDataPool[randIndex];
-
+  private deleteData(data?: number) : void {
+    let dataIndex = 0;
+    if (data) {
+      dataIndex = this.addedDataPool.indexOf(data);
+    } else {
+      dataIndex = MathUtils.randomNum(0, this.addedDataPool.length - 2);
+      data = this.addedDataPool[dataIndex];
+    }
     this.tree.delete(data);
     this.treeDataPool.push(data);
-    this.addedDataPool.slice(randIndex, 1);
+    this.addedDataPool.slice(dataIndex, 1);
   }
 
   debugPushData() : void {
-    this.pushData();
+    this.pushData(this.debugNextAddData);
+    this.getDebugNextData();
     this.generateTreeMapData();
   }
-  debugDeleteData() : void {
-    this.deleteData();
+  debugDeleteData(value: string|number) : void {
+    this.debugNextDelData = typeof value === 'string' ? parseInt(value) : value;
+    this.deleteData(this.debugNextDelData);
+    this.getDebugNextData();
     this.generateTreeMapData();
   }
 
@@ -172,13 +194,26 @@ export class RedBlackTreeGame extends CanvasGameProvider {
     this.ctx.font = '13px Arail';
     this.canvas = canvas;
     this.genData();
-    for (let i = 0; i < 16; i++) {
-      this.pushData();
-    }
+    this.pushData(39);
+    this.pushData(11);
+    this.pushData(56);
+    this.pushData(4);
+    this.pushData(23);
+    this.pushData(41);
+    this.pushData(61);
+    this.pushData(6);
+    this.pushData(40);
+    this.pushData(44);
+    this.pushData(60);
+    this.pushData(76);
+    this.pushData(57);
+    this.deleteData(23);
+
+    this.getDebugNextData();
     this.generateTreeMapData();
   }
   public destroy() : void {
-    //Base function
+    console.log('[RedBlackTreeGame] destroy');
   }
   public render(deltatime : number) : void {
     this.renderTreeMap();

@@ -1,8 +1,10 @@
 /* eslint-disable */
 
+import { EventEmitter } from "@/utils/EventEmitter";
+
 export type DrawSpectrumCallback = () => void;
 
-export class CanvasGameProvider {
+export class CanvasGameProvider extends EventEmitter {
 
   protected ctx : CanvasRenderingContext2D|null = null;
   protected canvas : HTMLCanvasElement|null = null;

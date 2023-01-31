@@ -410,7 +410,7 @@ export class ClockGame extends CanvasGameProvider {
     this.resize_rest_particles();
   }
   public destroy() : void {
-    this.clear();
+    this.clearFrame();
     this.clearMouseMoveTimer();
     this.removeEvents();
 
@@ -492,7 +492,7 @@ export class ClockGame extends CanvasGameProvider {
     
   // base functions
 
-  private clear() {
+  private clearFrame() {
     if(this.ctx) {
       //ctx.globalAlpha = 0.05;
       this.ctx.fillStyle = '#000';
@@ -501,7 +501,7 @@ export class ClockGame extends CanvasGameProvider {
     }
   }
   private update() {
-    this.clear();
+    this.clearFrame();
     this.particles.forEach(p => p.move());
   }
   private getMapDisplaySize(twoLine = false) {

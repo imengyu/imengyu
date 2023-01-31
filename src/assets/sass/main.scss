@@ -86,6 +86,19 @@ input, textarea, select, button {
   &:hover {
     background-color: #353535;
   }
+
+  span {
+    color: #fff;
+  }
+
+  input {
+    display: inline-block;
+    width: 20px;
+    background-color: transparent;
+    color: #fff;
+    outline: none;
+    border: none;
+  }
     
 }
 .imengyu-icon-button {

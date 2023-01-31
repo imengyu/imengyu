@@ -84,10 +84,20 @@ export class RedBlackTree {
    * @param node1 
    * @param node2 
    */
-  exchangeNode(node1: RedBlackTreeNode, node2: RedBlackTreeNode) {
+  exchangeNodeValue(node1: RedBlackTreeNode, node2: RedBlackTreeNode) {
     const v1 = node1.value;
     node1.value = node2.value;
     node2.value = v1;
+  }
+  /**
+   * 交换两个节点颜色
+   * @param node1 
+   * @param node2 
+   */
+  exchangeNodeColor(node1: RedBlackTreeNode, node2: RedBlackTreeNode) {
+    const v1 = node1.isBlack;
+    node1.isBlack = node2.isBlack;
+    node2.isBlack = v1;
   }
 
   /**
@@ -233,7 +243,8 @@ export class RedBlackTree {
       if (deleteNode.left === null && deleteNode.right === null) {
         if (deleteNode.isBlack) {
           //删除节点如果为黑色，则需要进行删除平衡的操作
-
+          doBalanceNode(deleteNode);
+          deleteNode.removeParentLink();
         } else {
           //删除节点如果为红色，直接删除即可，不会影响黑色节点的数量；
           deleteNode.removeParentLink();
@@ -246,8 +257,19 @@ export class RedBlackTree {
         || (deleteNode.left !== null && deleteNode.right === null)
       ) {
         const childNode = deleteNode.left ? deleteNode.left : deleteNode.right as RedBlackTreeNode;
-        this.exchangeNode(deleteNode, childNode);
-        doDeleteNode(childNode);
+        deleteNode.removeParentLink();
+
+        if (parent) {
+          parent.isLeft(deleteNode) ? 
+            parent.setLeftChild(childNode) :
+            parent.setRightChild(childNode);
+        } else {
+          this.root = childNode;
+          childNode.removeParentLink();
+        }
+
+        //涂黑
+        childNode.isBlack = true;
       }
       //情景3：有两个子节点时，与二叉搜索树一样，使用后继节点作为替换的
       //删除节点，情形转至为1或2处理。
@@ -260,18 +282,105 @@ export class RedBlackTree {
           else 
             break;
         }
-
-        if (currFind) {
-
-        }
-
+        
+        //交换后继节点
+        this.exchangeNodeValue(deleteNode, currFind);
+        //情形转至为1或2处理
+        doDeleteNode(currFind);
       }
     }
+    const doBalanceNode = (node: RedBlackTreeNode) => {
+      //情形1 当前节点为根节点（父节点为NULL）
+      if (node === this.root)
+        return;
+      
+      const parent = node.parent as RedBlackTreeNode;
+      const brother = (parent.isLeft(node) ? parent.right : parent.left) as RedBlackTreeNode;
+
+      if (brother.isBlack) 
+      {
+        //情形2 兄弟节点为黑色
+        if (brother.isAllChildBlack()) {
+          //情形2.1 兄弟的子节点全黑
+          //兄弟节点的子节点全为黑色，也就意味着兄弟节点（S）可以涂红而不会和子冲突。
+          //S涂红后，也就实现了子平衡，
+          //这时候我们看父节点是红是黑，再做处理。
+          if (parent.isBlack) {
+            //情形2.1.1 父节点为黑色
+            //此时将S涂红，父节点作为新的平衡节点N，递归上去处理。
+            brother.isBlack = false;
+            doBalanceNode(parent);
+          } else {
+            //情形2.1.2 父节点为红色
+            //此时将S涂红，P涂黑，平衡结束。
+            brother.isBlack = false;
+            parent.isBlack = true;
+          }
+        } else {
+          //情形2.2 兄弟的子节点不全黑
+          if (parent.isLeft(brother) && (brother.left && !brother.left.isBlack)) {
+            //情形2.2.1 S为左子，SL红；S为右子，SR红
+            //以P为支点右旋；交换P和S颜色，SL涂黑；平衡结束。
+            const borderLeft = brother.left;
+            this.rotateRight(parent);
+            this.exchangeNodeColor(parent, brother);
+            borderLeft.isBlack = true;
+          }
+          else if (parent.isRight(brother) && (brother.right && !brother.right.isBlack)) {
+            //对称的情形(2)：S为黑色，S为右子，SR红时：
+            //以P为支点左旋；交换P和S颜色（S涂为P原颜色，P涂黑），SR涂黑；平衡结束。
+            const borderRight = brother.right;
+            this.rotateLeft(parent);
+            this.exchangeNodeColor(parent, brother);
+            borderRight.isBlack = true;
+          }
+          else if (parent.isLeft(brother) && (!brother.left || brother.left.isBlack)) {
+            //情形2.2.2 S为左子，SL黑；S为右子，SR黑
+            //以S为支点左旋，交换S和SR颜色（SR涂黑，S涂红） ，此时转至情形2.2.1-(1) S左-SL红 进行处理。
+            const borderRight = brother.right;
+            this.rotateLeft(brother);
+            brother.isBlack = false;
+            if (borderRight)
+              borderRight.isBlack = true;
+            doBalanceNode(node);
+          }
+          else if (parent.isRight(brother) && (!brother.right || brother.right.isBlack)) {
+            //对称的情形(2) S为黑色，S为右子，SR黑
+            //以S为支点右旋，交换S和SL颜色（SL涂黑，S涂红），此时转至2.2.1-(1) S右-SR红进行处理。
+            const borderLeft = brother.left;
+            this.rotateRight(brother);
+            brother.isBlack = false;
+            if (borderLeft)
+              borderLeft.isBlack = true;
+            doBalanceNode(node);
+          }
+        }
+      } 
+      else 
+      {
+        //情形3 兄弟节点为红色
+        if (parent.isLeft(brother)) {
+          this.rotateRight(parent);
+          this.exchangeNodeColor(parent, brother);
+          doBalanceNode(node);
+        } else if (parent.isRight(brother)) {
+          this.rotateLeft(parent);
+          this.exchangeNodeColor(parent, brother);
+          doBalanceNode(node);
+        }
+      }
+    };
     
     //查找删除节点
     const node = this.findNode(val);
-    if (node)
+    if (node) {
+      console.log('Delete', node.value);
+      
       doDeleteNode(node);
+    } else {
+      
+      console.log('Delete not found', val);
+    }
   }
 }
 
@@ -331,6 +440,17 @@ export class RedBlackTreeNode {
    */
   public isRight(node : RedBlackTreeNode) : boolean {
     return (node === this.right);
+  }
+  /**
+   * 检查两个子节点是不是全黑
+   */
+  public isAllChildBlack() {
+    return (
+      (this.left && this.right && this.left.isBlack && this.right.isBlack)
+      || (this.right === null && this.left && this.left.isBlack)
+      || (this.left === null && this.right && this.right.isBlack)
+      || (this.left === null && this.right === null)
+    );
   }
   /**
    * 清除父级节点连接
