@@ -1,7 +1,9 @@
+import { EventEmitter } from "@/utils/EventEmitter";
+
 /**
  * 红黑树
  */
-export class RedBlackTree {
+export class RedBlackTree extends EventEmitter {
   /**
    * 根
    */
@@ -27,7 +29,7 @@ export class RedBlackTree {
    * 按节点node左旋
    * @param node 
    */
-  rotateLeft(node: RedBlackTreeNode) {
+  private rotateLeft(node: RedBlackTreeNode) {
     const parent = node.parent as RedBlackTreeNode;
     const right = node.right as RedBlackTreeNode;
     if (right) {
@@ -54,7 +56,7 @@ export class RedBlackTree {
    * 按节点node右旋
    * @param node 
    */
-  rotateRight(node: RedBlackTreeNode) {
+  private rotateRight(node: RedBlackTreeNode) {
     const parent = node.parent as RedBlackTreeNode;
     const left = node.left as RedBlackTreeNode;
     if (left) {
@@ -82,7 +84,7 @@ export class RedBlackTree {
    * @param node1 
    * @param node2 
    */
-  exchangeNodeValue(node1: RedBlackTreeNode, node2: RedBlackTreeNode) {
+  private exchangeNodeValue(node1: RedBlackTreeNode, node2: RedBlackTreeNode) {
     const v1 = node1.value;
     node1.value = node2.value;
     node2.value = v1;
@@ -92,11 +94,15 @@ export class RedBlackTree {
    * @param node1 
    * @param node2 
    */
-  exchangeNodeColor(node1: RedBlackTreeNode, node2: RedBlackTreeNode) {
+  private exchangeNodeColor(node1: RedBlackTreeNode, node2: RedBlackTreeNode) {
     const v1 = node1.isBlack;
     node1.isBlack = node2.isBlack;
     node2.isBlack = v1;
   }
+  private emitGenSnapShot() {
+    this.emit('genSnapshot');
+  }
+
 
   /**
    * 插入
@@ -111,6 +117,7 @@ export class RedBlackTree {
     if (this.root === null) {
       this.root = newNode; 
       newNode.isBlack = true;//根黑色
+      this.emitGenSnapShot();
       return;
     } 
     
@@ -150,6 +157,7 @@ export class RedBlackTree {
       //插入情景1：红黑树为空树
       if (node === this.root) {
         node.isBlack = true;
+        this.emitGenSnapShot();
         return;
       }
       if (node.parent == null) {
@@ -174,6 +182,7 @@ export class RedBlackTree {
         uncle.isBlack = true;
         parent.isBlack = true;
         grandpa.isBlack = false;
+        this.emitGenSnapShot();
         balanceNode(grandpa); //递归平衡祖父
       } else {
         if (grandpa.isRight(parent)) {
@@ -183,10 +192,12 @@ export class RedBlackTree {
             parent.isBlack = true;
             grandpa.isBlack = false;
             this.rotateLeft(grandpa);
+            this.emitGenSnapShot();
           } 
           //插入情景4.3.2：插入结点是其父结点的左子结点
           else if (parent.isLeft(node)) {
             this.rotateRight(parent);
+            this.emitGenSnapShot();
             balanceNode(parent);
           }
         } else {
@@ -196,10 +207,12 @@ export class RedBlackTree {
             parent.isBlack = true;
             grandpa.isBlack = false;
             this.rotateRight(grandpa);
+            this.emitGenSnapShot();
           } 
           //插入情景4.2.2：插入结点是其父结点的右子结点
           else if (parent.isRight(node)) {
             this.rotateLeft(parent);
+            this.emitGenSnapShot();
             balanceNode(parent);
           }
         }
@@ -242,10 +255,13 @@ export class RedBlackTree {
         if (deleteNode.isBlack) {
           //删除节点如果为黑色，则需要进行删除平衡的操作
           doBalanceNode(deleteNode);
+          this.emitGenSnapShot();
           deleteNode.removeParentLink();
+          this.emitGenSnapShot();
         } else {
           //删除节点如果为红色，直接删除即可，不会影响黑色节点的数量；
           deleteNode.removeParentLink();
+          this.emitGenSnapShot();
         }
       } 
       //情景2：删除结点只有一个子节点时，删除节点只能是黑色，其子节点为红色，
@@ -268,6 +284,7 @@ export class RedBlackTree {
 
         //涂黑
         childNode.isBlack = true;
+        this.emitGenSnapShot();
       }
       //情景3：有两个子节点时，与二叉搜索树一样，使用后继节点作为替换的
       //删除节点，情形转至为1或2处理。
@@ -283,8 +300,10 @@ export class RedBlackTree {
         
         //交换后继节点
         this.exchangeNodeValue(deleteNode, currFind);
+        this.emitGenSnapShot();
         //情形转至为1或2处理
         doDeleteNode(currFind);
+        this.emitGenSnapShot();
       }
     }
     const doBalanceNode = (node: RedBlackTreeNode) => {
@@ -309,6 +328,7 @@ export class RedBlackTree {
             //情形2.1.1 父节点为黑色
             //此时将S涂红，父节点作为新的平衡节点N，递归上去处理。
             brother.isBlack = false;
+            this.emitGenSnapShot();
             doBalanceNode(parent);
           } else {
             //情形2.1.2 父节点为红色
@@ -323,25 +343,31 @@ export class RedBlackTree {
             //以P为支点右旋；交换P和S颜色，SL涂黑；平衡结束。
             const borderLeft = brother.left;
             this.rotateRight(parent);
+            this.emitGenSnapShot();
             this.exchangeNodeColor(parent, brother);
             borderLeft.isBlack = true;
+            this.emitGenSnapShot();
           }
           else if (parent.isRight(brother) && (brother.right && !brother.right.isBlack)) {
             //对称的情形(2)：S为黑色，S为右子，SR红时：
             //以P为支点左旋；交换P和S颜色（S涂为P原颜色，P涂黑），SR涂黑；平衡结束。
             const borderRight = brother.right;
             this.rotateLeft(parent);
+            this.emitGenSnapShot();
             this.exchangeNodeColor(parent, brother);
             borderRight.isBlack = true;
+            this.emitGenSnapShot();
           }
           else if (parent.isLeft(brother) && (!brother.left || brother.left.isBlack)) {
             //情形2.2.2 S为左子，SL黑；S为右子，SR黑
             //以S为支点左旋，交换S和SR颜色（SR涂黑，S涂红） ，此时转至情形2.2.1-(1) S左-SL红 进行处理。
             const borderRight = brother.right;
             this.rotateLeft(brother);
+            this.emitGenSnapShot();
             brother.isBlack = false;
             if (borderRight)
               borderRight.isBlack = true;
+            this.emitGenSnapShot();
             doBalanceNode(node);
           }
           else if (parent.isRight(brother) && (!brother.right || brother.right.isBlack)) {
@@ -349,9 +375,11 @@ export class RedBlackTree {
             //以S为支点右旋，交换S和SL颜色（SL涂黑，S涂红），此时转至2.2.1-(1) S右-SR红进行处理。
             const borderLeft = brother.left;
             this.rotateRight(brother);
+            this.emitGenSnapShot();
             brother.isBlack = false;
             if (borderLeft)
               borderLeft.isBlack = true;
+            this.emitGenSnapShot();
             doBalanceNode(node);
           }
         }
@@ -361,11 +389,15 @@ export class RedBlackTree {
         //情形3 兄弟节点为红色
         if (parent.isLeft(brother)) {
           this.rotateRight(parent);
+          this.emitGenSnapShot();
           this.exchangeNodeColor(parent, brother);
+          this.emitGenSnapShot();
           doBalanceNode(node);
         } else if (parent.isRight(brother)) {
           this.rotateLeft(parent);
+          this.emitGenSnapShot();
           this.exchangeNodeColor(parent, brother);
+          this.emitGenSnapShot();
           doBalanceNode(node);
         }
       }
@@ -373,14 +405,10 @@ export class RedBlackTree {
     
     //查找删除节点
     const node = this.findNode(val);
-    if (node) {
-      console.log('Delete', node.value);
-      
+    if (node)
       doDeleteNode(node);
-    } else {
-      
+    else
       console.log('Delete not found', val);
-    }
   }
 }
 

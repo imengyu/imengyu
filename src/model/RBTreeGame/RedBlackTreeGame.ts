@@ -6,6 +6,13 @@ import { RedBlackTree, RedBlackTreeNode } from "./RedBlackTree";
 
 export class RedBlackTreeGame extends CanvasGameProvider {
 
+  constructor() {
+    super();
+    this.tree.on('genSnapshot', () => {
+      this.generateNewTreeSnapshot();
+    });
+  }
+
   private width = 0;
   private height = 0;
 
@@ -75,7 +82,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 
   //树的变化快照
   private treeSnapshots = [] as TreeSnapshot[];
-  private treeSnapshotCurrent = null as TreeSnapshotNode|null;
+  private treeSnapshotCurrent = null as TreeSnapshot|null;
 
   //生成快照
   private generateNewTreeSnapshot() {
@@ -96,6 +103,9 @@ export class RedBlackTreeGame extends CanvasGameProvider {
       
       const snapshotNode = new TreeSnapshotNode();
       snapshotNode.value = node.value;
+      snapshotNode.isBlack = node.isBlack;
+      snapshotNode.gameData.color = node.isBlack ? 0 : 255;
+      snapshotNode.gameData.opacity = 0;
       snapshotNode.gameData.generateHeight = height;
       snapshotNode.gameData.generateAllHeight = allHeight;
 
@@ -103,14 +113,14 @@ export class RedBlackTreeGame extends CanvasGameProvider {
         //按左右生成坐标
         const selfPos = node.parent?.checkIsChild(node) || 0;
         if (selfPos === -1)
-          snapshotNode.gameData.generatePosition.x = parent.gameData.generatePosition.x - widthNow;
+          snapshotNode.gameData.generatePositionX = parent.gameData.generatePositionX - widthNow;
         else if (selfPos === 1)
-          snapshotNode.gameData.generatePosition.x = parent.gameData.generatePosition.x + widthNow;
-        snapshotNode.gameData.generatePosition.y = parent.gameData.generatePosition.y + (1 / allHeight);
+          snapshotNode.gameData.generatePositionX = parent.gameData.generatePositionX + widthNow;
+        snapshotNode.gameData.generatePositionY = parent.gameData.generatePositionY + (1 / allHeight);
       } else {
         //根节点
-        snapshotNode.gameData.generatePosition.x = 0;
-        snapshotNode.gameData.generatePosition.y = 0;
+        snapshotNode.gameData.generatePositionX = 0;
+        snapshotNode.gameData.generatePositionY = 0;
       }
 
       //递归生成子级
@@ -139,56 +149,75 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 
   //渲染树
   private renderTreeMap() {
+    if (this.treeSnapshotCurrent) {
+      this.renderTreeNode(this.treeSnapshotCurrent.root, null);
+    }
+  }
+  private renderTreeNode(node : TreeSnapshotNode|null, parentPos: {x: number, y: number }|null) {
     const ctx = this.ctx as CanvasRenderingContext2D ;
     const w2 = this.width / 2;
     const h2 = this.height / 2;
-
-    const renderNode = (node : TreeSnapshotNode|null, parentPos: {x: number, y: number }|null) => {
-      if (node) {
-        const nodeRealpos = {
-          x: w2 + w2 * node.gameData.generatePosition.x,
-          y: h2 / 2 + h2 * node.gameData.generatePosition.y,
-        }
-
-        if (parentPos) {
-          ctx.beginPath();
-          ctx.moveTo(parentPos.x, parentPos.y);
-          ctx.lineTo(nodeRealpos.x, nodeRealpos.y);
-          ctx.stroke();
-        }
-        
-        if (node.left)
-          renderNode(node.left, nodeRealpos);
-        if (node.right)
-          renderNode(node.right, nodeRealpos);
-
-        if (node.isBlack) 
-          ctx.fillStyle = '#000'
-        else
-          ctx.fillStyle = '#f00'
-
-        ctx.beginPath();        //开始绘制新路径 
-        ctx.arc(nodeRealpos.x, nodeRealpos.y, 10, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        
-        ctx.fillStyle = '#fff'
-        ctx.fillText(node.value.toString(), nodeRealpos.x, nodeRealpos.y + 4, 10);
-
+    if (node) {
+      const nodeRealpos = {
+        x: w2 + w2 * node.gameData.generatePositionX,
+        y: h2 / 2 + h2 * node.gameData.generatePositionY,
       }
-    }; 
 
-    renderNode(this.treeSnapshotCurrent, null);
+      if (parentPos) {
+        ctx.beginPath();
+        ctx.moveTo(parentPos.x, parentPos.y);
+        ctx.lineTo(nodeRealpos.x, nodeRealpos.y);
+        ctx.stroke();
+      }
+      
+      if (node.left)
+        this.renderTreeNode(node.left, nodeRealpos);
+      if (node.right)
+        this.renderTreeNode(node.right, nodeRealpos);
+
+      ctx.fillStyle = `rgb(${node.gameData.color},0,0)`;
+
+      ctx.beginPath();        //开始绘制新路径 
+      ctx.arc(nodeRealpos.x, nodeRealpos.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      
+      ctx.fillStyle = '#fff'
+      ctx.fillText(node.value.toString(), nodeRealpos.x, nodeRealpos.y + 4, 10);
+
+    }
   }
 
   //对当前与下一个快照做比对，以得出修改过的节点
   private diffTreeSnapshot(current: TreeSnapshot, next: TreeSnapshot) {
+
+    const addToChangedList = (node : TreeSnapshotNode) => {
+      node.next = current.changedNodes;
+      current.changedNodes = node;
+    };
+
     const loopNode = (node : TreeSnapshotNode) => {
       const nextNode = this.findTreeSnapshot(next.root, node.value);
       if (nextNode) {
-        node.gameData.action = 'transition';
+        let changed = false;
         if (node.isBlack !== nextNode.isBlack) {
-          
+          node.gameData.targetColor = nextNode.isBlack ? 0 : 255;
+          changed = true;
+        }
+        if (node.gameData.generatePositionX !== nextNode.gameData.generatePositionX) {
+          node.gameData.targetPositionX = nextNode.gameData.generatePositionX;
+          changed = true;
+        }
+        if (node.gameData.generatePositionY !== nextNode.gameData.generatePositionY) {
+          node.gameData.targetPositionY = nextNode.gameData.generatePositionY;
+          changed = true;
+        }
+
+        if (changed) {
+          node.gameData.action = 'transition';
+          addToChangedList(node);
+        } else {
+          node.gameData.action = 'none';
         }
 
       } else {
@@ -196,9 +225,12 @@ export class RedBlackTreeGame extends CanvasGameProvider {
         node.gameData.action = 'removing';
       }
 
+      if (node.left) loopNode(node.left);
+      if (node.right) loopNode(node.right);
     }
-    if (this.treeSnapshotCurrent && this.treeSnapshotCurrent)
-      loopNode(this.treeSnapshotCurrent);
+
+    //循环一次当前快照，得出已经变换位置或者颜色的节点、将要移除的节点
+    loopNode(current.root);
   }
   //查找快照树指定节点
   private findTreeSnapshot(root: TreeSnapshotNode, value : number) {
@@ -218,15 +250,73 @@ export class RedBlackTreeGame extends CanvasGameProvider {
   }
   //执行树的动画
   private updateTreeAction(deltatime : number) {
-
-
-    const loopNode = (node : TreeSnapshotNode) => {
-      const nextNode = this.findTreeSnapshot(node, );
-
-
+    const FADE_TRANS_TIME = 1;
+    const MOVE_TRANS_SPEED = 1;
+    const COLOR_TRANS_SPEED = 255;
+    if (this.treeSnapshotCurrent && this.treeSnapshotCurrent) {
+      let node = this.treeSnapshotCurrent.changedNodes;
+      while (node) {
+        const gameData = node.gameData;
+        switch (gameData.action) {
+          case 'adding': {
+            if (gameData.opacity < 1)
+              gameData.opacity += deltatime * FADE_TRANS_TIME;
+            break;
+          }
+          case 'removing': {
+            if (gameData.opacity > 0)
+              gameData.opacity -= deltatime * FADE_TRANS_TIME;
+            break;
+          }
+          case 'transition': { 
+            if (gameData.targetColor !== null) {
+              if (gameData.color < gameData.targetColor) {
+                gameData.color += Math.floor(deltatime * COLOR_TRANS_SPEED);
+              } else if (gameData.color > gameData.targetColor) {
+                gameData.color -= Math.floor(deltatime * COLOR_TRANS_SPEED);
+              } 
+            }
+            
+            if (gameData.targetPositionX !== null) {
+              if (gameData.generatePositionX < gameData.targetPositionX) {
+                gameData.generatePositionX = Math.min(gameData.targetPositionX, gameData.generatePositionX + deltatime * MOVE_TRANS_SPEED);
+              } else if (gameData.generatePositionX > gameData.targetPositionX) {
+                gameData.generatePositionX = Math.max(gameData.targetPositionX, gameData.generatePositionX - deltatime * MOVE_TRANS_SPEED);
+              } else {
+                gameData.targetPositionX = null;
+              }
+            }
+            
+            if (gameData.targetPositionY !== null) {
+              if (gameData.generatePositionY < gameData.targetPositionY) {
+                gameData.generatePositionY = Math.min(gameData.targetPositionY, gameData.generatePositionY + deltatime * MOVE_TRANS_SPEED);
+              } else if (gameData.generatePositionY > gameData.targetPositionY) {
+                gameData.generatePositionY = Math.max(gameData.targetPositionY, gameData.generatePositionY - deltatime * MOVE_TRANS_SPEED);
+              } else {
+                gameData.targetPositionY = null;
+              }
+            }
+            break;
+          }
+        }
+        node = node.next;
+      }
     }
-    if (this.treeSnapshotCurrent && this.treeSnapshotCurrent)
-      loopNode(this.treeSnapshotCurrent);
+  }
+  //执行快照切换
+  private runSnapShot(deltatime : number) {
+    if (this.treeSnapshots.length > 1) {
+      if (this.treeSnapshotCurrent) {
+        this.treeSnapshotCurrent.timeLive -= deltatime;
+        if (this.treeSnapshotCurrent.timeLive <= 0) {
+          this.treeSnapshots.shift();
+          this.treeSnapshotCurrent = this.treeSnapshots[0];
+        }
+      } else {
+        this.treeSnapshots.shift()
+        this.treeSnapshotCurrent = this.treeSnapshots[0];
+      }
+    }
   }
 
   //基础控制函数
@@ -249,6 +339,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
   public render(deltatime : number) : void {
     this.renderTreeMap();
     this.updateTreeAction(deltatime);
+    this.runSnapShot(deltatime);
   }
   public start() : void {
     console.log('[RedBlackTreeGame] start');
@@ -263,32 +354,38 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 }
 
 export class TreeSnapshot {
-  public constructor(root : TreeSnapshotNode) {
+  public constructor(root : TreeSnapshotNode, timeLive = 2) {
     this.root = root;
+    this.timeLive = timeLive;
   }
 
   public root : TreeSnapshotNode;
+  public timeLive : number;
   public changedNodes : TreeSnapshotNode|null = null;
 }
 export class TreeSnapshotNode {
   public gameData = new RedBlackTreeGameNodeData();
-  public left : TreeSnapshotNode|null = null;
-  public right : TreeSnapshotNode|null = null;
-  public next : TreeSnapshotNode|null = null;
   public value = 0;
   public isBlack = false;
+
+  public left : TreeSnapshotNode|null = null;
+  public right : TreeSnapshotNode|null = null;
+
+  public prev : TreeSnapshotNode|null = null;
+  public next : TreeSnapshotNode|null = null;
 }
 export class RedBlackTreeGameNodeData {
-  generatePosition = { x: 0, y: 0 };
+  generatePositionX = 0;
+  generatePositionY = 0;
   generateAllHeight = 0;
   generateHeight = 0;
 
-  action = 'none' as 'none'|'transition'|'removing'|'adding';
+  action = 'adding' as 'none'|'transition'|'removing'|'adding';
   opacity = 1;
   color = 1;
 
-  targetPosition = { x: 0, y: 0 };
-  targetOpacity = 1;
-  targetColor = 0;
+  targetPositionX = null as null|number;
+  targetPositionY = null as null|number;
+  targetColor = null as null|number;
 }
 
