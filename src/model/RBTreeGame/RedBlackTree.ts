@@ -1,5 +1,3 @@
-import { RedBlackTreeGameNodeData } from "./RedBlackTreeGame";
-
 /**
  * 红黑树
  */
@@ -410,10 +408,6 @@ export class RedBlackTreeNode {
    * 数值
    */
   public value = 0;
-  /**
-   * 图表中渲染所需数据
-   */
-  public gameData = new RedBlackTreeGameNodeData();
 
   /**
    * 检查某个节点是不是当前节点的子级，是左子则返回-1，右子返回1，非子返回0.
