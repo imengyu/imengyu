@@ -49,7 +49,7 @@ export class RedBlackTree {
       right.setLeftChild(node);
       node.setRightChild(rightLeft)
     } else {
-      console.log('node ', node.value , ' has no right child, can\'t rotateLeft');
+      throw new Error('node ' + node.value + ' has no right child, can\'t rotateLeft');
     }
   }
   /**
@@ -76,7 +76,7 @@ export class RedBlackTree {
       left.setRightChild(node);
       node.setLeftChild(leftRight);
     } else {
-      console.log('node ', node.value , ' has no left child, can\'t rotateRight');
+      throw new Error('node ' + node.value + ' has no left child, can\'t rotateRight');
     }
   }
   /**
@@ -291,8 +291,10 @@ export class RedBlackTree {
     }
     const doBalanceNode = (node: RedBlackTreeNode) => {
       //情形1 当前节点为根节点（父节点为NULL）
-      if (node === this.root)
+      if (node === this.root) {
+        this.root = null;
         return;
+      }
       
       const parent = node.parent as RedBlackTreeNode;
       const brother = (parent.isLeft(node) ? parent.right : parent.left) as RedBlackTreeNode;

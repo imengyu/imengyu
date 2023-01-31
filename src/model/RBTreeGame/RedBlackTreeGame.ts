@@ -194,21 +194,8 @@ export class RedBlackTreeGame extends CanvasGameProvider {
     this.ctx.font = '13px Arail';
     this.canvas = canvas;
     this.genData();
-    this.pushData(39);
-    this.pushData(11);
-    this.pushData(56);
-    this.pushData(4);
-    this.pushData(23);
-    this.pushData(41);
-    this.pushData(61);
-    this.pushData(6);
-    this.pushData(40);
-    this.pushData(44);
-    this.pushData(60);
-    this.pushData(76);
-    this.pushData(57);
-    this.deleteData(23);
-
+    for (let i = 0; i < 16; i++)
+      this.pushData();
     this.getDebugNextData();
     this.generateTreeMapData();
   }
