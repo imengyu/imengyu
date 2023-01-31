@@ -43,7 +43,7 @@ export class RedBlackTree {
           parent.setRightChild(right);
       } else {
         this.root = right;
-        right.clearParent();
+        right.removeParentLink();
       }
 
       right.setLeftChild(node);
@@ -70,7 +70,7 @@ export class RedBlackTree {
           parent.setRightChild(left);
       } else {
         this.root = left;
-        left.clearParent();
+        left.removeParentLink();
       }
       
       left.setRightChild(node);
@@ -78,6 +78,16 @@ export class RedBlackTree {
     } else {
       console.log('node ', node.value , ' has no left child, can\'t rotateRight');
     }
+  }
+  /**
+   * 交换两个节点数据
+   * @param node1 
+   * @param node2 
+   */
+  exchangeNode(node1: RedBlackTreeNode, node2: RedBlackTreeNode) {
+    const v1 = node1.value;
+    node1.value = node2.value;
+    node2.value = v1;
   }
 
   /**
@@ -217,24 +227,51 @@ export class RedBlackTree {
    * @param val 
    */
   public delete(val: number) : void {
-    //
-    const deleteNode = this.findNode(val);
-    if (deleteNode) {
-
-      //情景1：若删除结点无子结点，直接删除
+    const doDeleteNode = (deleteNode: RedBlackTreeNode) => {
+      const parent = deleteNode.parent;
+      //情景1：若删除结点无子结点
       if (deleteNode.left === null && deleteNode.right === null) {
-        deleteNode.clearParent();
+        if (deleteNode.isBlack) {
+          //删除节点如果为黑色，则需要进行删除平衡的操作
+
+        } else {
+          //删除节点如果为红色，直接删除即可，不会影响黑色节点的数量；
+          deleteNode.removeParentLink();
+        }
       } 
-      //情景2：若删除结点只有一个子结点，用子结点替换删除结点
-      else if (deleteNode.left === null && deleteNode.right !== null) {
-        
+      //情景2：删除结点只有一个子节点时，删除节点只能是黑色，其子节点为红色，
+      //否则无法满足红黑树的性质了。 此时用删除节点的子节点接到父节点，且将子节点颜色涂黑，保证黑色数量。
+      else if (
+        (deleteNode.left === null && deleteNode.right !== null)
+        || (deleteNode.left !== null && deleteNode.right === null)
+      ) {
+        const childNode = deleteNode.left ? deleteNode.left : deleteNode.right as RedBlackTreeNode;
+        this.exchangeNode(deleteNode, childNode);
+        doDeleteNode(childNode);
       }
-      else if (deleteNode.left !== null && deleteNode.right === null) {
-        
+      //情景3：有两个子节点时，与二叉搜索树一样，使用后继节点作为替换的
+      //删除节点，情形转至为1或2处理。
+      else if (deleteNode.left !== null && deleteNode.right !== null) {
+        //查找后继节点，这里寻找右后继节点
+        let currFind = deleteNode.right;
+        while(currFind) {
+          if (currFind.left)
+            currFind = currFind.left;
+          else 
+            break;
+        }
+
+        if (currFind) {
+
+        }
+
       }
     }
     
-    console.log('delete ' + val);
+    //查找删除节点
+    const node = this.findNode(val);
+    if (node)
+      doDeleteNode(node);
   }
 }
 
@@ -298,7 +335,7 @@ export class RedBlackTreeNode {
   /**
    * 清除父级节点连接
    */
-  public clearParent() {
+  public removeParentLink() {
     if (this.parent) {
       if (this.parent.isLeft(this))
         this.parent.left = null;
@@ -314,7 +351,7 @@ export class RedBlackTreeNode {
   public setLeftChild(left : RedBlackTreeNode|null) : void {
     console.assert(left != this, 'Left child can not be it self!');
 
-    left?.clearParent();
+    left?.removeParentLink();
     this.left = left;
     if (this.left)
       this.left.parent = this;
@@ -326,7 +363,7 @@ export class RedBlackTreeNode {
   public setRightChild(right : RedBlackTreeNode|null) : void {
     console.assert(right != this, 'Right child can not be it self!');
 
-    right?.clearParent();
+    right?.removeParentLink();
     this.right = right;
     if (this.right)
       this.right.parent = this;

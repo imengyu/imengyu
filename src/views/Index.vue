@@ -92,7 +92,8 @@
       <div v-if="currentGameAnim=='rbtree'" class="item">
         <span>模式</span>
         <div>
-          <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.debugPushData()">添加数据</div>
+          <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.debugPushData()">&gt; 添加数据</div>
+          <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.debugDeleteData()">&lt; 删除数据</div>
         </div>
       </div>
       <div v-if="currentGameAnim=='clock'" class="item">

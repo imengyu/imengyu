@@ -13,6 +13,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
   //树中不允许出现重复键值，因此采用数据池，随机取出数据
   private treeDataPool = [] as number[];
   private treeDataPoolSize = 64;//数据个数
+  private addedDataPool = [] as number[];
 
   //生成数据
   private genData() {
@@ -24,12 +25,27 @@ export class RedBlackTreeGame extends CanvasGameProvider {
   }
   private pushData() : void {
     const randIndex = MathUtils.randomNum(0, this.treeDataPool.length - 2);
-    this.tree.insert(this.treeDataPool[randIndex]);
+    const data = this.treeDataPool[randIndex];
+
+    this.tree.insert(data);
     this.treeDataPool.splice(randIndex, 1);
+    this.addedDataPool.push(data);
+  }
+  private deleteData() : void {
+    const randIndex = MathUtils.randomNum(0, this.addedDataPool.length - 2);
+    const data = this.addedDataPool[randIndex];
+
+    this.tree.delete(data);
+    this.treeDataPool.push(data);
+    this.addedDataPool.slice(randIndex, 1);
   }
 
   debugPushData() : void {
     this.pushData();
+    this.generateTreeMapData();
+  }
+  debugDeleteData() : void {
+    this.deleteData();
     this.generateTreeMapData();
   }
 
