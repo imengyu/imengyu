@@ -24,6 +24,9 @@ export class CanvasGameProvider extends EventEmitter {
     this.ctx = ctx;
     this.canvas = canvas;
   }
+  public canPlayWithMusic() : boolean {
+    return false;
+  }
   public destroy() : void {
     //Base function
   }

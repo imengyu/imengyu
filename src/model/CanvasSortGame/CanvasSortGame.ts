@@ -69,7 +69,9 @@ export class CanvasSortGame extends CanvasGameProvider {
       index += step;
     }
   }
-
+  public canPlayWithMusic() {
+    return true;
+  }
   public stop() : void {
     clearInterval(this.workInterval);
     this.workInterval = 0;

@@ -52,10 +52,15 @@
 
     <!--音乐控件-->
     <MusicGameControll ref="musicGameControll" :canvasGames="(gameProviders as CanvasGameProvider[])"
-      :currentCanvasGame="(gameProvider as CanvasGameProvider)" :playerVolume="setVolume"
-      :class="showAnimTools ? 'open' : ''" :open="showAnimTools" @switch-open="showAnimTools = !showAnimTools"
-      @update-volume="(v) => setVolume = v" @show-settings="showSetting = true"
-      @on-go-spectrum-mode="onAnimSwitchSpectrum(true)" @on-quit-spectrum-mode="onAnimSwitchSpectrum(false)">
+      :currentCanvasGame="(gameProvider as CanvasGameProvider)"
+      :playerVolume="setVolume"
+      :class="showAnimTools ? 'open' : ''"
+      :open="showAnimTools" @switch-open="showAnimTools = !showAnimTools"
+      @update-volume="(v) => setVolume = v"
+      @show-settings="showSetting = true"
+      @on-go-spectrum-mode="onAnimSwitchSpectrum(true)"
+      @on-quit-spectrum-mode="onAnimSwitchSpectrum(false)"
+    >
       <div class="item">
         <span>动画</span>
         <div class="imengyu-go-button mt-0" @click="setEnableAnim = !setEnableAnim; onSetEnableAnimChanged()"
@@ -91,17 +96,25 @@
       <div v-if="currentGameAnim == 'rbtree'" class="item">
         <span>模式</span>
         <div>
-          <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.debugPushData()">&gt; 添加数据 {{
-            debugNextAddData
-          }}</div>
-          <div class="imengyu-go-button mt-0">
-            <span @click="rbTreeGameProvider.debugDeleteData(debugNextDelData)">&lt; 删除数据</span>
-            <input v-model="debugNextDelData" />
+          <div class="flex-row mt-2">
+            <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.switchAutoEnabled()">{{ rbTreeGameData.switchAutoEnabled ? '▶ 当前自动' : '■ 当前手动' }}</div>
           </div>
-          <div class="flex-row">
+          <div v-if="false" class="imengyu-go-button mt-2">
+            <span @click="rbTreeGameProvider.debugPushData(rbTreeGameData.debugNextAddData)">+ 添加数据</span>
+            <input v-model="rbTreeGameData.debugNextAddData" />
+          </div>
+          <div v-if="false" class="imengyu-go-button mt-2">
+            <span @click="rbTreeGameProvider.debugDeleteData(rbTreeGameData.debugNextDelData)">&lt; 删除数据</span>
+            <input v-model="rbTreeGameData.debugNextDelData" />
+          </div>
+          <div v-if="!rbTreeGameData.switchAutoEnabled" class="flex-row mt-2">
             <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.prevSnapShot()">&lt;</div>
-            <div class="imengyu-icon-sort-text small">{{ snapshotIndex }}/{{ treeSnapshots }}</div>
-            <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.nextSnapShot()">下一帧 &gt;</div>
+            <div class="imengyu-icon-sort-text small">{{ rbTreeGameData.snapshotIndex }}/{{ rbTreeGameData.treeSnapshots }}</div>
+            <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.nextSnapShot()">{{ rbTreeGameData.snapshotIndex === rbTreeGameData.treeSnapshots ? '新循环' : '下一帧'}} &gt;</div>
+          </div>
+          <div v-else class="flex-row mt-2">
+            <div class="imengyu-go-button mt-0">当前帧</div>
+            <div class="imengyu-icon-sort-text small">{{ rbTreeGameData.snapshotIndex }}/{{ rbTreeGameData.treeSnapshots }}</div>
           </div>
         </div>
       </div>
@@ -205,11 +218,15 @@ export default defineComponent({
       rbTreeGameCanvasAnimHost: null as ICanvasAnimHost | null,
       clockGameCanvasAnimHost: null as ICanvasAnimHost | null,
 
-      debugNextDelData: 0,
-      debugNextAddData: 0,
       introInterval: 0,
-      snapshotIndex: 0,
-      treeSnapshots: 0,
+
+      rbTreeGameData: {
+        debugNextDelData: 0,
+        debugNextAddData: 0,
+        snapshotIndex: 0,
+        treeSnapshots: 0,
+        switchAutoEnabled: true,
+      },
     }
   },
   methods: {
@@ -315,12 +332,15 @@ export default defineComponent({
         this.clockGameProvider
       ];
       this.rbTreeGameProvider.on('debugNextDataChanged', (a: number, b: number) => {
-        this.debugNextAddData = a;
-        this.debugNextDelData = b;
+        this.rbTreeGameData.debugNextAddData = a;
+        this.rbTreeGameData.debugNextDelData = b;
       });
       this.rbTreeGameProvider.on('snapshotIndexChange', (a: number, b: number) => {
-        this.snapshotIndex = a;
-        this.treeSnapshots = b;
+        this.rbTreeGameData.snapshotIndex = a;
+        this.rbTreeGameData.treeSnapshots = b;
+      });
+      this.rbTreeGameProvider.on('autoSwitchChange', (a: boolean) => {
+        this.rbTreeGameData.switchAutoEnabled = a;
       });
       
       if (this.setEnableAnim)

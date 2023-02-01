@@ -438,6 +438,9 @@ export class BlackHoleGame extends CanvasGameProvider {
   modeInt = 0;
   modeChangeCallback : BlackholeWorkModeChangeCallbackFunction|null  = null;
   
+  public canPlayWithMusic() {
+    return true;
+  }
   public setBlackholeWorkModeChangeCallback(callback: BlackholeWorkModeChangeCallbackFunction) : void {
     this.modeChangeCallback = callback;
   }

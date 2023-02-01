@@ -68,7 +68,8 @@ export class RedBlackTreeGame extends CanvasGameProvider {
     this.addedDataPool.slice(dataIndex, 1);
   }
 
-  debugPushData() : void {
+  debugPushData(value: string|number) : void {
+    this.debugNextDelData = typeof value === 'string' ? parseInt(value) : value;
     this.pushData(this.debugNextAddData);
     this.getDebugNextData();
   }
@@ -159,6 +160,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
         genNode(height, height, 0.6, root, null),
         type,
         mark,
+        type === 'finish' ? 3 : 2,
       );
 
       //循环添加所有的节点至链表中
@@ -238,7 +240,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 
       ctx.lineWidth = 2;
       ctx.font = '13px Arail';
-      ctx.fillStyle = `rgb(${node.gameData.color},0,0)`;
+      ctx.fillStyle = nodeMarkCur === 4 ? '#aaa' : `rgb(${node.gameData.color},0,0)`;
       ctx.strokeStyle = '#000';
       ctx.beginPath();
       ctx.arc(nodeRealpos.x, nodeRealpos.y, 10, 0, Math.PI * 2);
@@ -297,6 +299,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 
   //对当前与下一个快照做比对，以得出修改过的节点
   private diffTreeSnapshot(prev: TreeSnapshot, current: TreeSnapshot, next: TreeSnapshot|null) {
+    current.changedNodes = null;
     //循环一次当前快照，得出已经变换位置或者颜色的节点、将要移除的节点
     let currNode : TreeSnapshotNode|null = current.allNodes;
     while(currNode) {
@@ -327,8 +330,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
           if (!nextNode) {
             //下一帧没有，则表示当前节点正在被移除
             currNode.gameData.action = 'removing';
-            currNode.gameData.opacity = 0;
-            current.addToChangedNodesLinkedList(currNode);
+            currNode.gameData.opacity = 1;
           } else {
             currNode.gameData.action = 'none';
             currNode.gameData.opacity = 1;
@@ -357,8 +359,8 @@ export class RedBlackTreeGame extends CanvasGameProvider {
   }
   //执行树的动画
   private updateTreeAction(deltatime : number) {
-    const FADE_TRANS_TIME = 1;
-    const MOVE_TRANS_SPEED = 1;
+    const FADE_TRANS_TIME = 2;
+    const MOVE_TRANS_SPEED = this.treeSnapshotCurrent?.type === 'rotate' ? 0.4 : 1;
     const COLOR_TRANS_SPEED = 255;
     if (this.treeSnapshotCurrent && this.treeSnapshotCurrent) {
       let node = this.treeSnapshotCurrent.changedNodes;
@@ -369,9 +371,6 @@ export class RedBlackTreeGame extends CanvasGameProvider {
           if (gameData.action === 'adding') {
             if (gameData.opacity < 1)
               gameData.opacity = Math.min(1, gameData.opacity + deltatime * FADE_TRANS_TIME);
-          } else if (gameData.action === 'removing') {
-            if (gameData.opacity > 0)
-              gameData.opacity = Math.max(0, gameData.opacity - deltatime * FADE_TRANS_TIME);
           }
 
           if (gameData.targetColor !== null) {
@@ -407,12 +406,12 @@ export class RedBlackTreeGame extends CanvasGameProvider {
     }
   }
 
-  public enableAutoRunSnapShot = false;
+  public enableAutoRunSnapShot = true;
   public snapshotIndex = 0;
 
   //执行快照切换
   private runSnapShot(deltatime : number) {
-    if (this.enableAutoRunSnapShot && this.snapshotIndex < this.treeSnapshots.length - 1) {
+    if (this.enableAutoRunSnapShot) {
       if (this.treeSnapshotCurrent) {
         this.treeSnapshotCurrent.timeLive -= deltatime;
         if (this.treeSnapshotCurrent.timeLive <= 0)
@@ -427,17 +426,22 @@ export class RedBlackTreeGame extends CanvasGameProvider {
     if (this.snapshotIndex < this.treeSnapshots.length - 1) {
       this.snapshotIndex++;
 
-      if (!this.treeSnapshots[this.snapshotIndex].isDiffPatched) {
+      //if (!this.treeSnapshots[this.snapshotIndex].isDiffPatched) {
         //与上一个快照帧做比较
         this.diffTreeSnapshot(
           this.treeSnapshots[this.snapshotIndex - 1],
           this.treeSnapshots[this.snapshotIndex],
           this.treeSnapshots[this.snapshotIndex + 1] || null,
         );
-      }
+      //}
 
       this.treeSnapshotCurrent = this.treeSnapshots[this.snapshotIndex];
       this.emitSnapshotIndexChange();
+    } else {
+      //触达末尾，进入下一轮循环
+      this.snapshotIndex = 0;
+      this.treeSnapshots.splice(1, this.treeSnapshots.length - 2);
+      this.genDataPage();
     }
   }
   //上一帧
@@ -451,17 +455,27 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 
   //生成一次循环帧数据
   public genDataPage() {
-    this.pushData(2);
-    this.pushData(1);
-    this.pushData(3);
-    this.deleteData(1);
-    this.deleteData(2);
-    //for (let i = 0; i < 16; i++) 
-    //  Math.random() > 0.7 ? this.pushData() : this.deleteData();
+    if (this.addedDataPool.length === 0) {
+      for (let i = 0; i < 10; i++) 
+        this.pushData();
+      for (let i = 0; i < 16; i++) 
+        Math.random() > 0.7 ? this.pushData() : this.deleteData();
+    } else {
+      for (let i = 0; i < 16; i++) 
+        Math.random() >= 0.5 ? this.pushData() : this.deleteData();
+    }
+  }
+
+  public switchAutoEnabled() {
+    this.enableAutoRunSnapShot = !this.enableAutoRunSnapShot;
+    this.emitAutoSwitchChange();
   }
 
   private emitSnapshotIndexChange() {
     this.emit('snapshotIndexChange', this.snapshotIndex, this.treeSnapshots.length - 1);
+  }
+  private emitAutoSwitchChange() {
+    this.emit('autoSwitchChange', this.enableAutoRunSnapShot);
   }
 
   //基础控制函数
