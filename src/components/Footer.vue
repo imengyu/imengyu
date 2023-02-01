@@ -1,6 +1,6 @@
 <template>
   <div class="imengyu-copyright">
-    <a href="javascript:;" @click="$emit('on-show-copyright')"><i class="iconfont icon-banquan"></i> 2022 快乐的梦鱼 版权所有</a> 
+    <a href="javascript:;" @click="$emit('on-show-copyright')"><i class="iconfont icon-banquan"></i> 2023 快乐的梦鱼 版权所有</a> 
     | <a href="http://beian.miit.gov.cn/" target="blank">{{BeianNumber}}</a>
   </div>
 </template>

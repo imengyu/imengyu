@@ -8,10 +8,10 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 
   constructor() {
     super();
-    this.tree.on('genSnapshot', (type: string, mark: string) => {
-      this.generateNewTreeSnapshot(type, mark);
+    this.tree.on('genSnapshot', (type: string, mark: string, step: string) => {
+      this.generateNewTreeSnapshot(type, mark, step);
     });
-    this.treeSnapshots.push(new TreeSnapshot(null, 'first', 'Empty State'));
+    this.treeSnapshots.push(new TreeSnapshot(null, 'first', 'Empty State', ''));
   }
 
   private width = 0;
@@ -87,7 +87,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
   private treeSnapshotCurrent = null as TreeSnapshot|null;
 
   //生成快照
-  private generateNewTreeSnapshot(type: string, mark: string) {
+  private generateNewTreeSnapshot(type: string, mark: string, step: string) {
     const getTreeHeight = (node : RedBlackTreeNode|null) => {
       if (node) {
         const height = 1;
@@ -160,6 +160,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
         genNode(height, height, 0.6, root, null),
         type,
         mark,
+        step,
         type === 'finish' ? 3 : 2,
       );
 
@@ -205,7 +206,8 @@ export class RedBlackTreeGame extends CanvasGameProvider {
         this.ctx.globalAlpha = 1;
         this.ctx.fillStyle = '#333'
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(this.treeSnapshotCurrent.mark, this.width / 2,60);
+        this.ctx.fillText(this.treeSnapshotCurrent.step, this.width / 2, 100);
+        this.ctx.fillText(this.treeSnapshotCurrent.mark, this.width / 2, 140);
       }
     }
   }
@@ -448,7 +450,10 @@ export class RedBlackTreeGame extends CanvasGameProvider {
   public prevSnapShot() {
     if (this.snapshotIndex > 0) {
       this.snapshotIndex--;
+      if (this.treeSnapshotCurrent)
+        this.treeSnapshotCurrent.timeLive = 2;
       this.treeSnapshotCurrent = this.treeSnapshots[this.snapshotIndex];
+      this.treeSnapshotCurrent.timeLive = 2;
       this.emitSnapshotIndexChange();
     }
   }
@@ -460,8 +465,14 @@ export class RedBlackTreeGame extends CanvasGameProvider {
         this.pushData();
       for (let i = 0; i < 16; i++) 
         Math.random() > 0.7 ? this.pushData() : this.deleteData();
+    } else if (this.addedDataPool.length > 30) {
+      for (let i = 0; i < 20; i++) 
+        Math.random() >= 0.9 ? this.pushData() : this.deleteData();
+    } else if (this.addedDataPool.length < 10) {
+      for (let i = 0; i < 20; i++) 
+        Math.random() >= 0.2 ? this.pushData() : this.deleteData();
     } else {
-      for (let i = 0; i < 16; i++) 
+      for (let i = 0; i < 20; i++) 
         Math.random() >= 0.5 ? this.pushData() : this.deleteData();
     }
   }
@@ -513,13 +524,15 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 }
 
 export class TreeSnapshot {
-  public constructor(root : TreeSnapshotNode|null, type: string, mark: string, timeLive = 2) {
+  public constructor(root : TreeSnapshotNode|null, type: string, mark: string, step: string, timeLive = 2) {
     this.root = root;
     this.type = type;
     this.mark = mark;
+    this.step = step;
     this.timeLive = timeLive;
   }
   public type: string;
+  public step: string;
   public mark: string;
   public root : TreeSnapshotNode|null;
   public timeLive : number;

@@ -39,6 +39,10 @@ input, textarea, select, button {
 }
 .imengyu-canvas {
   background-color: #e7e7e7;
+
+  &.blur {
+    filter: blur(1px);
+  }
 }
 .imengyu-main-host {
 
@@ -77,6 +81,15 @@ input, textarea, select, button {
 
   &.big {
     padding: 6px 12px;
+  }
+
+  &.light {
+    color: #333;
+    background-color: transparent;
+
+    &:hover {
+      background-color: transparent;
+    }
   }
 
   i {
@@ -127,7 +140,7 @@ input, textarea, select, button {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: $page-bottom + 150px;
+  bottom: $page-bottom + 140px;
   top: 0px;
   display: flex;
   justify-content: center;
@@ -135,6 +148,13 @@ input, textarea, select, button {
   
   z-index: 0;
   flex-direction: column;
+
+  &.light-mask {
+    background-color: rgba(231, 231, 231, 0.7);
+  }  
+  &.dark-mask {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
 
   h1 {
     margin: 10px 0 15px 0;
@@ -173,16 +193,15 @@ input, textarea, select, button {
 }
 
 .imengyu-intro-box {
-  padding: $page-padding-lg;
+  //padding: $page-padding-lg;
   text-align: center;
-  //background-color: rgba(255, 255, 255, 0.55);
   //box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.03);
   width: 600px;
 
   h1 {
     position: relative;
     font-size: 50px;
-    padding-bottom: 40px;
+    padding-bottom: 30px;
 
     &::after {
       display: inline-block;
@@ -220,7 +239,7 @@ input, textarea, select, button {
   }
 
   .imengyu-go-button {
-    margin-top: 50px;
+    margin-top: 30px;
   }
 }
 

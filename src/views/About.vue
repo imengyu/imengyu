@@ -96,7 +96,7 @@
           <br><br>
 
           <div :class="'imengyu-hidden-area float '+(showHiddenAbout?'show':'')">
-            <code class="mb-3 display-inline-block">21/170/50/0</code><br>
+            <code class="mb-3 display-inline-block">23/170/50/0</code><br>
             找男朋友中，不颜控，真心的合得来就好，不是非常喜欢10。<br>
             是小m，喜欢蛮多东西，但不乱，是一个很正经的男孩子，<br>
             希望和未来的男朋友能有共同爱好，能一起玩就太好啦(/▽＼)<br>
@@ -116,8 +116,8 @@
         <div class="imengyu-content-sub-title">
           LEARNING MORE
           <span>
-            学习永无止境<br>
-            努力学习提升自己中
+            学习路线·学习永无止境<br>
+            努力提升自己中<br>
           </span>
         </div>      
 

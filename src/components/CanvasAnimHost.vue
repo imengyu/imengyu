@@ -1,6 +1,6 @@
 <template>
   <transition enter-active-class="fadeIn" leave-active-class="fadeOut">
-    <canvas v-show="playing" class="imengyu-canvas animated" ref="canvas"></canvas>
+    <canvas v-show="playing" :class="['imengyu-canvas','animated', (blur ? 'blur' : '')]" ref="canvas"></canvas>
   </transition>
 </template>
 
@@ -20,6 +20,10 @@ export default defineComponent({
     gameProvider: {
       type: Object as PropType<CanvasGameProvider>,
       default: null,
+    },
+    blur: {
+      type: Boolean,
+      default: false,
     },
     create2DCtx: {
       type: Boolean,

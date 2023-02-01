@@ -3,21 +3,44 @@
     :class="'imengyu-main ' + ((setEnableAnim && (currentGameAnim != 'sort' && currentGameAnim != 'rbtree')) ? 'dark' : '')">
 
     <!--Canvas-->
-    <CanvasAnimHost v-show="gameProvider == rbTreeGameProvider" ref="rbTreeGameCanvasAnimHost"
-      :gameProvider="(rbTreeGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
-    <CanvasAnimHost v-show="setEnableAnim && gameProvider == sortGameProvider" ref="sortGameCanvasAnimHost"
-      :gameProvider="(sortGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
-    <CanvasAnimHost v-show="setEnableAnim && gameProvider==blackholeGameProvider" ref="blackholeGameCanvasAnimHost" :gameProvider="(blackholeGameProvider as unknown as CanvasGameProvider)" :create2DCtx="false"></CanvasAnimHost>
-    <CanvasAnimHost v-show="setEnableAnim && gameProvider == clockGameProvider" ref="clockGameCanvasAnimHost"
-      :gameProvider="(clockGameProvider as unknown as CanvasGameProvider)"></CanvasAnimHost>
+    <CanvasAnimHost
+      v-show="setEnableAnim && gameProvider == rbTreeGameProvider" 
+      ref="rbTreeGameCanvasAnimHost"
+      :blur="showIntro || $route.name !== 'Index'"
+      :gameProvider="(rbTreeGameProvider as unknown as CanvasGameProvider)"
+    />
+    <CanvasAnimHost
+      v-show="setEnableAnim && gameProvider == sortGameProvider"
+      ref="sortGameCanvasAnimHost"
+      :gameProvider="(sortGameProvider as unknown as CanvasGameProvider)"
+    />
+    <CanvasAnimHost
+      v-show="setEnableAnim && gameProvider == blackholeGameProvider"
+      ref="blackholeGameCanvasAnimHost"
+      :gameProvider="(blackholeGameProvider as unknown as CanvasGameProvider)"
+      :create2DCtx="false"
+    />
+    <CanvasAnimHost
+      v-show="setEnableAnim && gameProvider == clockGameProvider"
+      ref="clockGameCanvasAnimHost"
+      :gameProvider="(clockGameProvider as unknown as CanvasGameProvider)"
+    />
 
     <!--Intro-->
-    <div class="imengyu-intro animated fadeInRight" v-show="showIntro && (currentGameAnim == 'sort' || !setEnableAnim)">
-      <div class="imengyu-intro-box animated position-relative overflow-hidden">
+    <div
+      :class="[
+        'imengyu-intro','animated','fadeInRight',
+        (currentGameAnim == 'rbtree' ? 'light-mask': '')
+      ]" 
+      v-show="showIntro"
+    >
+      <div :class="[
+        'imengyu-intro-box','animated','position-relative','overflow-hidden',
+      ]">
 
         <h1>你好，我是快乐的梦鱼</h1>
         <i class="text animated fadeInLeft">是一只小程序员 前端开发/UI设计</i>
-        <i class="text animated fadeInLeft">很开心你来访问 ヾ(•ω•`)o</i>
+        <i class="text animated fadeInLeft">欢迎你来访问 ヾ(•ω•`)o</i>
 
         <div class="imengyu-go-button big animated fadeInLeft" @click="onGo">
           更多关于我
@@ -25,6 +48,10 @@
         </div>
 
       </div>
+
+      <button class="imengyu-go-button light animated fadeInLeft mr-2" @click="showIntro=false;showAnimTools=true;">
+        隐藏文字
+      </button>
     </div>
 
     <!--Main-->
@@ -81,6 +108,7 @@
           {{ canvasAnimHost.currentFpsShowVal }}
         </div>
       </div>
+
       <div v-if="currentGameAnim == 'blackhole'" class="item">
         <span>模式</span>
         <div>
@@ -93,11 +121,29 @@
           </div>
         </div>
       </div>
+      <div v-if="currentGameAnim == 'blackhole'" class="item full">
+        <div class="imengyu-icon-sort-info">
+          <div class="title">控制说明：</div>
+          <div>
+            这是一个黑洞粒子动画，我好无聊，为什么会写出这种东西呢。它有几个模式可选，你可以点击“更换”按扭更换动画运行模式。
+          </div>
+        </div>
+      </div>
+
       <div v-if="currentGameAnim == 'rbtree'" class="item">
         <span>模式</span>
         <div>
           <div class="flex-row mt-2">
-            <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.switchAutoEnabled()">{{ rbTreeGameData.switchAutoEnabled ? '▶ 当前自动' : '■ 当前手动' }}</div>
+            <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.switchAutoEnabled()">
+              <template v-if="rbTreeGameData.switchAutoEnabled">
+                <i class="iconfont icon-play mr-2">当前自动</i>
+                <span></span>
+              </template>
+              <template v-else>
+                <i class="iconfont icon-pause mr-2">当前手动</i>
+                <span></span>
+              </template>
+            </div>
           </div>
           <div v-if="false" class="imengyu-go-button mt-2">
             <span @click="rbTreeGameProvider.debugPushData(rbTreeGameData.debugNextAddData)">+ 添加数据</span>
@@ -118,11 +164,13 @@
           </div>
         </div>
       </div>
-      <div v-if="currentGameAnim == 'rbtree'" class="item">
-        <span></span>
+      <div v-if="currentGameAnim == 'rbtree'" class="item full">
         <div class="imengyu-icon-sort-info">
-          <div>控制说明：</div>
-          <div>你可通过上方的 “自动/手动” 按钮切换自动模式，手动模式下你可以一帧一帧前进/后退，你可以通过它仔细观察清楚红黑树每个操作节点的变化。</div>
+          <div class="title">控制说明：</div>
+          <div>
+            这是一个红黑树插入、删除的可视化动画。你可通过上方的 “自动/手动” 按钮切换自动模式，
+            手动模式下你可以一帧一帧前进/后退，你可以通过它仔细观察清楚红黑树每个操作节点的变化。
+          </div>
         </div>
       </div>
 
@@ -138,6 +186,15 @@
           </div>
         </div>
       </div>
+      <div v-if="currentGameAnim == 'clock'" class="item full">
+        <div class="imengyu-icon-sort-info">
+          <div class="title">控制说明：</div>
+          <div>
+            这是一个Canvas粒子数字时钟动画，通过粒子来显示数字。点击“更换”按扭切换可能的模式。
+          </div>
+        </div>
+      </div>
+
       <div v-if="currentGameAnim == 'sort' && sortGameProvider.currentSortMethod !== 'spectrum'" class="item">
         <span>排序方法</span>
         <div v-if="gameProvider" class="imengyu-icon-sort-text" title="点击更改当前动画排序方式">
@@ -154,15 +211,20 @@
       </div>
       <div v-if="currentGameAnim == 'sort'" class="item">
         <span></span>
-        <div class="imengyu-icon-sort-info">
-          <div>控制说明：</div>
-          <div>你可通过上方的 “排序方法” 选择框选择不同的排序动画。点击下方的“音乐”按钮可以选择一个本地音乐播放，让数据图表跟着音乐跳动。</div>
-        </div>
         <div v-show="sortGameProvider.currentSortMethod != 'spectrum' && sortGameProvider.currentSortMethod != ''"
           class="imengyu-icon-sort-info">
           <div>Data count: {{ sortGameProvider.dataCount }}</div>
           <div>Array access: {{ sortGameProvider.sortAccessCount }}</div>
           <div>Array swap: {{ sortGameProvider.sortSwapCount }}</div>
+        </div>
+      </div>
+      <div v-if="currentGameAnim == 'sort'" class="item full">
+        <div class="imengyu-icon-sort-info">
+          <div class="title">控制说明：</div>
+          <div>
+            这是一个排序的可视化动画。你可通过上方的 “排序方法” 选择框选择不同的排序动画。
+            点击下方的“音乐”按钮可以选择一个本地音乐播放，让数据图表跟着音乐跳动。
+          </div>
         </div>
       </div>
     </MusicGameControll>
@@ -187,6 +249,7 @@ import { CanvasGameProvider } from '../model/CanvasGameProvider'
 import { emitter } from '@/main'
 import Const from '@/const/Const'
 import { RedBlackTreeGame } from '@/model/RBTreeGame/RedBlackTreeGame'
+import MathUtils from '@/utils/MathUtils'
 
 export default defineComponent({
   name: 'Index',
@@ -246,7 +309,7 @@ export default defineComponent({
       this.currentGameAnim = (this.$refs.selectGame as HTMLSelectElement).value;
       switch (this.currentGameAnim) {
         case 'sort': this.gameProvider = this.sortGameProvider; break;
-        //case 'blackhole': this.gameProvider = this.blackholeGameProvider; break;
+        case 'blackhole': this.gameProvider = this.blackholeGameProvider; break;
         case 'rbtree': this.gameProvider = this.rbTreeGameProvider; break;
         case 'clock': this.gameProvider = this.clockGameProvider as ClockGame; break;
       }
@@ -330,19 +393,23 @@ export default defineComponent({
 
     document.title = Const.SiteName;
 
-    this.currentGameAnim = 'rbtree';
+    //随机选择一个动画
+    const currentAnim = MathUtils.randomNum(0, 1);
+
+    this.currentGameAnim = this.gameAmins[currentAnim];
+
     setTimeout(() => {
       this.rbTreeGameCanvasAnimHost = this.$refs.rbTreeGameCanvasAnimHost as ICanvasAnimHost;
       this.sortGameCanvasAnimHost = this.$refs.sortGameCanvasAnimHost as ICanvasAnimHost;
       this.blackholeGameCanvasAnimHost = this.$refs.blackholeGameCanvasAnimHost as ICanvasAnimHost;
       this.clockGameCanvasAnimHost = this.$refs.clockGameCanvasAnimHost as ICanvasAnimHost;
-      this.gameProvider = this.sortGameProvider;
       this.gameProviders = [
         this.rbTreeGameProvider,
         this.sortGameProvider,
         this.blackholeGameProvider,
         this.clockGameProvider
-      ];
+      ]; 
+      this.gameProvider = this.gameProviders[currentAnim];
       this.rbTreeGameProvider.on('debugNextDataChanged', (a: number, b: number) => {
         this.rbTreeGameData.debugNextAddData = a;
         this.rbTreeGameData.debugNextDelData = b;

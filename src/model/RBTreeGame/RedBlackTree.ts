@@ -120,7 +120,7 @@ export class RedBlackTree extends EventEmitter {
    * 标记快照
    */
   private emitGenSnapShot(type: 'small'|'rotate'|'finish', mark: string) {
-    this.emit('genSnapshot', type, mark);
+    this.emit('genSnapshot', type, mark, this.step);
   }
   /**
    * 标记快照
@@ -132,11 +132,15 @@ export class RedBlackTree extends EventEmitter {
     }
   }
 
+  private step = '';
+
   /**
    * 插入
    * @param val 
    */
   public insert(val: number) : void {
+    this.step = `Insert ${val}`;
+
     const TAG = `[insert(${val})]`;
     const newNode = new RedBlackTreeNode();
 
@@ -335,6 +339,8 @@ export class RedBlackTree extends EventEmitter {
    * @param val 
    */
   public delete(val: number) : void {
+    this.step = `Delete ${val}`;
+
     const doDeleteNode = (deleteNode: RedBlackTreeNode) => {
       const TAG = (s: string) => `[delete.doDeleteNode(${deleteNode.value}):${s}]`;
 
@@ -370,9 +376,6 @@ export class RedBlackTree extends EventEmitter {
         const childNode = deleteNode.left ? deleteNode.left : deleteNode.right as RedBlackTreeNode;
         deleteNode.removeParentLink();
         this.removeFromAllNodes(deleteNode);
-
-        this.markNode(deleteNode, 'N', 4);
-        this.emitGenSnapShot('small', `${TAG('2')} UNLINK N(${deleteNode.value})`);
 
         if (parent) {
           parent.isLeft(deleteNode) ? 
@@ -445,7 +448,7 @@ export class RedBlackTree extends EventEmitter {
             //此时将S涂红，父节点作为新的平衡节点N，递归上去处理。
             brother.isBlack = false;
 
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(brother, 'B');
             this.emitGenSnapShot('small', `${TAG('2.1.1')} B(${brother.value})->red`);
 
@@ -456,7 +459,7 @@ export class RedBlackTree extends EventEmitter {
             brother.isBlack = false;
             parent.isBlack = true;
 
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(parent, 'P');
             this.markNode(brother, 'B');
             this.emitGenSnapShot('finish', `${TAG('2.1.2')} B(${brother.value})->red P(${parent.value})->black`);
@@ -469,7 +472,7 @@ export class RedBlackTree extends EventEmitter {
             const borderLeft = brother.left;
             this.rotateRight(parent);
 
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(parent, 'P', 3);
             this.emitGenSnapShot('rotate', `${TAG('2.2.1')} rotateRight(P(${parent.value}))`);
 
@@ -488,14 +491,14 @@ export class RedBlackTree extends EventEmitter {
             const borderRight = brother.right;
             this.rotateLeft(parent);
               
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(parent, 'P', 2);
             this.emitGenSnapShot('rotate', `${TAG('2.2.1.2')} rotateLeft(P(${parent.value}))`);
 
             this.exchangeNodeColor(parent, brother);
             borderRight.isBlack = true;
 
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(parent, 'P');
             this.markNode(brother, 'B');
             this.markNode(borderRight, 'BR');
@@ -507,7 +510,7 @@ export class RedBlackTree extends EventEmitter {
             const borderRight = brother.right;
             this.rotateLeft(brother);
 
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(brother, 'B', 2);
             this.emitGenSnapShot('rotate', `${TAG('2.2.2')} rotateLeft(B(${brother.value}))`);
 
@@ -515,7 +518,7 @@ export class RedBlackTree extends EventEmitter {
             if (borderRight)
               borderRight.isBlack = true;
 
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(brother, 'B');
             this.markNode(borderRight, 'BR');
             this.emitGenSnapShot('small', `${TAG('2.2.2')} B(${brother.value})->red BR(${borderRight?.value || 'null'})->black`);
@@ -528,7 +531,7 @@ export class RedBlackTree extends EventEmitter {
             const borderLeft = brother.left;
             this.rotateRight(brother);
 
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(brother, 'B', 3);
             this.emitGenSnapShot('rotate', `${TAG('2.2.2.2')} rotateRight(B(${brother.value}))`);
 
@@ -536,7 +539,7 @@ export class RedBlackTree extends EventEmitter {
             if (borderLeft)
               borderLeft.isBlack = true;
 
-            this.markNode(node, 'N', 4);
+            this.markNode(node, 'N', 1);
             this.markNode(brother, 'B');
             this.markNode(borderLeft, 'BL');
             this.emitGenSnapShot('small', `${TAG('2.2.2')} B(${brother.value})->red BL(${borderLeft?.value || 'null'})->black`);

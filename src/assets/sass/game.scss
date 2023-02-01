@@ -45,6 +45,10 @@
       > div {
         display: inline-block;
         max-width: 66%;
+
+        .title {
+          margin-top: 4px;
+        }
       }
       &.full > div {
         max-width: 100%;
@@ -147,6 +151,10 @@
   line-height: 15px;
   padding: 6px 10px;
   color: #000;
+  max-height: 100px;
+  overflow-y: scroll;
+
+  @include pc-fix-scrollbar-white();
 }
 .imengyu-icon-down {
   font-weight: normal;
