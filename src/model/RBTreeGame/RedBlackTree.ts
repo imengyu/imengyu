@@ -125,8 +125,11 @@ export class RedBlackTree extends EventEmitter {
   /**
    * 标记快照
    */
-  private markNode(node: RedBlackTreeNode, mark: 'N'|'P'|'GP'|'B'|'BL'|'BR'|'U'|'UL'|'UR') {
-    node.graphMark = mark;
+  private markNode(node: RedBlackTreeNode|null, mark: 'N'|'P'|'GP'|'B'|'BL'|'BR'|'U'|'UL'|'UR'|'C'|'CL'|'CR'|'R', markCur = 0) {
+    if (node) {
+      node.graphMark = mark;
+      node.graphMarkCur = markCur;
+    }
   }
 
   /**
@@ -134,7 +137,9 @@ export class RedBlackTree extends EventEmitter {
    * @param val 
    */
   public insert(val: number) : void {
+    const TAG = '[insert]';
     const newNode = new RedBlackTreeNode();
+
     newNode.value = val;
     newNode.isBlack = false; //新节点红色
     this.addToAllNodes(newNode);
@@ -145,7 +150,7 @@ export class RedBlackTree extends EventEmitter {
       newNode.isBlack = true;//根黑色
 
       this.markNode(newNode, 'N')
-      this.emitGenSnapShot('finish', `[insert] root = ${val}`);
+      this.emitGenSnapShot('finish', `${TAG} root = N(${val})`);
       return;
     } 
     
@@ -164,7 +169,7 @@ export class RedBlackTree extends EventEmitter {
 
           this.markNode(currFind, 'P');
           this.markNode(newNode, 'N');
-          this.emitGenSnapShot('small', `[insert] ${currFind.value}.left = ${val}`);
+          this.emitGenSnapShot('small', `${TAG} P(${currFind.value}).left = N(${val})`);
 
           currFind = null;//停止循环
         }
@@ -180,7 +185,7 @@ export class RedBlackTree extends EventEmitter {
 
           this.markNode(currFind, 'P');
           this.markNode(newNode, 'N');
-          this.emitGenSnapShot('small', `[insert] P(${currFind.value}).right = N(${val})`);
+          this.emitGenSnapShot('small', `${TAG} P(${currFind.value}).right = N(${val})`);
 
           currFind = null;//停止循环
         }
@@ -192,24 +197,26 @@ export class RedBlackTree extends EventEmitter {
     }
 
     const balanceNode = (node: RedBlackTreeNode) => {
-      this.markNode(node, 'N');
+      const TAG = (s: string) => `[insert.balanceNode(${node.value}):${s}]`;
 
       //插入情景1：红黑树为空树
       if (node === this.root) {
         node.isBlack = true;
 
-        this.emitGenSnapShot('finish', `[balanceNode:1:${node.value}] ${node.value}->black`);
+        this.markNode(node, 'N', 1);
+        this.emitGenSnapShot('finish', `${TAG('1')} N(${node.value})->black`);
         return;
       }
       if (node.parent == null)
-        throw new Error('node parent is null but not root!' + node);
+        throw new Error('node parent is null but not root!' + node.value);
       //获取父级
       const parent = node.parent as RedBlackTreeNode;
       if (parent.isBlack) {
         //插入情景3：插入结点的父结点为黑结点
         //由于插入的结点是红色的，并不会影响红黑树的平衡，直接插入即可，无需做自平衡。
 
-        this.emitGenSnapShot('finish', `[balanceNode:3:${node.value}] finish`);
+        this.markNode(node, 'N', 1);
+        this.emitGenSnapShot('finish', `${TAG('3')} finish`);
         return;
       } 
 
@@ -227,7 +234,8 @@ export class RedBlackTree extends EventEmitter {
         this.markNode(uncle, 'U');
         this.markNode(parent, 'P');
         this.markNode(grandpa, 'GP');
-        this.emitGenSnapShot('small', `[balanceNode:4.1:${node.value}] u:${uncle.value}->black p:${parent.value}->black gp:${grandpa.value}->red`);
+        this.markNode(node, 'N', 1);
+        this.emitGenSnapShot('small', `${TAG('4.1')} U(${uncle.value})->black P(${parent.value})->black GP(${grandpa.value})->red`);
         
         balanceNode(grandpa); //递归平衡祖父
       } else {
@@ -237,18 +245,28 @@ export class RedBlackTree extends EventEmitter {
           if (parent.isRight(node)) {
             parent.isBlack = true;
             grandpa.isBlack = false;
-            this.rotateLeft(grandpa);
 
             this.markNode(grandpa, 'GP');
             this.markNode(parent, 'P');
-            this.emitGenSnapShot('rotate', `[balanceNode:4.3.1:${node.value}] p:${parent.value}->black gp:${grandpa.value}->ref rotateLeft(gp:${grandpa.value})`);
+            this.markNode(node, 'N', 1);
+            this.emitGenSnapShot('rotate', `${TAG('4.3.1')} P(${parent.value})->black GP(${grandpa.value})->red`);
+
+            this.rotateLeft(grandpa);
+
+            this.markNode(grandpa, 'GP', 2);
+            this.markNode(node, 'N', 1);
+            this.emitGenSnapShot('rotate', `${TAG('4.3.1')} rotateLeft(GP(${grandpa.value}))`);
+
+            this.markNode(node, 'N', 1);
+            this.emitGenSnapShot('finish', `${TAG('4.3.1')} finish`);
           } 
           //插入情景4.3.2：插入结点是其父结点的左子结点
           else if (parent.isLeft(node)) {
             this.rotateRight(parent);
 
-            this.markNode(parent, 'P');
-            this.emitGenSnapShot('rotate', `[balanceNode:4.3.2:${node.value}] rotateRight(p:${parent.value})`);
+            this.markNode(parent, 'P', 3);
+            this.markNode(node, 'N', 1);
+            this.emitGenSnapShot('rotate', `${TAG('4.3.2')} rotateRight(P(${parent.value}))`);
 
             balanceNode(parent);
           }
@@ -258,18 +276,29 @@ export class RedBlackTree extends EventEmitter {
           if (parent.isLeft(node)) {
             parent.isBlack = true;
             grandpa.isBlack = false;
+            
+            this.markNode(parent, 'P');
+            this.markNode(grandpa, 'GP');
+            this.markNode(node, 'N', 1);
+            this.emitGenSnapShot('rotate', `${TAG('4.2.1')} P(${parent.value})->black GP(${grandpa.value})->red`);
+
             this.rotateRight(grandpa);
 
             this.markNode(parent, 'P');
-            this.markNode(grandpa, 'GP');
-            this.emitGenSnapShot('rotate', `[balanceNode:4.2.1:${node.value}] p:${parent.value}->black gp:${grandpa.value}->red rotateRight(gp:${grandpa.value})`);
+            this.markNode(grandpa, 'GP', 3);
+            this.markNode(node, 'N', 1);
+            this.emitGenSnapShot('rotate', `${TAG('4.2.1')} rotateRight(GP(${grandpa.value}))`);
+
+            this.markNode(node, 'N', 1);
+            this.emitGenSnapShot('finish', `${TAG('4.3.1')} finish`);
           } 
           //插入情景4.2.2：插入结点是其父结点的右子结点
           else if (parent.isRight(node)) {
             this.rotateLeft(parent);
 
-            this.markNode(parent, 'P');
-            this.emitGenSnapShot('rotate', `[balanceNode:4.2.2:${node.value}] rotateLeft(p:${parent.value})`);
+            this.markNode(parent, 'P', 2);
+            this.markNode(node, 'N', 1);
+            this.emitGenSnapShot('rotate', `${TAG('4.2.3')} rotateLeft(P(${parent.value}))`);
             
             balanceNode(parent);
           }
@@ -307,7 +336,11 @@ export class RedBlackTree extends EventEmitter {
    */
   public delete(val: number) : void {
     const doDeleteNode = (deleteNode: RedBlackTreeNode) => {
-      const TAG = (s: string) => `[delete.doDeleteNode:${s}:${deleteNode.value}]`;
+      const TAG = (s: string) => `[delete.doDeleteNode(${deleteNode.value}):${s}]`;
+
+      this.markNode(deleteNode, 'N', 4);
+      this.emitGenSnapShot('small', `${TAG('0')} MARK N{${deleteNode.value})`);
+      
       const parent = deleteNode.parent;
       //情景1：若删除结点无子结点
       if (deleteNode.left === null && deleteNode.right === null) {
@@ -317,13 +350,15 @@ export class RedBlackTree extends EventEmitter {
           deleteNode.removeParentLink();
           this.removeFromAllNodes(deleteNode);
 
-          this.emitGenSnapShot('small', `${TAG('1.1')} finish`);
+          this.markNode(deleteNode, 'N', 4);
+          this.emitGenSnapShot('small', `${TAG('1.1')} UNLINK N(${deleteNode.value})`);
         } else {
           //删除节点如果为红色，直接删除即可，不会影响黑色节点的数量；
           deleteNode.removeParentLink();
           this.removeFromAllNodes(deleteNode);
 
-          this.emitGenSnapShot('small', `${TAG('1.2')} finish`);
+          this.markNode(deleteNode, 'N', 4);
+          this.emitGenSnapShot('small', `${TAG('1.2')} UNLINK N(${deleteNode.value})`);
         }
       } 
       //情景2：删除结点只有一个子节点时，删除节点只能是黑色，其子节点为红色，
@@ -336,6 +371,9 @@ export class RedBlackTree extends EventEmitter {
         deleteNode.removeParentLink();
         this.removeFromAllNodes(deleteNode);
 
+        this.markNode(deleteNode, 'N', 4);
+        this.emitGenSnapShot('small', `${TAG('2')} UNLINK N{${deleteNode.value})`);
+
         if (parent) {
           parent.isLeft(deleteNode) ? 
             parent.setLeftChild(childNode) :
@@ -345,10 +383,17 @@ export class RedBlackTree extends EventEmitter {
           childNode.removeParentLink();
         }
 
+        if (parent)
+          this.markNode(parent, 'P');
+        this.markNode(childNode, 'C');
+        this.markNode(deleteNode, 'N', 4);
+        this.emitGenSnapShot('small', `${TAG('2')} ${parent ? `P(${parent.value}).child` : 'root'} = C(${childNode.value})`);
+
         //涂黑
         childNode.isBlack = true;
         
-        this.emitGenSnapShot('small', `${TAG('2')} finish`);
+        this.markNode(childNode, 'C');
+        this.emitGenSnapShot('small', `${TAG('2')} C(${childNode.value})->black`);
       }
       //情景3：有两个子节点时，与二叉搜索树一样，使用后继节点作为替换的
       //删除节点，情形转至为1或2处理。
@@ -364,19 +409,23 @@ export class RedBlackTree extends EventEmitter {
         
         //交换后继节点
         this.exchangeNodeValue(deleteNode, currFind);
-        
-        this.emitGenSnapShot('small', `${TAG('3')} exchangeNodeValue(d:${deleteNode.value}, r:${currFind.value}) finish`);
+
+        this.markNode(deleteNode, 'N', 4);
+        this.markNode(currFind, 'R');
+        this.emitGenSnapShot('small', `${TAG('3')} N(${deleteNode.value}) <--> R(${currFind.value})`);
         
         //情形转至为1或2处理
         doDeleteNode(currFind);
       }
     }
     const doBalanceNode = (node: RedBlackTreeNode) => {
-      const TAG = (s: string) => `[delete.doBalanceNode:${s}:${node.value}]`;
+      const TAG = (s: string) => `[delete.doBalanceNode(${node.value}):${s}]`;
 
       //情形1 当前节点为根节点（父节点为NULL）
       if (node === this.root) {
         this.root = null;
+
+        this.emitGenSnapShot('finish', `${TAG('1')} root = null`);
         return;
       }
       
@@ -396,7 +445,9 @@ export class RedBlackTree extends EventEmitter {
             //此时将S涂红，父节点作为新的平衡节点N，递归上去处理。
             brother.isBlack = false;
 
-            this.emitGenSnapShot('small', `${TAG('2.1.1')} b:${brother.value}->red`);
+            this.markNode(node, 'N', 4);
+            this.markNode(brother, 'B');
+            this.emitGenSnapShot('small', `${TAG('2.1.1')} B(${brother.value})->red`);
 
             doBalanceNode(parent);
           } else {
@@ -405,7 +456,10 @@ export class RedBlackTree extends EventEmitter {
             brother.isBlack = false;
             parent.isBlack = true;
 
-            this.emitGenSnapShot('finish', `${TAG('2.1.2')} b:${brother.value}->red p:${parent.value}->black`);
+            this.markNode(node, 'N', 4);
+            this.markNode(parent, 'P');
+            this.markNode(brother, 'B');
+            this.emitGenSnapShot('finish', `${TAG('2.1.2')} B(${brother.value})->red P(${parent.value})->black`);
           }
         } else {
           //情形2.2 兄弟的子节点不全黑
@@ -415,12 +469,18 @@ export class RedBlackTree extends EventEmitter {
             const borderLeft = brother.left;
             this.rotateRight(parent);
 
-            this.emitGenSnapShot('small', `${TAG('2.2.1')} rotateRight(p:${parent.value})`);
+            this.markNode(node, 'N', 4);
+            this.markNode(parent, 'P', 3);
+            this.emitGenSnapShot('small', `${TAG('2.2.1')} rotateRight(P(${parent.value}))`);
 
             this.exchangeNodeColor(parent, brother);
             borderLeft.isBlack = true;
 
-            this.emitGenSnapShot('finish', `${TAG('2.2.1')} exchangeNodeColor(p:${parent.value}, b:${brother.value}) bl:${borderLeft.prev}->black`);
+            this.markNode(node, 'N', 4);
+            this.markNode(parent, 'P');
+            this.markNode(brother, 'B');
+            this.markNode(borderLeft, 'BL');
+            this.emitGenSnapShot('finish', `${TAG('2.2.1')} P(${parent.value}).color <--> B(${brother.value}).color BL(${borderLeft.value})->black`);
           }
           else if (parent.isRight(brother) && (brother.right && !brother.right.isBlack)) {
             //对称的情形(2)：S为黑色，S为右子，SR红时：
@@ -428,23 +488,37 @@ export class RedBlackTree extends EventEmitter {
             const borderRight = brother.right;
             this.rotateLeft(parent);
               
-            this.emitGenSnapShot('small', `${TAG('2.2.1.2')} rotateLeft(p:${parent.value})`);
+            this.markNode(node, 'N', 4);
+            this.markNode(parent, 'P', 2);
+            this.emitGenSnapShot('small', `${TAG('2.2.1.2')} rotateLeft(P(${parent.value}))`);
 
             this.exchangeNodeColor(parent, brother);
             borderRight.isBlack = true;
 
-            this.emitGenSnapShot('finish', `${TAG('2.2.1.2')} exchangeNodeColor(p:${parent.value}, b:${brother.value}) br:${borderRight.prev}->black`);
+            this.markNode(node, 'N', 4);
+            this.markNode(parent, 'P');
+            this.markNode(brother, 'B');
+            this.markNode(borderRight, 'BR');
+            this.emitGenSnapShot('finish', `${TAG('2.2.1.2')} P(${parent.value}).color <--> B(${brother.value}).color BR(${borderRight.prev})->black`);
           }
           else if (parent.isLeft(brother) && (!brother.left || brother.left.isBlack)) {
             //情形2.2.2 S为左子，SL黑；S为右子，SR黑
             //以S为支点左旋，交换S和SR颜色（SR涂黑，S涂红） ，此时转至情形2.2.1-(1) S左-SL红 进行处理。
             const borderRight = brother.right;
             this.rotateLeft(brother);
+
+            this.markNode(node, 'N', 4);
+            this.markNode(brother, 'B', 2);
+            this.emitGenSnapShot('small', `${TAG('2.2.2')} rotateLeft(B(${brother.value}))`);
+
             brother.isBlack = false;
             if (borderRight)
               borderRight.isBlack = true;
 
-            this.emitGenSnapShot('small', `${TAG('2.2.2')} rotateLeft(b:${brother.value}) b:${brother.value}->red br:${borderRight?.value || 'null'}->black`);
+            this.markNode(node, 'N', 4);
+            this.markNode(brother, 'B');
+            this.markNode(borderRight, 'BR');
+            this.emitGenSnapShot('small', `${TAG('2.2.2')} B(${brother.value})->red BR(${borderRight?.value || 'null'})->black`);
 
             doBalanceNode(node);
           }
@@ -453,11 +527,19 @@ export class RedBlackTree extends EventEmitter {
             //以S为支点右旋，交换S和SL颜色（SL涂黑，S涂红），此时转至2.2.1-(1) S右-SR红进行处理。
             const borderLeft = brother.left;
             this.rotateRight(brother);
+
+            this.markNode(node, 'N', 4);
+            this.markNode(brother, 'B', 3);
+            this.emitGenSnapShot('small', `${TAG('2.2.2.2')} rotateRight(B(${brother.value}))`);
+
             brother.isBlack = false;
             if (borderLeft)
               borderLeft.isBlack = true;
 
-            this.emitGenSnapShot('small', `${TAG('2.2.2.2')} rotateRight(b:${brother.value}) b:${brother.value}->red bl:${borderLeft?.value || 'null'}->black`);
+            this.markNode(node, 'N', 4);
+            this.markNode(brother, 'B');
+            this.markNode(borderLeft, 'BL');
+            this.emitGenSnapShot('small', `${TAG('2.2.2')} B(${brother.value})->red BL(${borderLeft?.value || 'null'})->black`);
 
             doBalanceNode(node);
           }
@@ -468,16 +550,32 @@ export class RedBlackTree extends EventEmitter {
         //情形3 兄弟节点为红色
         if (parent.isLeft(brother)) {
           this.rotateRight(parent);
+
+          this.markNode(node, 'N', 4);
+          this.markNode(parent, 'P', 3);
+          this.emitGenSnapShot('small', `${TAG('3.1')} rotateRight(P(${parent.value}))`);
+
           this.exchangeNodeColor(parent, brother);
     
-          this.emitGenSnapShot('small', `${TAG('3.1')} rotateRight(p:${parent.value}) exchangeNodeColor(p:${parent.value}, b:${brother.value})`);
+          this.markNode(node, 'N', 4);
+          this.markNode(parent, 'P');
+          this.markNode(brother, 'B');
+          this.emitGenSnapShot('small', `${TAG('3.1')} P(${parent.value}).color <--> B(${brother.value}).color`);
 
           doBalanceNode(node);
         } else if (parent.isRight(brother)) {
           this.rotateLeft(parent);
+
+          this.markNode(node, 'N', 4);
+          this.markNode(parent, 'P', 2);
+          this.emitGenSnapShot('small', `${TAG('3.2')} rotateLeft(P(${parent.value}))`);
+
           this.exchangeNodeColor(parent, brother);
 
-          this.emitGenSnapShot('small', `${TAG('3.2')} rotateLeft(p:${parent.value}) exchangeNodeColor(p:${parent.value}, b:${brother.value})`);
+          this.markNode(node, 'N', 4);
+          this.markNode(parent, 'P');
+          this.markNode(brother, 'B');
+          this.emitGenSnapShot('small', `${TAG('3.2')} P(${parent.value}).color <--> B(${brother.value}).color`);
 
           doBalanceNode(node);
         }
@@ -520,6 +618,7 @@ export class RedBlackTreeNode {
 
   public isMark = false;
   public graphMark = '';
+  public graphMarkCur = 0;
 
 
   /**

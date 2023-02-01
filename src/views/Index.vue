@@ -98,7 +98,11 @@
             <span @click="rbTreeGameProvider.debugDeleteData(debugNextDelData)">&lt; 删除数据</span>
             <input v-model="debugNextDelData" />
           </div>
-          <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.nextSnapShot()">下一帧 {{ snapshotIndex }}/{{ treeSnapshots }}</div>
+          <div class="flex-row">
+            <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.prevSnapShot()">&lt;</div>
+            <div class="imengyu-icon-sort-text small">{{ snapshotIndex }}/{{ treeSnapshots }}</div>
+            <div class="imengyu-go-button mt-0" @click="rbTreeGameProvider.nextSnapShot()">下一帧 &gt;</div>
+          </div>
         </div>
       </div>
       <div v-if="currentGameAnim == 'clock'" class="item">

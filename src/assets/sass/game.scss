@@ -84,7 +84,7 @@
   input[type="range"] {
     display: inline-block;
     vertical-align: middle;
-    -webkit-appearance: none;
+    appearance: none;
 
     &.vol {
       width: calc(100% - 55px);
@@ -171,6 +171,9 @@
   max-width: 200px;
   text-overflow: ellipsis;
 
+  &.small {
+    font-size: 12px;
+  }
   &.spectrum {
     overflow: hidden;
     font-size: 12px;

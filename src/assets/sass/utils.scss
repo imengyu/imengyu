@@ -142,6 +142,14 @@
   cursor: pointer;
 }
 
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
 
 @media only screen and (max-width: 500px) { 
   .hide-sm {

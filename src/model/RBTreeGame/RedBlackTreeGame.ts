@@ -106,6 +106,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
       snapshotNode.value = node.value;
       snapshotNode.isBlack = node.isBlack;
       snapshotNode.gameData.nodeMark = node.graphMark; node.graphMark = '';
+      snapshotNode.gameData.nodeMarkCur = node.graphMarkCur; node.graphMarkCur = 0;
       snapshotNode.gameData.color = node.isBlack ? 0 : 255;
       snapshotNode.gameData.opacity = 1;
       snapshotNode.gameData.generateHeight = height;
@@ -215,6 +216,8 @@ export class RedBlackTreeGame extends CanvasGameProvider {
         x: w2 + w2 * node.gameData.generatePositionX,
         y: h2 / 2 + h2 * node.gameData.generatePositionY,
       }
+      const mark = node.gameData.nodeMark;
+      const nodeMarkCur = node.gameData.nodeMarkCur;
 
       ctx.globalAlpha = 1;
       
@@ -245,10 +248,41 @@ export class RedBlackTreeGame extends CanvasGameProvider {
       ctx.fillStyle = '#fff'
       ctx.fillText(node.value.toString(), nodeRealpos.x, nodeRealpos.y + 4, 10);
 
-      const mark = node.gameData.nodeMark;
       if (mark) {
-        if (mark === 'N') {
+        if (nodeMarkCur === 1) {
           ctx.strokeStyle = '#f60';
+          ctx.beginPath();
+          ctx.arc(nodeRealpos.x, nodeRealpos.y, 14, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        else if (nodeMarkCur === 2) {
+          ctx.strokeStyle = '#26a';
+          ctx.beginPath();
+          ctx.arc(nodeRealpos.x, nodeRealpos.y, 14, Math.PI, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(nodeRealpos.x - 12,nodeRealpos.y);
+          ctx.lineTo(nodeRealpos.x - 16,nodeRealpos.y);
+          ctx.lineTo(nodeRealpos.x - 14,nodeRealpos.y + 3);
+          ctx.closePath();
+          ctx.stroke();
+        }
+        else if (nodeMarkCur === 3) {
+          ctx.strokeStyle = '#26a';
+          ctx.beginPath();
+          ctx.arc(nodeRealpos.x, nodeRealpos.y, 14, Math.PI, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(nodeRealpos.x + 12,nodeRealpos.y);
+          ctx.lineTo(nodeRealpos.x + 16,nodeRealpos.y);
+          ctx.lineTo(nodeRealpos.x + 14,nodeRealpos.y + 3);
+          ctx.closePath();
+          ctx.stroke();
+        }
+        else if (nodeMarkCur === 4) {
+          ctx.strokeStyle = '#000';
           ctx.beginPath();
           ctx.arc(nodeRealpos.x, nodeRealpos.y, 14, 0, Math.PI * 2);
           ctx.stroke();
@@ -258,7 +292,6 @@ export class RedBlackTreeGame extends CanvasGameProvider {
         ctx.fillStyle = '#000';
         ctx.fillText(mark, nodeRealpos.x + 30, nodeRealpos.y + 5);
       }
-
     }
   }
 
@@ -310,6 +343,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
       currNode = currNode.next2;
     }
 
+    current.isDiffPatched = true;
   }
   //查找快照树指定节点
   private findTreeSnapshotAllNodes(root: TreeSnapshotNode|null, value : number) {
@@ -390,26 +424,44 @@ export class RedBlackTreeGame extends CanvasGameProvider {
 
   //下一帧
   public nextSnapShot() {
-
     if (this.snapshotIndex < this.treeSnapshots.length - 1) {
       this.snapshotIndex++;
 
-      //与上一个快照帧做比较
-      this.diffTreeSnapshot(
-        this.treeSnapshots[this.snapshotIndex - 1],
-        this.treeSnapshots[this.snapshotIndex],
-        this.treeSnapshots[this.snapshotIndex + 1] || null,
-      );
-
+      if (!this.treeSnapshots[this.snapshotIndex].isDiffPatched) {
+        //与上一个快照帧做比较
+        this.diffTreeSnapshot(
+          this.treeSnapshots[this.snapshotIndex - 1],
+          this.treeSnapshots[this.snapshotIndex],
+          this.treeSnapshots[this.snapshotIndex + 1] || null,
+        );
+      }
 
       this.treeSnapshotCurrent = this.treeSnapshots[this.snapshotIndex];
-      console.log(this.treeSnapshotCurrent);
+      this.emitSnapshotIndexChange();
+    }
+  }
+  //上一帧
+  public prevSnapShot() {
+    if (this.snapshotIndex > 0) {
+      this.snapshotIndex--;
+      this.treeSnapshotCurrent = this.treeSnapshots[this.snapshotIndex];
       this.emitSnapshotIndexChange();
     }
   }
 
+  //生成一次循环帧数据
+  public genDataPage() {
+    this.pushData(2);
+    this.pushData(1);
+    this.pushData(3);
+    this.deleteData(1);
+    this.deleteData(2);
+    //for (let i = 0; i < 16; i++) 
+    //  Math.random() > 0.7 ? this.pushData() : this.deleteData();
+  }
+
   private emitSnapshotIndexChange() {
-    this.emit('snapshotIndexChange', this.snapshotIndex, this.treeSnapshots.length);
+    this.emit('snapshotIndexChange', this.snapshotIndex, this.treeSnapshots.length - 1);
   }
 
   //基础控制函数
@@ -422,8 +474,7 @@ export class RedBlackTreeGame extends CanvasGameProvider {
     this.ctx.font = '13px Arail';
     this.canvas = canvas;
     this.genData();
-    for (let i = 0; i < 16; i++)
-      this.pushData();
+    this.genDataPage();
     this.getDebugNextData();
     
   }
@@ -458,6 +509,7 @@ export class TreeSnapshot {
   public mark: string;
   public root : TreeSnapshotNode|null;
   public timeLive : number;
+  public isDiffPatched = false;
   /**
    * next
    */
@@ -497,6 +549,14 @@ export class RedBlackTreeGameNodeData {
   opacity = 1;
   color = 1;
   nodeMark = '';
+  /*
+  0 none 
+  1 cur 
+  2 rotate left cur 
+  3 rotate right cur
+  4 delete cur
+  */
+  nodeMarkCur = 0;
 
   targetPositionX = null as null|number;
   targetPositionY = null as null|number;
