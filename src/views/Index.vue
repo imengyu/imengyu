@@ -118,6 +118,14 @@
           </div>
         </div>
       </div>
+      <div v-if="currentGameAnim == 'rbtree'" class="item">
+        <span></span>
+        <div class="imengyu-icon-sort-info">
+          <div>控制说明：</div>
+          <div>你可通过上方的 “自动/手动” 按钮切换自动模式，手动模式下你可以一帧一帧前进/后退，你可以通过它仔细观察清楚红黑树每个操作节点的变化。</div>
+        </div>
+      </div>
+
       <div v-if="currentGameAnim == 'clock'" class="item">
         <span>模式</span>
         <div>
@@ -146,6 +154,10 @@
       </div>
       <div v-if="currentGameAnim == 'sort'" class="item">
         <span></span>
+        <div class="imengyu-icon-sort-info">
+          <div>控制说明：</div>
+          <div>你可通过上方的 “排序方法” 选择框选择不同的排序动画。点击下方的“音乐”按钮可以选择一个本地音乐播放，让数据图表跟着音乐跳动。</div>
+        </div>
         <div v-show="sortGameProvider.currentSortMethod != 'spectrum' && sortGameProvider.currentSortMethod != ''"
           class="imengyu-icon-sort-info">
           <div>Data count: {{ sortGameProvider.dataCount }}</div>
